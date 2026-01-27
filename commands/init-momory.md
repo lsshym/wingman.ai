@@ -1,4 +1,4 @@
-# Initialize Memory Bank (Full Logic + Rule/Handoff - EN)
+# Initialize Memory Bank
 
 **System Role**: You are a scaffolding tool.
 **Task**: Create the required files strictly based on the configuration variables defined below. Do not generate conversational text.
@@ -47,13 +47,13 @@ Ensure these directories exist:
 (Replace `{MEMORY_PATH}` with the actual value of **VAR_MEMORY_DIR**)
 '''markdown
 ---
-description: Memory Bank Driver
+description: Memory Bank Driver (记忆库驱动)
 globs: **/*
 alwaysApply: true
 ---
 # MEMORY BANK DRIVER
 
-## RULE
+## RULE (核心规则)
 1. **🧠 READ CONTEXT**: At the start of EVERY session, read `{MEMORY_PATH}/activeContext.md`.
 2. **🛑 ENFORCE PATTERNS**: Before generating code, check the `Critical Rules & Patterns` section in `activeContext.md`. You MUST follow these architectural constraints (e.g., security wrappers, specific hooks) even if the user doesn't mention them.
 3. **🔌 UPDATE HANDOFF**: Before ending a session or when context shifts, update the `Session Handoff` section. Summarize strictly what is needed for the *next* conversation to continue seamlessly.
@@ -61,43 +61,43 @@ alwaysApply: true
 
 ---
 
-## Step 4: Create Project Brief (Template)
+## Step 4: Create Project Brief (Chinese Content)
 **File Path**: **VAR_MEMORY_DIR** + `/projectBrief.md`
 **Content**:
 '''markdown
-# Project Brief
+# Project Brief (项目概况)
 
-## Tech Stack
-- Framework: 
-- Language: 
-- Styling: 
-- State Management: 
+## 2. 核心技术栈
+- 前端框架: 
+- 语言: 
+- 样式: 
+- 状态管理: 
 
-## Core Conventions
-- **Structure**: 
-- **Naming**: PascalCase for components, camelCase for functions.
-- **Strict Rules**: No `any` type; No inline styles.
+## 3. 核心开发规范
+- **文件结构**: 
+- **命名规范**: 组件使用 PascalCase，函数使用 camelCase。
+- **严禁事项**: 严禁使用 `any` 类型；严禁在组件内直接写行内样式。
 '''
 
 ---
 
-## Step 5: Create Active Context (Rule & Handoff Template)
+## Step 5: Create Active Context (Chinese Content - Rule & Handoff)
 **File Path**: **VAR_MEMORY_DIR** + `/activeContext.md`
 **Content**:
 '''markdown
-# 🧠 Active Memory & Constraints
+# 🧠 Active Memory & Constraints (核心记忆与约束)
 
-## 🛑 Critical Rules & Patterns
-- **[Architectural Constraints]**: 
+## 🛑 Critical Rules & Patterns (强制规范与踩坑记录)
+- **[架构约束]**: 
 
-## 🔌 Session Handoff
-- **[Current Context]**: 
+## 🔌 Session Handoff (会话交接)
+- **[当前上下文]**: 
 
-## 💡 Pending Ideas
+## 💡 Pending Ideas (待办思路)
 - 
 '''
 
 ---
 
 ## Step 6: Finish
-Output exactly: "✅ Memory Bank initialized (Dynamic Logic + Handoff Template)."
+Output exactly: "✅ Memory Bank initialized (Dynamic Logic + Chinese Content)."
