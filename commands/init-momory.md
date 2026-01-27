@@ -1,55 +1,36 @@
-# Initialize Memory Bank Scaffolding
+# Initialize Memory Bank (Rule & Handoff Version)
 
 **System Role**: You are a scaffolding tool.
-**Task**: Create the required files strictly based on the configuration variables. Do not generate conversational text.
+**Task**: Create the required files strictly based on the configuration variables.
 
 ---
 
-## Step 0: CONFIGURATION (VARIABLES)
-**Action**: Parse the user's input command to set **VAR_TAG**.
-1. If user typed `/init <name>` (e.g., `/init azu`), set **VAR_TAG** = "<name>".
-2. If user typed `/init` (no argument), set **VAR_TAG** = "".
-
-> IF (**VAR_TAG** != ""):
->    **VAR_MEMORY_DIR** = `.cursor/memory-` + **VAR_TAG**
->    **VAR_RULE_FILE** = `.cursor/rules/memory-` + **VAR_TAG** + `.mdc`
-> ELSE:
->    **VAR_MEMORY_DIR** = `.cursor/memory`
->    **VAR_RULE_FILE** = `.cursor/rules/memory-bank.mdc`
+## Step 0: CONFIGURATION
+**VAR_MEMORY_DIR** = `.cursor/memory`
+**VAR_RULE_FILE** = `.cursor/rules/memory-bank.mdc`
 
 ---
 
-## Step 1: Secure in .gitignore (Priority)
-**Condition**: EXECUTE ONLY IF **VAR_TAG** IS NOT EMPTY.
-(If **VAR_TAG** is empty, skip this step entirely, as the default configuration should not be ignored).
-
-**Action**:
-1. Check if `.gitignore` exists in the project root.
-2. **If it does not exist**: Create an empty `.gitignore` file first.
-3. **Then**: Append the following lines to `.gitignore`.
-
-**Content to Append**:
-(Replace `{MEMORY_DIR}` and `{RULE_FILE}` with actual values)
+## Step 1: Secure in .gitignore
+**Condition**: Check if `.gitignore` exists. If not, create it.
+**Action**: Append the following lines:
 '''gitignore
-
-# --- Cursor Memory Bank ({MEMORY_DIR}) ---
-{MEMORY_DIR}/
-{RULE_FILE}
+# --- Cursor Memory Bank ---
+.cursor/memory/
 '''
 
 ---
 
 ## Step 2: Structure Setup
-Ensure these directories exist:
+Ensure directories exist:
 - `.cursor/rules/`
-- **VAR_MEMORY_DIR**
+- `.cursor/memory/`
 
 ---
 
 ## Step 3: Create Driver Rule
 **File Path**: **VAR_RULE_FILE**
 **Content**:
-(Replace `{MEMORY_PATH}` with the actual value of **VAR_MEMORY_DIR**)
 '''markdown
 ---
 description: Memory Bank Driver
@@ -59,53 +40,48 @@ alwaysApply: true
 # MEMORY BANK DRIVER
 
 ## RULE
-1. **READ**: Always read `{MEMORY_PATH}/activeContext.md` at the start of a session.
-2. **CHECK**: Refer to `{MEMORY_PATH}/projectBrief.md` for technical constraints.
+1. **🧠 READ CONTEXT**: At the start of EVERY session, read `.cursor/memory/activeContext.md`.
+2. **🛑 ENFORCE PATTERNS**: Before generating code, check the `Critical Rules & Patterns` section in `activeContext.md`. You MUST follow these architectural constraints (e.g., security wrappers, specific hooks) even if the user doesn't mention them.
+3. **🔌 UPDATE HANDOFF**: Before ending a session or when context shifts, update the `Session Handoff` section. Summarize strictly what is needed for the *next* conversation to continue seamlessly.
 '''
 
 ---
 
-## Step 4: Create Project Brief (Template)
+## Step 4: Create Project Brief (Static)
 **File Path**: **VAR_MEMORY_DIR** + `/projectBrief.md`
 **Content**:
 '''markdown
-## 2. 核心技术栈 (看情况使用)
-- 前端框架: 
-- 语言: 
-- 样式: 
-- 状态管理: 
-- 后端/API: 
+# Project Brief
 
-## 3. 核心开发规范
-- **文件结构**: 
-- **命名规范**: 组件使用 PascalCase，函数使用 camelCase。
-- **严禁事项**: 严禁使用 `any` 类型；严禁在组件内直接写行内样式。
+## Tech Stack
+- Framework: 
+- Language: 
+- Styling: 
+
+## Core Conventions
+- **Naming**: PascalCase for components.
+- **Structure**: 
 '''
 
 ---
 
-## Step 5: Create Active Context (User Template)
+## Step 5: Create Active Context (Rule & Handoff)
 **File Path**: **VAR_MEMORY_DIR** + `/activeContext.md`
 **Content**:
 '''markdown
-# ⚡️ Active Context (工作现场)
+# 🧠 Active Memory & Constraints
 
-Last Updated: 
+## 🛑 Critical Rules & Patterns (强制规范与踩坑记录)
+- **[规范]**: 
 
-## 📍 Current Focus (当前聚焦)
+## 🔌 Session Handoff (会话交接)
+- **[当前上下文]**: 
 
-- [ ] 
-
-## 🚧 Progress Status (进度状态)
-
-- [ ] 
-- [ ] 
-
-## 🧠 Memory Dump (关键记忆快照)
-
+## 💡 Pending Ideas (待办思路)
+- 
 '''
 
 ---
 
 ## Step 6: Finish
-Output exactly: "✅ Memory Bank structure created. Gitignore updated (if applicable)."
+Output: "✅ Memory Bank initialized with [Rule & Handoff] template."
