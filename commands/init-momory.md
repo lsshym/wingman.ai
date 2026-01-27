@@ -1,4 +1,4 @@
-# Initialize Memory Bank
+# Initialize Memory Bank (Final Hybrid Version)
 
 **System Role**: You are a scaffolding tool.
 **Task**: Create the required files strictly based on the configuration variables defined below. Do not generate conversational text.
@@ -41,7 +41,7 @@ Ensure these directories exist:
 
 ---
 
-## Step 3: Create Driver Rule
+## Step 3: Create Driver Rule (Enhanced)
 **File Path**: **VAR_RULE_FILE**
 **Content**:
 (Replace `{MEMORY_PATH}` with the actual value of **VAR_MEMORY_DIR**)
@@ -54,9 +54,11 @@ alwaysApply: true
 # MEMORY BANK DRIVER
 
 ## RULE (核心规则)
-1. **🧠 READ CONTEXT**: At the start of EVERY session, read `{MEMORY_PATH}/activeContext.md`.
-2. **🛑 ENFORCE PATTERNS**: Before generating code, check the `Critical Rules & Patterns` section in `activeContext.md`. You MUST follow these architectural constraints (e.g., security wrappers, specific hooks) even if the user doesn't mention them.
-3. **🔌 UPDATE HANDOFF**: Before ending a session or when context shifts, update the `Session Handoff` section. Summarize strictly what is needed for the *next* conversation to continue seamlessly.
+1. **🧠 READ (读取上下文)**: At the start of EVERY session, **read** `{MEMORY_PATH}/activeContext.md`.
+2. **🛑 ENFORCE (强制规范)**: Before generating code, **check** the `Critical Rules & Patterns` section in `activeContext.md`. You MUST follow these architectural constraints even if not explicitly prompted.
+3. **📝 UPDATE (动态更新)**: After a significant task or before ending a session, **you must edit** `{MEMORY_PATH}/activeContext.md`:
+   - If you discovered a new pattern or pitfall, update **[Critical Rules]**.
+   - If ending the session, update **[Session Handoff]** for the next context.
 '''
 
 ---
@@ -67,13 +69,13 @@ alwaysApply: true
 '''markdown
 # Project Brief (项目概况)
 
-## 2. 核心技术栈
+## 2. Core Tech Stack (核心技术栈)
 - 前端框架: 
 - 语言: 
-- 样式: 
+- 样式方案: 
 - 状态管理: 
 
-## 3. 核心开发规范
+## 3. Core Conventions (核心规范)
 - **文件结构**: 
 - **命名规范**: 组件使用 PascalCase，函数使用 camelCase。
 - **严禁事项**: 严禁使用 `any` 类型；严禁在组件内直接写行内样式。
@@ -100,4 +102,4 @@ alwaysApply: true
 ---
 
 ## Step 6: Finish
-Output exactly: "✅ Memory Bank initialized (Dynamic Logic + Chinese Content)."
+Output exactly: "✅ Memory Bank initialized (Hybrid Version with Enhanced Update Rules)."
