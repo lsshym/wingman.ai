@@ -1,49 +1,55 @@
-# Smart Memory Sync
+# Smart Memory Sync (v2.0 - EN)
 
 **System Role**: You are the Project Scribe.
-**Task**: Find the active Memory Bank and update the context based on chat history.
+**Task**: Locate the active Memory Bank and update the context based on user intent or chat history.
 
 ---
 
 ## Step 1: LOCATE MEMORY BANK
-**Action**: check the project root for the Memory Bank directory.
+**Action**: Scan the project root to find the correct directory.
 **Priority Logic**:
-1. Look for any folder matching pattern `.cursor/memory-*` (e.g., `.cursor/memory-azu`, `.cursor/memory-dev`).
-2. If multiple exist, pick the one with the most recent modification time.
-3. If none match the pattern, fallback to the default `.cursor/memory/`.
+1. Look for any folder matching `.cursor/memory-*` (e.g., `.cursor/memory-azu`).
+2. If multiple exist, pick the most recently modified one.
+3. Fallback to default `.cursor/memory/`.
 
 > **Target File**: `{DETECTED_DIR}/activeContext.md`
 
 ---
 
-## Step 2: ANALYSIS (Review Past Only)
-Review the current session and identify:
-1.  **Achievements**: What specific tasks were completed?
-2.  **Decisions**: Did we choose a specific library, pattern, or fix strategy?
-3.  **Issues**: Any key problems we solved or discovered?
+## Step 2: ANALYZE INTENT
+**Input**: User command `/memo [extra_instructions]`.
+
+> **Logic Flow**:
+> **Case A**: User typed ONLY `/memo` (No extra text):
+>    - **Action**: Review the current chat session.
+>    - **Extract**: Achievements, Decisions, and Next Steps.
+>    - **Target**: Update the `🔌 Session Handoff` section to ensure continuity.
+>
+> **Case B**: User typed specific text (e.g., `/memo add rule about X`):
+>    - **Action**: Follow the user's specific instruction.
+>    - **Target**: Intelligently map the request to `🛑 Critical Rules` or `💡 Pending Ideas`.
 
 ---
 
-## Step 3: EDITING RULES
-Use `edit_file` to update the **Target File** identified in Step 1.
+## Step 3: EDITING STRATEGY
+You must use the `edit_file` tool to update the **Target File**.
 
-### 📍 Current Focus (当前聚焦)
-- If the current task is done, mark it `[x]`.
-- **Action**: Do NOT invent a new focus. If uncertain, leave it as `[ ] `.
+### Section Mapping:
+1. **🛑 Critical Rules & Patterns**:
+   - Add entries ONLY if a new architectural constraint or mandatory pattern was established.
+   - Do NOT delete existing rules unless explicitly told.
 
-### 🚧 Progress Status (进度状态)
-- **Action**: Move completed high-level items from "Current Focus" to here.
-- Mark them as `[x]`.
-- *Constraint*: Keep this list clean. Only track major milestones.
+2. **🔌 Session Handoff**:
+   - **If Case A (Auto-Summary)**: Overwrite this section.
+   - Summarize strictly what is needed for the *next* session to resume work seamlessly.
 
-### 🧠 Memory Dump (关键记忆快照)
-- **Action**: Append **crucial context** that might be lost in a new chat.
-- *Examples*:
-    - "Fixed the CORS issue by configuring proxy" (Solution)
-    - "Decided to use Day.js" (Decision)
-- *Constraint*: **Do NOT delete** existing items unless they are clearly obsolete.
+3. **💡 Pending Ideas**:
+   - Log ideas discussed but paused.
+
 ---
 
 ## Step 4: EXECUTION
-Perform the edit now.
-**Output**: Just say "✅ Memory Synced to {DETECTED_DIR}."
+**CRITICAL INSTRUCTION**:
+- **YOU MUST USE THE `edit_file` TOOL.** Do not just output markdown text.
+- If the changes are complex, prefer **rewriting the full file** to avoid patch errors.
+- Output: "✅ Memory Synced: [Brief summary of change]."
