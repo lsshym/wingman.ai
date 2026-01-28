@@ -33,15 +33,21 @@ Analyze the data structure and choose the binding method:
     2.  Insert a safe fallback value (e.g., `'N/A'`, `0`) or a mock placeholder.
     3.  Add a comment: `// FIXME: Field [field_name] missing in API`.
 
-## 3. TYPE CONFLICT PROTOCOL (Source of Truth Check)
-> **Rule**: For **Incompatible Data Types**, you MUST stop and ask.
-* **Trigger**: When a field exists in both API and UI, but types mismatch (e.g., API sends `string`, TS expects `number`).
-* **Action**: **STOP generating code**. Do NOT assume one is correct.
-* **Protocol**: Ask the user:
-    > "Type Mismatch Detected: API returns `[Type A]` but UI expects `[Type B]`.
-    > **Decision Required**:
-    > 1.  **Update TS Interface** (Treat API as Source of Truth)?
-    > 2.  **Write Conversion Adapter** (Treat UI as Source of Truth)?"
+## 3. CONFLICT PROTOCOL (Source of Truth & Structure Check)
+> **Rule**: For **Incompatible Data** or **Structural Mismatches**, you MUST stop and evaluate.
+
+* **Red Flag (STOP IMMEDIATELY)**:
+    * Are you about to write **Dummy/Placeholder Data** (e.g., `gender: ''`, `id: 0`) inside a `map` just to satisfy TS?
+    * Are you reshaping data solely because the component reads a **hardcoded path** (e.g., `data.base.cover` vs `data.main_image`)?
+
+* **Protocol Action**:
+    1.  **Identify the Gap**: "API provides `[Path A]`, Component expects `[Path B]`."
+    2.  **Apply "Component Polymorphism" (Preferred)**:
+        * **Do NOT** create an adapter loop.
+        * **Action**: Update the Component Interface to accept a **Union Type** (e.g., `OC_Info | ProductItem`).
+        * **Action**: Modify the component logic to support multiple paths (e.g., `const img = data.cover || data.main_image`).
+    3.  **Ask if unsure**:
+        > "Structural Mismatch: Component is rigid. Shall I refactor the component to support Polymorphism (recommended) or create an adapter?"
 
 ## 4. MINIMAL INVASIVE DOM MODIFICATION
 > **Rule**: Visual freeze, Logic flexible.
@@ -53,7 +59,7 @@ Analyze the data structure and choose the binding method:
 
 ## EXECUTION STEPS
 1.  Check Input Data complexity.
-2.  **CRITICAL**: Check for **Type Conflicts**. If found -> **STOP & Trigger Protocol 3**.
+2.  **CRITICAL**: Check for **Dummy Data Requirements**. If you feel forced to write `gender: ''`, **STOP -> Apply Protocol 3 (Polymorphism)**.
 3.  If no conflicts, apply **Scenario A** or **Scenario B**.
 4.  Update logic/loops (`map`) without breaking CSS.
 5.  Handle missing fields with Fallback + FIXME.
