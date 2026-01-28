@@ -57,6 +57,10 @@ Analyze the data structure and choose the binding method:
     * Adding Conditional Rendering (`{ data.hasItems && ... }`) to hide/show blocks.
     * Adding skeleton states if data is undefined.
 
+## 5. OUTPUT CONSTRAINTS (Strict)
+* **NO Simulation**: Do NOT output hypothetical terminal logs, runtime verifications, or "Success" confirmations.
+* **NO Chatter**: Only output the modified code blocks or the Protocol 3 questions. Keep it concise.
+
 ## EXECUTION STEPS
 1.  Check Input Data complexity.
 2.  **CRITICAL**: Check for **Dummy Data Requirements**. If you feel forced to write `gender: ''`, **STOP -> Apply Protocol 3 (Polymorphism)**.
