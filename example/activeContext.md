@@ -16,8 +16,8 @@ oc相关的ts定义尽量放在`src/types/oc.d.ts`中，不要在其他文件中
 ## 🔌 Session Handoff (会话交接)
 - **[当前上下文]**: 
   - **店铺 OC 区域**：`StoreFeaturedContent` 从 `storeData.oc_list` 读取 OC 数据，根据数量判断单/多 OC 模式，多 OC 模式的 View All 跳转到 `/store/[slug]/oc`
-  - **OC 列表页**：路由为 `/store/[slug]/oc`，通过 `getStoreIntroductionSSR` 获取 `storeData.oc_list`；PC 端显示面包屑导航，每个 OC 区块包含左侧 `OCCard` 大卡和右侧 `OCSmallCard` 小卡网格（最多 6 个），底部有 View All 按钮跳转到对应 OC 详情页；移动端隐藏面包屑，每个 OC 区块顶部显示头像+名称+收藏按钮，小卡使用 `AcgSwiper` 横向滑动
-  - **OC 详情页**：`[slug]/oc/[ocSlug]/page.tsx` 通过 `getOCDetailSSR` 获取 OC 详情，调用 `/web/oc/detail` 接口；页面包含面包屑、OC 头像名称收藏、OCCard 大卡、以及商品列表分页展示
+  - **OC 列表页**：路由为 `/store/[slug]/oc`，通过 `getOCListSSR` 调用 `/web/oc/list` 接口获取 OC 列表（接口已包含 `store` 字段，不再依赖 `getStoreIntroductionSSR`）；PC 端显示面包屑导航（店铺名来自 `ocList[0].store.name`），每个 OC 区块包含左侧 `OCCard` 大卡和右侧 `OCSmallCard` 小卡网格（最多 6 个），底部有 View All 按钮跳转到对应 OC 详情页；移动端隐藏面包屑，每个 OC 区块顶部显示头像+名称+收藏按钮，小卡使用 `AcgSwiper` 横向滑动
+  - **OC 详情页**：`[slug]/oc/[ocSlug]/page.tsx` 通过 `getOCDetailSSR` 调用 `/web/oc/detail` 接口获取 OC 详情（接口已包含 `store` 字段，不再依赖 `getStoreIntroductionSSR`）；页面头部显示店铺头像（优先 `ocData.store.avatar`，回退到 `ocData.base.cover.url`）、店铺名称（优先 `ocData.store.name`，回退到 `ocData.name`）和收藏按钮；下方展示 OCCard 大卡以及商品列表分页
   - **兼容路由**：`/store/oc-hub/page.tsx` 处理旧链接 `/store/oc-hub?store_slug=xxx`，重定向到 `/store/[slug]/oc`
 
 ## 💡 Pending Ideas (待办思路)
