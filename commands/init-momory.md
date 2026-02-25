@@ -1,105 +1,118 @@
-# Initialize Memory Bank (Final Hybrid Version)
+# Init Memory Bank
 
-**System Role**: You are a scaffolding tool.
-**Task**: Create the required files strictly based on the configuration variables defined below. Do not generate conversational text.
-
----
-
-## Step 0: DYNAMIC CONFIGURATION (Soft Logic)
-**Action**: Parse the user's input command to set **VAR_TAG**.
-1. If user typed `/init <name>` (e.g., `/init azu`), set **VAR_TAG** = "<name>".
-2. If user typed `/init` (no argument), set **VAR_TAG** = "".
-
-> **LOGIC FLOW**:
-> IF (**VAR_TAG** != ""):
->    **VAR_MEMORY_DIR** = `.cursor/memory-` + **VAR_TAG**
->    **VAR_RULE_FILE** = `.cursor/rules/memory-` + **VAR_TAG** + `.mdc`
-> ELSE:
->    **VAR_MEMORY_DIR** = `.cursor/memory`
->    **VAR_RULE_FILE** = `.cursor/rules/memory-bank.mdc`
+**System**: Scaffolding tool.
+**Task**: Create files based on variables strictly. No conversational text.
 
 ---
 
-## Step 1: Secure in .gitignore (Conditional)
-**Condition**: EXECUTE ONLY IF **VAR_TAG** IS NOT EMPTY (Private Mode).
-**Action**:
-1. Check if `.gitignore` exists in the project root.
-2. If it does not exist, create it.
-3. Append the following lines to `.gitignore`:
+## Step 0: CONFIG
+Parse command.
+If "/init <name>", TAG="<name>".
+If "/init", TAG="".
+
+IF TAG != "":
+  MEM_DIR = ".cursor/memory-" + TAG
+  RULE = ".cursor/rules/memory-" + TAG + ".mdc"
+ELSE:
+  MEM_DIR = ".cursor/memory"
+  RULE = ".cursor/rules/memory-bank.mdc"
+
+---
+
+## Step 1: .gitignore
+If TAG != "", ensure .gitignore exists and append:
 '''gitignore
-# --- Cursor Memory Bank ({MEMORY_DIR}) ---
-{MEMORY_DIR}/
-{RULE_FILE}
+{MEM_DIR}/
+{RULE}
 '''
 
 ---
 
-## Step 2: Structure Setup
-Ensure these directories exist:
-- `.cursor/rules/`
-- **VAR_MEMORY_DIR**
+## Step 2: Dirs
+Ensure:
+- .cursor/rules/
+- .cursor/skills/memory-manager/
+- {MEM_DIR}
 
 ---
 
-## Step 3: Create Driver Rule (Enhanced)
-**File Path**: **VAR_RULE_FILE**
+## Step 3: Driver Rule
+**File**: {RULE}
 **Content**:
-(Replace `{MEMORY_PATH}` with the actual value of **VAR_MEMORY_DIR**)
 '''markdown
 ---
-description: Memory Bank Driver (记忆库驱动)
+description: Memory Bank Driver
 globs: **/*
 alwaysApply: true
 ---
 # MEMORY BANK DRIVER
 
-## RULE (核心规则)
-1. **🧠 READ (读取上下文)**: At the start of EVERY session, **read** `{MEMORY_PATH}/activeContext.md`.
-2. **🛑 ENFORCE (强制规范)**: Before generating code, **check** the `Critical Rules & Patterns` section in `activeContext.md`. You MUST follow these architectural constraints even if not explicitly prompted.
-3. **📝 UPDATE (动态更新)**: After a significant task or before ending a session, **you must edit** `{MEMORY_PATH}/activeContext.md`:
-   - If you discovered a new pattern or pitfall, update **[Critical Rules]**.
-   - If ending the session, update **[Session Handoff]** for the next context.
+1. READ: At start of session, read {MEM_DIR}/activeContext.md.
+2. ENFORCE: Follow architecture constraints in activeContext.md.
+3. AUTO-UPDATE: When a significant task or coding step is completed, you MUST AUTOMATICALLY trigger the Memory Manager Skill. Do not wait for the user to ask.
+4. OVERRIDE: If the user explicitly says "skip update", "don't save", or "no memory", DO NOT trigger the update.
 '''
 
 ---
 
-## Step 4: Create Project Brief (Chinese Content)
-**File Path**: **VAR_MEMORY_DIR** + `/projectBrief.md`
+## Step 4: Project Brief
+**File**: {MEM_DIR}/projectBrief.md
 **Content**:
 '''markdown
-# Project Brief (项目概况)
+# Project Brief
 
-## 2. Core Tech Stack (核心技术栈)
-- 前端框架: 
-- 语言: 
-- 样式方案: 
-- 状态管理: 
+## Tech Stack
+- Frontend: 
+- Lang: 
+- Style: 
 
-## 3. Core Conventions (核心规范)
-- **文件结构**: 
-- **命名规范**: 组件使用 PascalCase，函数使用 camelCase。
-- **严禁事项**: 严禁使用 `any` 类型；严禁在组件内直接写行内样式。
+## Conventions
+- Naming: PascalCase for Components, camelCase for functions.
+- Rules: No any type; No inline styles.
 '''
 
 ---
 
-## Step 5: Create Active Context (Chinese Content - Rule & Handoff)
-**File Path**: **VAR_MEMORY_DIR** + `/activeContext.md`
+## Step 5: Active Context
+**File**: {MEM_DIR}/activeContext.md
 **Content**:
 '''markdown
-# 🧠 Active Memory & Constraints (核心记忆与约束)
+# Active Memory & Constraints
 
-## 🛑 Critical Rules & Patterns (强制规范与踩坑记录)
-- **[架构约束]**: 
+## Critical Rules
+- [Architecture]: Follow existing directory structure.
 
-## 🔌 Session Handoff (会话交接)
-- **[当前上下文]**: 
+## Session Handoff
+- [Status]: Initialization complete.
 
-## 💡 Pending Ideas (待办思路)
-- 
+## Pending Ideas
 '''
 
 ---
 
-## Step 6: Finish
-Output exactly: "✅ Memory Bank initialized (Hybrid Version with Enhanced Update Rules)."
+## Step 6: Memory Skill
+**File**: .cursor/skills/memory-manager/SKILL.md
+**Content**:
+'''markdown
+---
+description: Update Memory Bank
+---
+# Memory Manager
+
+Trigger: Auto-triggered by Driver Rule at task completion, OR manually via "update memory".
+
+Steps:
+1. Analyze recent changes.
+2. Open {MEM_DIR}/activeContext.md.
+3. Update:
+   - Rules: Append new rules below .
+   - Status: Replace text below with current summary.
+   - Ideas: Append below .
+4. Do NOT rewrite from scratch. Edit marked sections only.
+5. Reply: "Memory Auto-Updated."
+'''
+
+---
+
+## Step 7: Finish
+Output exactly: "Initialized with Auto-Update."
