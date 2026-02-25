@@ -50,7 +50,7 @@ alwaysApply: true
 1. READ: At start of session, read {MEM_DIR}/activeContext.md.
 2. ENFORCE: Follow architecture constraints in activeContext.md.
 3. AUTO-UPDATE: When a significant task or coding step is completed, you MUST AUTOMATICALLY trigger the Memory Manager Skill. Do not wait for the user to ask.
-4. OVERRIDE: If the user explicitly says "skip update", "don't save", or "no memory", DO NOT trigger the update.
+4. OVERRIDE: If the user explicitly says "skip update", "不更新", or "跳过记录", DO NOT trigger the update.
 '''
 
 ---
@@ -59,16 +59,16 @@ alwaysApply: true
 **File**: {MEM_DIR}/projectBrief.md
 **Content**:
 '''markdown
-# Project Brief
+# 项目概况
 
-## Tech Stack
-- Frontend: 
-- Lang: 
-- Style: 
+## 核心技术栈
+- 前端框架: 
+- 语言: 
+- 样式方案: 
 
-## Conventions
-- Naming: PascalCase for Components, camelCase for functions.
-- Rules: No any type; No inline styles.
+## 核心规范
+- 命名: 组件使用 PascalCase，函数使用 camelCase。
+- 严禁事项: 禁用 any 类型；禁用行内样式。
 '''
 
 ---
@@ -77,15 +77,15 @@ alwaysApply: true
 **File**: {MEM_DIR}/activeContext.md
 **Content**:
 '''markdown
-# Active Memory & Constraints
+# 核心记忆与约束
 
-## Critical Rules
-- [Architecture]: Follow existing directory structure.
+## 强制规范
+- [架构]: 遵循现有目录结构。
 
-## Session Handoff
-- [Status]: Initialization complete.
+## 当前进度
+- [状态]: 初始化完成。
 
-## Pending Ideas
+## 待办事项
 '''
 
 ---
@@ -99,7 +99,7 @@ description: Update Memory Bank
 ---
 # Memory Manager
 
-Trigger: Auto-triggered by Driver Rule at task completion, OR manually via "update memory".
+Trigger: Auto-triggered by Driver Rule at task completion, OR manually via "记录一下", "update memory", "save context".
 
 Steps:
 1. Analyze recent changes.
@@ -109,7 +109,7 @@ Steps:
    - Status: Replace text below with current summary.
    - Ideas: Append below .
 4. Do NOT rewrite from scratch. Edit marked sections only.
-5. Reply: "Memory Auto-Updated."
+5. Reply: "记忆已自动更新 (Memory Updated)."
 '''
 
 ---
