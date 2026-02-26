@@ -47,35 +47,41 @@ alwaysApply: true
 ---
 # MEMORY BANK DRIVER
 
-1. READ: At start of session, read {MEM_DIR}/activeContext.md.
-2. AUTO-UPDATE: When a significant task or coding step is completed, you MUST AUTOMATICALLY trigger the Memory Manager Skill. Do not wait for the user to ask.
-3. OVERRIDE: If the user explicitly says "skip update", "不更新", or "跳过记录", DO NOT trigger the update.
+1. READ: At start of session, read BOTH {MEM_DIR}/projectBrief.md AND {MEM_DIR}/activeContext.md.
+2. ENFORCE: Strictly follow the rules and constraints defined in projectBrief.md.
+3. AUTO-UPDATE: When a significant task or coding step is completed, you MUST AUTOMATICALLY trigger the Memory Manager Skill. Do not wait for the user to ask.
+4. OVERRIDE: If the user explicitly says "skip update", "不更新", or "跳过记录", DO NOT trigger the update.
 '''
 
 ---
 
-## Step 4: Project Brief
+## Step 4: Project Brief (Static)
 **File**: {MEM_DIR}/projectBrief.md
 **Content**:
 '''markdown
-# 项目概况
+# 项目概况与强制规范
 
 ## 核心技术栈
 - 前端框架: 
 - 语言: 
 - 样式方案: 
+
+## 强制规范
+- 命名: 组件使用 PascalCase，函数使用 camelCase。
+- 严禁事项: 禁用 any 类型；禁用行内样式。
+- 架构约束: 遵循现有目录结构。
 '''
 
 ---
 
-## Step 5: Active Context
+## Step 5: Active Context (Dynamic Tracker)
 **File**: {MEM_DIR}/activeContext.md
 **Content**:
 '''markdown
 # 核心记忆与进度
 
 ## 当前进度 (做过什么)
-- [状态]: 初始化完成。
+- [状态]: 项目初始化完成。
 
 ## 待办事项 (还没做什么)
 '''
@@ -106,4 +112,4 @@ Steps:
 ---
 
 ## Step 7: Finish
-Output exactly: "Initialized with Task Tracker Mode."
+Output exactly: "Initialized. (Rules in Brief, Progress in Context)"
