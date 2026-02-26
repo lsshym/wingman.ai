@@ -48,9 +48,8 @@ alwaysApply: true
 # MEMORY BANK DRIVER
 
 1. READ: At start of session, read {MEM_DIR}/activeContext.md.
-2. ENFORCE: Follow architecture constraints in activeContext.md.
-3. AUTO-UPDATE: When a significant task or coding step is completed, you MUST AUTOMATICALLY trigger the Memory Manager Skill. Do not wait for the user to ask.
-4. OVERRIDE: If the user explicitly says "skip update", "不更新", or "跳过记录", DO NOT trigger the update.
+2. AUTO-UPDATE: When a significant task or coding step is completed, you MUST AUTOMATICALLY trigger the Memory Manager Skill. Do not wait for the user to ask.
+3. OVERRIDE: If the user explicitly says "skip update", "不更新", or "跳过记录", DO NOT trigger the update.
 '''
 
 ---
@@ -65,10 +64,6 @@ alwaysApply: true
 - 前端框架: 
 - 语言: 
 - 样式方案: 
-
-## 核心规范
-- 命名: 组件使用 PascalCase，函数使用 camelCase。
-- 严禁事项: 禁用 any 类型；禁用行内样式。
 '''
 
 ---
@@ -77,15 +72,12 @@ alwaysApply: true
 **File**: {MEM_DIR}/activeContext.md
 **Content**:
 '''markdown
-# 核心记忆与约束
+# 核心记忆与进度
 
-## 强制规范
-- [架构]: 遵循现有目录结构。
-
-## 当前进度
+## 当前进度 (做过什么)
 - [状态]: 初始化完成。
 
-## 待办事项
+## 待办事项 (还没做什么)
 '''
 
 ---
@@ -105,14 +97,13 @@ Steps:
 1. Analyze recent changes.
 2. Open {MEM_DIR}/activeContext.md.
 3. Update:
-   - Rules: Append new rules below .
-   - Status: Replace text below with current summary.
-   - Ideas: Append below .
+   - Status: Replace text below with current summary of WHAT HAS BEEN DONE.
+   - Ideas: Replace or append below with WHAT IS LEFT TO DO.
 4. Do NOT rewrite from scratch. Edit marked sections only.
-5. Reply: "记忆已自动更新 (Memory Updated)."
+5. Reply: "进度已自动更新 (Progress Updated)."
 '''
 
 ---
 
 ## Step 7: Finish
-Output exactly: "Initialized with Auto-Update."
+Output exactly: "Initialized with Task Tracker Mode."
