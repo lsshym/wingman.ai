@@ -18,22 +18,22 @@ Parse input: `/memo [text]`.
 
 Case A: `/memo` (No extra text)
 - Review current chat session.
-- Extract achievements, decisions, next steps.
-- Target: Replace text below ``.
+- Target: Replace text below `` with what has been done.
+- Target: Update `` with pending tasks.
 
 Case B: `/memo [text]`
 - Follow specific instruction.
-- Map to ``, ``, or ``.
+- Map appropriately to `` or ``.
 
 ---
 
 ## Step 3: EDIT
 - CRITICAL: Use file editing tool directly. Do not output markdown in chat.
-- CRITICAL: Insert or replace text specifically at HTML anchors (``, ``, ``).
+- CRITICAL: Insert or replace text specifically at HTML anchors (``, ``).
 - CRITICAL: DO NOT rewrite the full file. Edit marked sections only.
 - CRITICAL: All inserted content must be in CHINESE.
 
 ---
 
 ## Step 4: CONFIRM
-Output exactly: "Memory Synced: [Brief Chinese summary of changes]."
+Output exactly: "进度已同步: [Brief Chinese summary of what was recorded]."
