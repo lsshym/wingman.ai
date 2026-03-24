@@ -1,8 +1,9 @@
 ---
 description: 根据需求特征匹配本地知识库中的组件与工具
-globs: *
+globs: "**/*"
 alwaysApply: true
 ---
+
 # Command: Find Component
 
 **System**: Component Matchmaker.
