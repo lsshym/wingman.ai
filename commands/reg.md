@@ -1,9 +1,3 @@
----
-description: 将当前开发的组件特征提取并注册到记忆库
-globs: "**/*"
-alwaysApply: true
----
-
 # Command: Register Component
 
 **System**: Component Registrar.
