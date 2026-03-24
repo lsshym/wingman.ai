@@ -13,46 +13,50 @@ Fallback: `.cursor/memory/activeContext.md`.
 
 ---
 
-## Step 2: STRICT ANALYSIS & FORMATTING (门禁规则)
+## Step 2: IRON LAWS & GATE FUNCTIONS (绝对铁律)
+Before generating any log, you MUST pass these gates:
+
+### Gate 1: Hallucination Check
+Ask: "Did the user actually write, modify, or discuss specific code in this current session?"
+IF NO: 
+  STOP - Do not write to the file. Reply: "当前会话没有检测到实质性的代码变动，无需记录。"
+
+### Gate 2: Generic Filler Check
+Ask: "Does my drafted log contain vague phrases like '用于展示', '支持多语言', '包含逻辑', '基础组件'?"
+IF YES: 
+  STOP - Rewrite the draft. You MUST describe the EXACT interaction, state change, or API called.
+
+---
+
+## Step 3: STRICT FORMATTING & CHECKLIST (Low Freedom - 严格格式)
 Parse input: `/memo [text]`.
-You MUST generate a highly detailed log. You are STRICTLY FORBIDDEN from using generic, low-density phrases like "用于展示", "支持多语言", "包含逻辑", or "基础组件".
+Case A: `/memo` (No extra text) -> Review current chat session.
+Case B: `/memo [text]` -> Follow the specific instruction in [text].
 
-**HARD CONSTRAINTS FOR LOGGING:**
-1. **.ts / .tsx Files**: Description MUST include at least 2 of the following 3 elements:
-   - **Key Interaction**: (e.g., button clicks, dialog triggers, route navigation).
-   - **Data Source/State**: (e.g., specific API called, Zustand store updated, or specific Props passed).
-   - **Output**: (e.g., what specific UI block was rendered or state mutated).
-2. **.scss / .css Files**: MUST specify which exact component it serves and what layout issue it solves (e.g., mobile responsiveness, dialog layout).
-3. **Assets (svg/png)**: MUST specify at least one component where it is imported/used.
-4. **Coverage**: The number of core files changed MUST equal the number of items recorded. Do not batch or group files into single bullet points unless they are purely type exports.
+**Self-Verification Checklist (Must verify internally before writing):**
+- [ ] For `.ts / .tsx`: Did I include at least 2 of [Key Interaction], [Data Source/State], [Output UI]?
+- [ ] For `.scss / .css`: Did I specify the exact component it serves and the layout issue solved?
+- [ ] For Assets: Did I specify where it is imported?
+- [ ] Does the number of core files changed equal the number of items recorded? (No batching).
 
-### Output Format Blueprint:
-### [YYYY-MM-DD] 简短功能标题 (If [text] is provided, use it as the title/context)
+**Output Format Blueprint (MUST BE EXACT):**
+### [YYYY-MM-DD] 简短功能标题 (If [text] is provided, use it as title)
 - **目标**: (一句话描述本次开发的核心业务目标)
 - **核心文件明细**:
-  - `path/to/file1.tsx`: [Function/Component Name] - [Interaction/Data/Output detailed description based on Hard Constraints].
-  - `path/to/file2.ts`: [Function Name] - [Interaction/Data/Output detailed description based on Hard Constraints].
+  - `path/to/file1.tsx`: [Function/Component Name] - [Interaction/Data/Output detailed description based on checklist].
+  - `path/to/file2.ts`: [Function Name] - [Interaction/Data/Output detailed description].
 - **遗留问题/备注**: (写死的数据、未处理的边界情况等)
 
-Case A: `/memo` (No extra text)
-- Review current chat session to fill in the format above strictly adhering to Hard Constraints.
-- Target: Update pending tasks based on current context.
-
-Case B: `/memo [text]`
-- Follow the specific instruction in [text] to summarize the work.
-- Map appropriately to the detailed format above strictly adhering to Hard Constraints.
-
 ---
 
-## Step 3: EDIT
-- CRITICAL: Use file editing tool directly. Do not just output markdown in chat.
+## Step 4: EDIT (CRITICAL ANCHOR SYNC)
+- CRITICAL: Use the file editing tool directly. Do not just output markdown in chat.
 - CRITICAL: DO NOT rewrite the full file. Edit marked sections only.
 - CRITICAL: All inserted content must be in CHINESE.
-- Action for DONE: Find the `` anchor. **PREPEND (insert immediately below the anchor)** the generated detailed log. DO NOT replace or delete historical logs below it.
-- Action for TODO: Find the `` anchor. Update the pending tasks list (you can replace the TODO list to keep it current).
+- **Action for DONE**: Find the `` HTML comment anchor. **PREPEND (insert immediately below the anchor)** the generated detailed log. DO NOT replace or delete historical logs below it.
+- **Action for TODO**: Find the `` HTML comment anchor. Update the pending tasks list immediately below it.
 
 ---
 
-## Step 4: VERIFY & CONFIRM
-Self-Correction before output: Did every recorded file meet the Hard Constraints? Are generic filler words avoided? If no, rewrite the log internally before saving to the file.
-Output exactly: "进度已极其详尽地同步: [Brief Chinese summary of what was recorded]."
+## Step 5: VERIFY & CONFIRM
+Output exactly: "✅ 进度已极其详尽地同步 (Iron Laws passed): [1句话简短总结刚才记录的核心功能]."
