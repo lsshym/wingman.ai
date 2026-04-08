@@ -1,46 +1,28 @@
 # Command: Init Memory Bank
 
-**System**: Scaffolding tool. You MUST use your file system tools to create directories and write these files to the disk silently. Do not just output the text in chat.
-**Task**: Create files based on variables strictly. No conversational text.
+**System**: Scaffolding tool. You MUST use your file system tools to create directories and write these files to the disk silently. Do not just output the text in chat. Create files strictly based on the variables below. No conversational text.
 
 ---
 
 ## Step 0: CONFIG
-Parse command.
-If "/init <name>", TAG="<name>".
-If "/init", TAG="".
-
 BRAIN_DIR = ".cursor/brain"
-
-IF TAG != "":
-  MEM_DIR = ".cursor/memory-" + TAG
-  RULE = ".cursor/rules/memory-" + TAG + ".mdc"
-ELSE:
-  MEM_DIR = ".cursor/memory"
-  RULE = ".cursor/rules/memory-bank.mdc"
+MEM_DIR = ".cursor/memory"
+DOMAIN_DIR = ".cursor/memory/domains"
+RULE = ".cursor/rules/memory-bank.mdc"
 
 ---
 
-## Step 1: .gitignore
-If TAG != "", ensure .gitignore exists and append:
-'''gitignore
-{MEM_DIR}/
-{RULE}
-'''
-*(Note: Do not ignore BRAIN_DIR as it contains long-term project knowledge that should be committed).*
-
----
-
-## Step 2: Dirs
+## Step 1: Dirs
 Ensure the following directories exist:
 - .cursor/rules/
 - .cursor/skills/memory-manager/
 - {MEM_DIR}/
+- {DOMAIN_DIR}/
 - {BRAIN_DIR}/
 
 ---
 
-## Step 3: Driver Rule (With Gate Functions)
+## Step 2: Driver Rule (With Dynamic Routing & Strict Gate)
 **File**: {RULE}
 **Content**:
 '''markdown
@@ -50,118 +32,125 @@ globs: **/*
 alwaysApply: true
 ---
 # MEMORY BANK DRIVER
-1. READ: At start of session, read BOTH of the following:
-   - Global Project Brain: {BRAIN_DIR}/projectBrief.md
-   - Short-term Context: {MEM_DIR}/activeContext.md
-### Gate Function (组件拦截门)
-BEFORE writing any new React component or utility function:
-  Ask: "Does a similar component or rule exist in {BRAIN_DIR}/projectBrief.md?"
-  IF yes:
-    STOP - Do not write a new one. Import or follow the existing one.
-2. ENFORCE: Strictly follow the constraints and business logic defined in projectBrief.md.
-3. AUTO-UPDATE: Only trigger the Memory Manager Skill when the completed task creates durable project knowledge, including:
-   - business rules or state flow changes
-   - API contracts / type contracts / data mapping changes
-   - routing / page composition / major interaction flow changes
-   - shared architecture decisions
-   - reusable project-wide conventions
-   - important debugging conclusions or recurring pitfalls
-Do NOT trigger memory updates for:
+
+1. **READING PROTOCOL (三层动态读取协议)**:
+   At start of session, read in this strict order:
+   - **Layer 1**: {BRAIN_DIR}/projectBrief.md
+   - **Layer 2 (Dynamic)**: Based on prompt & Domain Index in projectBrief.md, silently read the ONE relevant {DOMAIN_DIR}/<name>.md.
+   - **Layer 3**: {MEM_DIR}/activeContext.md
+
+2. **GATE FUNCTION (组件拦截门)**:
+   BEFORE writing any new React component or utility:
+   Ask: "Does a similar component or rule exist in projectBrief.md or the Domain file?"
+   IF yes: STOP. Import or follow the existing convention.
+
+3. **STRICT AUTO-UPDATE**:
+   Only trigger the Memory Manager Skill when the completed task creates durable project knowledge.
+   **DO NOT trigger updates for:**
    - pure component encapsulation or extraction
    - file renaming or moving
-   - style-only tweaks
+   - style-only tweaks (CSS/SCSS)
    - local refactors with no behavior change
    - one-off UI cleanup
    - replacing duplicated JSX with a small reusable component
-   - small utility/component wrapping unless it establishes a project-wide convention
-4. OVERRIDE: If the user explicitly says "skip update", "不更新", "跳过记录", "这个不用记忆", or "局部改动不记录", DO NOT trigger the update.
+
+4. **OVERRIDE**:
+   If the user explicitly says "skip update", "不更新", "跳过记录", "局部改动不记录", DO NOT trigger.
 '''
 
 ---
 
-## Step 4: Project Brief (Global Brain with Degrees of Freedom)
+## Step 3: Project Brief (Layer 1 - Brain)
 **File**: {BRAIN_DIR}/projectBrief.md
-*(If file already exists, skip overwriting)*
 **Content**:
 '''markdown
 # 项目全局大脑 (Project Brain)
 
-## 1. 核心技术栈
-- 前端框架: 
-- 语言: 
-- 样式方案: 
-
-## 2. 强制编码规范 (Low Freedom - 绝对服从)
+## 1. 强制编码规范 (Low Freedom - 绝对服从)
 - **命名**: 组件必须使用 PascalCase，函数必须使用 camelCase。
 - **严禁事项**: 绝对禁用 `any` 类型；绝对禁用行内样式 (Inline Styles)。
 - **架构**: 严格遵循现有目录结构，禁止随意跨模块引用。
 
-## 3. 核心业务与架构决策 (High Freedom - 启发式指导)
-- **业务机制**: (在此记录全局业务规则，例如状态流转、核心算法等，遇到类似场景可灵活变通)
-- **架构踩坑**: (在此记录跨端兼容处理、第三方库选型原因及防呆指南)
+## 2. 核心架构决策 (ADR - 启发式指导)
+> ⚠️ 记录影响全站的全局规则，必须附带 [WHY]。
+- **[架构踩坑]**: (在此记录跨端兼容处理、全局库选型原因)
+
+## 3. 领域索引 (Domain Index - 动态路由寻址)
+> ⚠️ AI 读取指南：根据当前对话推断业务线，按需读取对应 Domain 文件。
+- **Plushie (众筹娃娃)** -> .cursor/memory/domains/plushie.md
+- **Admin (后台管理)** -> .cursor/memory/domains/admin.md
+*(注：出现新业务模块时在此添加索引并创建文件)*
 '''
 
 ---
 
-## Step 5: Active Context (Dynamic Tracker)
+## Step 4: Domain Template (Layer 2)
+**File**: {DOMAIN_DIR}/plushie.md
+**Content**:
+'''markdown
+# 领域知识库: Plushie (众筹娃娃)
+
+## 当前业务真理 (Feature Truth Table)
+> ⚠️ 这里的逻辑代表当前真实生效的代码行为。遇到冲突必须直接覆盖旧结论。必须写明 [WHY]（避坑指南）。
+- 待规划...
+'''
+
+---
+
+## Step 5: Active Context (Layer 3)
 **File**: {MEM_DIR}/activeContext.md
 **Content**:
 '''markdown
 # 核心记忆与进度 (Active Context)
 
-## 当前进度 (WHAT HAS BEEN DONE)
-- [初始化]: 项目记忆库已建立。
----
 ## 待办事项 (WHAT IS LEFT TO DO)
 - [ ] 待规划
+
+---
+## 短期活跃日志 (CURRENT SPRINT LOGS)
+> ⚠️ 采用严格格式记录最近改动。超载后由 Skill 触发升华与清理。
+### [初始化] 记忆系统升级
+- **目标**: 启用动态路由与严格校验版记忆库。
+- **核心文件明细**:
+  - `.cursor/rules/memory-bank.mdc`: [配置] - 引入三层读取与拦截黑名单。
+- **遗留问题/备注**: 无。
 '''
 
 ---
 
-## Step 6: Memory Skill (With Checklists)
+## Step 6: Memory Skill (Strict Distillation & Logging)
 **File**: .cursor/skills/memory-manager/SKILL.md
 **Content**:
 '''markdown
 ---
-description: Update Memory Bank with Strict Hard Constraints
+description: Update Memory Bank with Distillation and Strict Checklists
 ---
 # Memory Manager
-Trigger: Auto-triggered by Driver Rule at task completion, OR manually via "记录一下", "update memory", "/memo".
-### DO NOT LOG THESE CHANGES
-Skip memory updates for:
-- pure component encapsulation/extraction
-- renaming symbols or files without behavioral change
-- moving files across folders
-- css/scss-only adjustments
-- local UI cleanup
-- replacing duplicated JSX with a small reusable component
-- small presentational refactors with unchanged business behavior
-Only log when the change creates durable knowledge that will matter in future tasks.
+Trigger: Auto-triggered by Driver Rule, OR manually via "记录一下", "/memo".
+
 Steps:
-1. Analyze all recent file changes, code additions, and logical implementations in the current conversation.
-2. Open {MEM_DIR}/activeContext.md.
-3. First decide whether this task should be logged:
-   - If it is only a local implementation detail, STOP and do not write memory.
-   - If it changes long-term project knowledge, continue.
-### Logging Verification Checklist
-Before writing, you MUST internally verify this checklist:
-- [ ] Is this durable project knowledge rather than a local implementation detail?
-- [ ] Are generic phrases ("用于展示", "基础组件") completely removed?
-- [ ] Do .ts/.tsx files specify at least 2 of: [Interaction], [Data/State], [Output]?
-- [ ] Do .scss/.css files specify the exact component and layout issue solved?
-4. PREPEND the newly completed tasks immediately below the `` anchor using EXACTLY this format:
-### [YYYY-MM-DD] 简短功能标题
-- **目标**: (一句话描述本次开发的核心业务目标)
-- **核心文件明细**:
-  - `path/to/file1.tsx`: [Function/Component Name] - [Interaction/Data/Output detailed description based on Hard Constraints].
-  - `path/to/file2.ts`: [Function Name] - [Interaction/Data/Output detailed description].
-- **遗留问题/备注**: (写死的数据、未处理的边界情况等)
-5. Update the pending tasks list immediately below the `` anchor.
-6. Do NOT rewrite or delete historical entries below your newly inserted log.
-7. Reply to user: "进度已极其详尽地自动更新 (Strict Progress Updated)."
+1. **GATEKEEPER**: Review recent changes. If they are purely UI cleanup, css tweaks, or component extraction WITHOUT behavior change, STOP entirely. Do not log.
+2. **DISTILL (知识升华)**: 
+   Identify if changes contain durable business rules or global architecture decisions.
+   - If YES: Update `{BRAIN_DIR}/projectBrief.md` or `{DOMAIN_DIR}/<name>.md` directly. You MUST completely overwrite outdated contradictory logic. You MUST include the `[WHY]`.
+3. **LOGGING VERIFICATION CHECKLIST**:
+   Before writing the short-term log to activeContext.md, internally verify:
+   - [ ] Are generic phrases ("用于展示", "基础组件") completely removed?
+   - [ ] Do .ts/.tsx files specify at least 2 of: [Interaction], [Data/State], [Output]?
+   - [ ] Do .scss/.css files specify the exact component and layout issue solved?
+4. **WRITE LOG**: 
+   Open `{MEM_DIR}/activeContext.md`. PREPEND the new task immediately below the `` using EXACTLY this format:
+   ### [YYYY-MM-DD] 简短功能标题
+   - **目标**: (一句话描述本次开发的核心业务目标)
+   - **核心文件明细**:
+     - `path/to/file1.tsx`: [Function Name] - [Interaction/Data/Output detailed description based on Hard Constraints].
+   - **遗留问题/备注**: (写死的数据、未处理边界等)
+5. **PURGE (定期修剪)**:
+   If `activeContext.md` has trivial logs older than 5 days or logs that have already been distilled into Domain files, silently DELETE those old entries to keep the file lean.
+6. **REPLY**: "进度已极其详尽地自动更新，高价值知识已升华 (Strict Progress Updated & Knowledge Distilled)."
 '''
 
 ---
 
 ## Step 7: Finish
-Output exactly: "Initialized. (Global Brain loaded with Gate Functions, Short-term Progress active)"
+Output exactly: "Memory Bank Initialized."
