@@ -1,62 +1,67 @@
-# Command: Memo Sync
+# Command: Memo Sync v2.1 (Distillation Edition)
 
-**System**: Project Scribe.
-**Task**: Update activeContext.md based on user intent.
+**System**: Project Scribe & Knowledge Distiller.
+**Task**: Update Memory Bank (Brain, Domain, and Active Context) based on user intent.
 **Constraint**: System logic in English, file content writing STRICTLY IN CHINESE.
 
 ---
 
-## Step 1: LOCATE
-Scan root for `.cursor/memory-*/activeContext.md`.
-If multiple, pick the most recently modified.
-Fallback: `.cursor/memory/activeContext.md`.
+## Step 1: DYNAMIC LOCATE (寻址)
+1. Read `.cursor/brain/projectBrief.md` to get the Domain Index.
+2. Identify the current working domain based on the chat context.
+3. Locate relevant files:
+   - Layer 1: `.cursor/brain/projectBrief.md`
+   - Layer 2: `.cursor/memory/domains/<domain_name>.md`
+   - Layer 3: `.cursor/memory/activeContext.md`
 
 ---
 
-## Step 2: IRON LAWS & GATE FUNCTIONS (绝对铁律)
-Before generating any log, you MUST pass these gates:
+## Step 2: IRON LAWS & THE DISTILLER GATE (绝对铁律与升华门)
 
-### Gate 1: Hallucination Check
+### Gate 1: Hallucination Check (防幻觉)
 Ask: "Did the user actually write, modify, or discuss specific code in this current session?"
-IF NO: 
-  STOP - Do not write to the file. Reply: "当前会话没有检测到实质性的代码变动，无需记录。"
+IF NO: STOP. Reply: "当前会话没有检测到实质性的代码变动，无需记录。"
 
-### Gate 2: Generic Filler Check
+### Gate 2: Knowledge Distillation (知识升华判断)
+Ask: "Does this change contain durable business rules, architectural decisions, or reusable patterns?"
+- IF YES: You MUST update Layer 1 (Global ADR) or Layer 2 (Domain Truth Table). 
+- **Requirement**: Include the `[WHY]` for every distilled point.
+
+### Gate 3: Generic Filler Check (绝杀废话)
 Ask: "Does my drafted log contain vague phrases like '用于展示', '支持多语言', '包含逻辑', '基础组件'?"
-IF YES: 
-  STOP - Rewrite the draft. You MUST describe the EXACT interaction, state change, or API called.
+IF YES: STOP and Rewrite. You MUST describe the EXACT interaction, state change, or API called.
 
 ---
 
-## Step 3: STRICT FORMATTING & CHECKLIST (Low Freedom - 严格格式)
-Parse input: `/memo [text]`.
-Case A: `/memo` (No extra text) -> Review current chat session.
-Case B: `/memo [text]` -> Follow the specific instruction in [text].
+## Step 3: STRICT FORMATTING & CHECKLIST (严格格式校验)
 
 **Self-Verification Checklist (Must verify internally before writing):**
-- [ ] For `.ts / .tsx`: Did I include at least 2 of [Key Interaction], [Data Source/State], [Output UI]?
-- [ ] For `.scss / .css`: Did I specify the exact component it serves and the layout issue solved?
-- [ ] For Assets: Did I specify where it is imported?
+- [ ] For `.ts / .tsx`: Include at least 2 of [Key Interaction], [Data Source/State], [Output UI].
+- [ ] For `.scss / .css`: Specify the exact component it serves and the layout issue solved.
+- [ ] For Logic: Ensure the `[WHY]` is captured if moved to Domain/Brain.
 - [ ] Does the number of core files changed equal the number of items recorded? (No batching).
 
-**Output Format Blueprint (MUST BE EXACT):**
-### [YYYY-MM-DD] 简短功能标题 (If [text] is provided, use it as title)
+**Output Format Blueprint:**
+### [YYYY-MM-DD] 简短功能标题
 - **目标**: (一句话描述本次开发的核心业务目标)
 - **核心文件明细**:
   - `path/to/file1.tsx`: [Function/Component Name] - [Interaction/Data/Output detailed description based on checklist].
-  - `path/to/file2.ts`: [Function Name] - [Interaction/Data/Output detailed description].
 - **遗留问题/备注**: (写死的数据、未处理的边界情况等)
 
 ---
 
-## Step 4: EDIT (CRITICAL ANCHOR SYNC)
-- CRITICAL: Use the file editing tool directly. Do not just output markdown in chat.
-- CRITICAL: DO NOT rewrite the full file. Edit marked sections only.
-- CRITICAL: All inserted content must be in CHINESE.
-- **Action for DONE**: Find the `` HTML comment anchor. **PREPEND (insert immediately below the anchor)** the generated detailed log. DO NOT replace or delete historical logs below it.
-- **Action for TODO**: Find the `` HTML comment anchor. Update the pending tasks list immediately below it.
+## Step 4: MULTI-LAYER EXECUTION (同步写入)
+
+- **Action for Layer 1/2 (Distill)**: 
+  If high-value knowledge is found, update `projectBrief.md` or `domains/<name>.md`. 
+  **Overwrite** old contradictory logic. Do not just append.
+- **Action for Layer 3 (Active Context)**:
+  Find the `` in `activeContext.md`.
+  **PREPEND** the generated detailed log. 
+- **Action for TODO**:
+  Update the pending tasks list below the ``.
 
 ---
 
 ## Step 5: VERIFY & CONFIRM
-Output exactly: "✅ 进度已极其详尽地同步 (Iron Laws passed): [1句话简短总结刚才记录的核心功能]."
+Output exactly: "✅ 进度已同步，高价值知识已升华 (Iron Laws passed): [1句话简短总结刚才升华或记录的核心内容]."
