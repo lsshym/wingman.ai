@@ -75,24 +75,35 @@ alwaysApply: true
 > ⚠️ 记录影响全站的全局规则，必须附带 [WHY]。
 - **[架构踩坑]**: (在此记录跨端兼容处理、全局库选型原因)
 
-## 3. 领域索引 (Domain Index - 动态路由寻址)
-> ⚠️ AI 读取指南：根据当前对话推断业务线，按需读取对应 Domain 文件。
-- **Plushie (众筹娃娃)** -> .cursor/memory/domains/plushie.md
-- **Admin (后台管理)** -> .cursor/memory/domains/admin.md
-*(注：出现新业务模块时在此添加索引并创建文件)*
+## 3. 领域索引表 (Domain Registry - 自动路由与分片)
+> ⚠️ AI 寻址与扩容指南：
+> 1. 【路由】：根据对话推断业务线，按需读取下方对应文件。
+> 2. 【自动分片 (Auto-Sharding)】：当提炼出独立于现有领域的新业务逻辑时，**你必须主动在 `.cursor/memory/domains/` 下新建对应的 `.md` 文件，并将新文件路径登记在下方！**
+> 
+> *(以下为 Demo 示例，请在实际开发中覆盖或持续扩充)*
+- **CoreAuth (身份鉴权与路由拦截)** -> .cursor/memory/domains/core-auth.md
+- **Dashboard (主控面板)** -> .cursor/memory/domains/dashboard.md
 '''
 
 ---
 
 ## Step 4: Domain Template (Layer 2)
-**File**: {DOMAIN_DIR}/plushie.md
+**File**: {DOMAIN_DIR}/core-module.md
+*(Create this as an example domain. If exists, do not overwrite.)*
 **Content**:
 '''markdown
-# 领域知识库: Plushie (众筹娃娃)
+# 领域知识库: CoreModule (核心业务模块示例)
 
 ## 当前业务真理 (Feature Truth Table)
 > ⚠️ 这里的逻辑代表当前真实生效的代码行为。遇到冲突必须直接覆盖旧结论。必须写明 [WHY]（避坑指南）。
-- 待规划...
+
+### 状态映射与 UI 表现
+- **[示例] 状态流转**: (在此记录特定模块的状态机或生命周期逻辑)
+  - **WHY**: (记录为什么这么设计的业务背景)
+
+### API 与数据结构
+- **[示例] 接口契约兜底**: (在此记录前端如何处理不规范或缺失的后端字段)
+  - **WHY**: (记录防备哪些潜在的数据异常)
 '''
 
 ---
@@ -118,36 +129,37 @@ alwaysApply: true
 
 ---
 
-## Step 6: Memory Skill (Strict Distillation & Logging)
+## Step 6: Memory Skill (Strict Distillation & Auto-Sharding)
 **File**: .cursor/skills/memory-manager/SKILL.md
 **Content**:
 '''markdown
 ---
-description: Update Memory Bank with Distillation and Strict Checklists
+description: Update Memory Bank with Distillation, Auto-Sharding, and Strict Checklists
 ---
 # Memory Manager
 Trigger: Auto-triggered by Driver Rule, OR manually via "记录一下", "/memo".
 
 Steps:
 1. **GATEKEEPER**: Review recent changes. If they are purely UI cleanup, css tweaks, or component extraction WITHOUT behavior change, STOP entirely. Do not log.
-2. **DISTILL (知识升华)**: 
-   Identify if changes contain durable business rules or global architecture decisions.
-   - If YES: Update `{BRAIN_DIR}/projectBrief.md` or `{DOMAIN_DIR}/<name>.md` directly. You MUST completely overwrite outdated contradictory logic. You MUST include the `[WHY]`.
+2. **DISTILL & AUTO-SHARD (知识升华与自动分片)**: 
+   Identify if changes contain durable business rules.
+   - **Evaluate Domain Boundary**: Does this knowledge belong to an existing domain in `projectBrief.md`? 
+   - **Auto-Shard**: If it represents a distinct business boundary (e.g., separating "Orders" from "Checkout"), YOU MUST CREATE a new `{DOMAIN_DIR}/<new_domain>.md` file, write the rules there, and REGISTER the new domain in `{BRAIN_DIR}/projectBrief.md`.
+   - **Distill**: Write the truth table logic. You MUST overwrite outdated logic. You MUST include the `[WHY]`.
 3. **LOGGING VERIFICATION CHECKLIST**:
    Before writing the short-term log to activeContext.md, internally verify:
    - [ ] Are generic phrases ("用于展示", "基础组件") completely removed?
    - [ ] Do .ts/.tsx files specify at least 2 of: [Interaction], [Data/State], [Output]?
    - [ ] Do .scss/.css files specify the exact component and layout issue solved?
 4. **WRITE LOG**: 
-   Open `{MEM_DIR}/activeContext.md`. PREPEND the new task immediately below the `` using EXACTLY this format:
+   Open `{MEM_DIR}/activeContext.md`. PREPEND the new task below ``:
    ### [YYYY-MM-DD] 简短功能标题
-   - **目标**: (一句话描述本次开发的核心业务目标)
+   - **目标**: (核心业务目标)
    - **核心文件明细**:
-     - `path/to/file1.tsx`: [Function Name] - [Interaction/Data/Output detailed description based on Hard Constraints].
-   - **遗留问题/备注**: (写死的数据、未处理边界等)
-5. **PURGE (定期修剪)**:
-   If `activeContext.md` has trivial logs older than 5 days or logs that have already been distilled into Domain files, silently DELETE those old entries to keep the file lean.
-6. **REPLY**: "进度已极其详尽地自动更新，高价值知识已升华 (Strict Progress Updated & Knowledge Distilled)."
+     - `path`: [Function Name] - [Checklist-based description].
+   - **遗留问题/备注**: (写死数据等)
+5. **PURGE**: Silently DELETE trivial/outdated logs from `activeContext.md` (older than 5 days or already distilled).
+6. **REPLY**: "进度已同步。高价值知识已升华 (如有新领域已自动建库分片)。"
 '''
 
 ---
