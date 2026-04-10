@@ -130,9 +130,11 @@ description: MANDATORY: Update activeContext.md based on user intent using the V
    - [ ] Do `.ts/.tsx` descriptions specify at least 2 of: [Interaction], [Data/State], [Output]?
    - [ ] Do `.scss/.css` descriptions specify the exact component and layout issue solved?
    - [ ] Does the number of core files changed equal the number of items recorded? (No batching).
-4. **WRITE LOG (严格格式)**: 
-   Open `.cursor/memory/activeContext.md`. Find the ``. **PREPEND (insert immediately below the anchor)** the generated detailed log. 
-   **CRITICAL: Do NOT rewrite or delete historical entries below it.**
+4. **DEDUPLICATE & WRITE LOG (去重与严格格式写入)**: 
+   Open `.cursor/memory/activeContext.md`. Find the ``.
+   - **Self-Correction Exception (自我修正豁免)**: 扫描锚点下方的现有日志。如果本次修改是针对**同日内/同一功能/同一Bug 的逻辑推翻或口径纠正**（例如：上一次记错了字段、计算公式被推翻），你**必须静默删除**那条旧的、错误的关联日志，只保留本次最新的真理。
+   - **PREPEND**: 将最终无矛盾的日志直接插入到锚点正下方。
+   - **CRITICAL RED LINE**: 除了上述的“同功能去重纠错”外，**绝对禁止**擅自合并、重写或删除任何其他不相关的历史记录！
    Format EXACTLY:
    ### [YYYY-MM-DD] 简短功能标题
    - **目标**: (一句话描述核心业务目标)
@@ -144,7 +146,7 @@ description: MANDATORY: Update activeContext.md based on user intent using the V
 6. **CHAINING (流转评估)**: 
    Does the completed task create durable project knowledge (macro business rules, API contracts, routing flow, state flow)? *Note: Micro-logic with inline comments usually do not need domain distillation.*
    - IF YES: Invoke the `distill-domain-knowledge` skill immediately.
-   - IF NO: Reply "✅ 进度已极其详尽地同步 (Iron Laws passed)."
+   - IF NO: Reply "✅ 进度已极其详尽地同步 (去重检查已通过, Iron Laws passed)."
 '''
 
 ---
