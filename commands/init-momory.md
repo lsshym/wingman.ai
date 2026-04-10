@@ -1,4 +1,4 @@
-# Command: Init Memory Bank v3.3 (Unabridged Auto-Trigger Edition)
+# Command: Init Memory Bank v3.4 (Hard Gate Edition)
 
 **System**: Scaffolding tool. You MUST use your file system tools to create directories and write these files to the disk silently. Do not just output the text in chat. Create files strictly based on the variables below. No conversational text.
 **Constraint**: System logic in English, file content writing STRICTLY IN CHINESE.
@@ -43,9 +43,18 @@ BEFORE writing any new React component or utility function:
 Ask: "Does a similar component or rule exist in `projectBrief.md` or the Domain file?"
 IF yes: STOP - Do not write a new one. Import or follow the existing convention.
 
+# 2.5 IMPLEMENTATION CONSISTENCY GATE (落地一致性门禁)
+Before any code edit, the agent MUST output an internal checklist and satisfy all:
+1. Which memory rule(s) are binding this task? (path + bullet title)
+2. What exact fields/symbols must be used? (e.g. `checkout_type`, forbidden: `crowdfunding.status`)
+3. Which files are allowed to change?
+If any item is unclear or cannot be met due to missing props/context, STOP and ask the user. DO NOT implement with substitutes.
+
 # 3. HARD CODING CONSTRAINTS (业务逻辑铁律 - 绝对服从)
 - **禁止业务字段误兜底 (NO SILENT FALLBACKS)**: 严禁使用 `??`, `||` 或链式 `?:` 将「语义相近但业务含义不同」的字段互为备份（例如：`gifts ?? actual_gifts`）。
   - **[WHY]**: 兜底会展示错误业务状态且极难排查。以哪个字段为准就只读该字段；数据缺失则 UI 按「无该项/空态」处理，绝不静默换用其他数据。
+- **禁止规则替代实现 (NO RULE SUBSTITUTION)**: If memory specifies a canonical field/contract (e.g. `checkout_type`), it is FORBIDDEN to substitute with proxy fields (e.g. `crowdfunding.status`) due to convenience. 
+  - **[WHY]**: Proxy fields may look similar but produce semantic drift and break domain truths.
 - **微观业务防呆注释 (Micro-Logic Comments)**: 对于代码量极小但业务影响极大的单点修改（例如：强制某金额为 0、特定状态拦截），**必须在代码原处**使用 `// @业务铁律: [WHY]` 进行显式注释。
   - **[WHY]**: 行为局部性原则。防止外部记忆库过于臃肿，同时确保未来阅读该行代码的开发者/AI 能立刻明白其业务重量，防止被误删。
 - **命名规范**: 组件必须 `PascalCase`，函数必须 `camelCase`。
@@ -60,6 +69,7 @@ BEFORE you output your final response to the user saying a coding task is "Done"
 1. **Value Funnel Check**: Did the current task modify Money Calculations, State Branching, Field Mapping, API Fallbacks, or Rule Checkboxes (金额计算/状态分支/字段映射/接口拦截)? 
 2. **Auto-Trigger**: IF YES, you MUST autonomously invoke the `log-sprint-progress` skill BEFORE replying to the user. Do NOT wait for the user to say `/memo`.
 3. **Hard Gate**: If the change passes the Value Funnel but you have NOT updated `activeContext.md` and evaluated `domains/*.md`, you are FORBIDDEN from telling the user the task is completed.
+4. **Memory Compliance Gate**: If any implemented logic conflicts with the memory domain truth table, the agent is FORBIDDEN to say done/fixed. Must explicitly report the conflict and provide a correction plan first.
 '''
 
 ---
@@ -97,10 +107,10 @@ BEFORE you output your final response to the user saying a coding task is "Done"
 
 ---
 ## 短期活跃日志 (CURRENT SPRINT LOGS)
-### [初始化] V3.3 价值漏斗与强制触发系统部署
-- **目标**: 启用基于 Superpowers 架构的多技能解耦版记忆系统，植入全套无删减铁律与强制收尾协议 (End of Task Protocol)。
+### [初始化] V3.4 价值漏斗与强制门禁系统部署
+- **目标**: 启用基于 Superpowers 架构的多技能解耦版记忆系统，植入防兜底门禁 (Implementation Gate) 与强制收尾协议。
 - **核心文件明细**:
-  - `.cursor/rules/00-architecture-and-standards.mdc`: [配置] - 剥离静态规则，实现免读取全局约束与单点防呆注释。
+  - `.cursor/rules/00-architecture-and-standards.mdc`: [配置] - 剥离静态规则，引入 2.5 落地一致性门禁与 5.4 记忆合规检查。
 - **遗留问题/备注**: 无。
 '''
 
@@ -124,6 +134,11 @@ description: MANDATORY: Update activeContext.md based on user intent using the V
 2. **GATEKEEPER (价值漏斗拦截门)**: 
    - **绝对拦截 (纯表现层/无状态)**: 纯 CSS/UI 像素调整、变量改名、代码位置挪动、无行为变化的组件抽离封装 -> 坚决不记 (STOP)。
    - **绝对放行 (业务/数据/流转)**: 只要改动涉及 **金额计算、状态流转映射、条件判断分支的增删、API 字段兜底/拦截**，哪怕只改了 1 行代码或 1 个数字，都属于核心业务逻辑 -> 必须记录 (PASS)。
+2.5 **RULE COMPLIANCE PROOF (强制证据)**:
+   Before writing logs, verify and record internally:
+   - [ ] Did implementation use the exact canonical field required by memory?
+   - [ ] Any proxy/heuristic substitution used? If yes, mark FAIL.
+   If FAIL -> MUST report violation, propose correction, and DO NOT claim completion.
 3. **VERIFICATION CHECKLIST (绝杀废话与严苛要求)**:
    Before writing, internally verify:
    - [ ] Are generic phrases ("用于展示", "基础组件", "支持多语言", "包含逻辑") completely removed?
@@ -146,7 +161,7 @@ description: MANDATORY: Update activeContext.md based on user intent using the V
 6. **CHAINING (流转评估)**: 
    Does the completed task create durable project knowledge (macro business rules, API contracts, routing flow, state flow)? *Note: Micro-logic with inline comments usually do not need domain distillation.*
    - IF YES: Invoke the `distill-domain-knowledge` skill immediately.
-   - IF NO: Reply "✅ 进度已极其详尽地同步 (去重检查已通过, Iron Laws passed)."
+   - IF NO: Reply "✅ 进度已极其详尽地同步 (去重检查与规则依从性门禁已通过)."
 '''
 
 ---
@@ -182,4 +197,4 @@ description: MANDATORY: Extract durable project knowledge, auto-shard domains, a
 ---
 
 ## Step 7: Finish
-Output exactly: "V3.3 Memory Bank Initialized. (Unabridged Edition: All Logic Intact + End of Task Auto-Trigger Enforced)."
+Output exactly: "V3.4 Memory Bank Initialized. (Hard Gate Edition: Implementation Consistency Gate + Anti-Substitution Rules Enforced)."
