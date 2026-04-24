@@ -1,23 +1,26 @@
 # Wingman
 
-> Cursor-native skills, packaged cleanly.
+> Shared core, platform shells.
 
-Wingman is an AI engineering skill pack organized around Cursor's native `skills/`, `commands/`, and `rules/` conventions.
+Wingman is a cross-platform AI engineering plugin package built around one shared content core and thin platform-specific wrappers.
 
-The repository is organized around one shared core plus a Codex packaging wrapper:
+The shared core lives at the repository root:
 
-- `rules/` contains always-on global rule files in `.mdc` format
-- `skills/` contains dual-mode Cursor skills with YAML frontmatter
+- `rules/` contains global rule files in `.mdc` format
+- `skills/` contains reusable skill capabilities with YAML frontmatter
 - `commands/` contains manual-first workflows with slash-command metadata
-- `.cursor-plugin/plugin.json` points Cursor at the shared `skills/` and `rules/`
-- `.codex/marketplace.json` keeps the repository packageable from the same root
+
+Platform wrappers stay thin:
+
+- `.cursor-plugin/plugin.json` maps Cursor to the shared `rules/`, `skills/`, and `commands/`
+- `.codex/marketplace.json` packages the same repository root for Codex
 
 ## Principles
 
-- Cursor-native structure first
-- YAML frontmatter drives both manual discovery and automatic recall
+- One shared content core
+- Platform differences isolated to lightweight metadata shells
+- YAML frontmatter enables discovery where platforms support it
 - Shared prompt bodies stay centralized and duplication-free
-- Codex remains a lightweight wrapper over the same package root
 
 ## Directory Layout
 
@@ -41,7 +44,7 @@ The repository is organized around one shared core plus a Codex packaging wrappe
 - `/reg`
 - `/zod-gen`
 
-Each skill now lives in `skills/<name>/SKILL.md` and exposes its public trigger through frontmatter `name`.
+Each skill lives in `skills/<name>/SKILL.md` and exposes its public trigger through frontmatter `name`.
 
 ## Included Commands
 
@@ -56,14 +59,25 @@ These manual workflows live directly under `commands/` and also use frontmatter 
 - `rules/system-core.mdc`
 - `rules/hierarchy.mdc`
 
-Both rule files include `alwaysApply: true` so they behave as global Cursor rules.
+Both rule files include `alwaysApply: true` so they behave as always-on rules in platforms that support this metadata.
 
 ## Packaging Model
 
-Wingman now packages its Cursor-facing behavior through native directory semantics plus YAML frontmatter instead of relying on flat filenames alone.
+Wingman uses Cursor-compatible directory semantics and frontmatter as the canonical packaging shape because they are explicit, portable, and easy to wrap for other ecosystems.
 
-Cursor is the primary runtime target in this repository state.
-Codex support is retained as a packaging wrapper through `.codex/marketplace.json`, but the content layer is optimized for Cursor-native triggering and discovery.
+Cursor is one supported target, not the identity of the project.
+Codex and future platforms should consume the same shared core through wrapper metadata rather than through duplicated prompt bodies.
+
+## Cursor Compatibility
+
+The current layout follows Cursor's plugin reference:
+
+- rules live in `rules/*.mdc`
+- skills live in `skills/<name>/SKILL.md`
+- commands live in `commands/*.md`
+- `.cursor-plugin/plugin.json` uses root-relative component paths without `..`
+
+This keeps the package compatible with Cursor's discovery rules while preserving a platform-neutral repository core.
 
 ## Public Entry Names
 

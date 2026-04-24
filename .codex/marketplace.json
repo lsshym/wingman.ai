@@ -5,7 +5,7 @@
       "name": "wingman",
       "version": "1.0.0",
       "source": "../",
-      "description": "Cursor-native AI engineering skill pack packaged with a Codex wrapper."
+      "description": "Cross-platform AI engineering plugin packaged for Codex from the same shared core."
     }
   ]
 }

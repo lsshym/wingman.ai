@@ -1,6 +1,6 @@
 {
   "name": "wingman",
   "displayName": "Wingman",
-  "description": "Cursor-native AI engineering skill pack with shared rules, skills, and manual workflows.",
+  "description": "Cross-platform AI engineering plugin with shared rules, skills, and manual workflows.",
   "version": "1.0.0"
 }
