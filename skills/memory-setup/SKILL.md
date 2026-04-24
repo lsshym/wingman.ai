@@ -1,9 +1,11 @@
 ---
-name: init
-description: Initialize the Cursor memory bank scaffolding, shared project memory files, and logging skills for a new repository or workspace.
+name: memory-setup
+description: Initialize the project memory workflow. Use when a repository needs durable context for long-running or collaborative work.
 ---
 
-# Command: Init Memory Bank v3.4 (Hard Gate Edition)
+# Command: /memory-setup v3.4 (Hard Gate Edition)
+
+Triggered when the user types `/memory-setup`.
 
 **System**: Scaffolding tool. You MUST use your file system tools to create directories and write these files to the disk silently. Do not just output the text in chat. Create files strictly based on the variables below. No conversational text.
 **Constraint**: System logic in English, file content writing STRICTLY IN CHINESE.
@@ -72,7 +74,7 @@ If the user explicitly says "skip update", "不更新", "跳过记录", "这个�
 # 5. END OF TASK PROTOCOL (强制收尾引擎 - 解决漏记漏触发)
 BEFORE you output your final response to the user saying a coding task is "Done", "Fixed", or "已改好", you MUST execute this checklist:
 1. **Value Funnel Check**: Did the current task modify Money Calculations, State Branching, Field Mapping, API Fallbacks, or Rule Checkboxes (金额计算/状态分支/字段映射/接口拦截)? 
-2. **Auto-Trigger**: IF YES, you MUST autonomously invoke the `log-sprint-progress` skill BEFORE replying to the user. Do NOT wait for the user to say `/memo`.
+2. **Auto-Trigger**: IF YES, you MUST autonomously invoke the `log-sprint-progress` skill BEFORE replying to the user. Do NOT wait for the user to say `/memory-sync`.
 3. **Hard Gate**: If the change passes the Value Funnel but you have NOT updated `activeContext.md` and evaluated `domains/*.md`, you are FORBIDDEN from telling the user the task is completed.
 4. **Memory Compliance Gate**: If any implemented logic conflicts with the memory domain truth table, the agent is FORBIDDEN to say done/fixed. Must explicitly report the conflict and provide a correction plan first.
 '''
@@ -129,7 +131,7 @@ BEFORE you output your final response to the user saying a coding task is "Done"
 description: MANDATORY: Update activeContext.md based on user intent using the Value Funnel.
 ---
 # Skill: Log Sprint Progress
-**Trigger**: Auto-triggered by `END OF TASK PROTOCOL` in standards, or when user says "/log", "/memo", "记录一下".
+**Trigger**: Auto-triggered by `END OF TASK PROTOCOL` in standards, or when user says "/log", "/memory-sync", "记录一下".
 **Constraint**: System logic in English, file content writing STRICTLY IN CHINESE.
 
 ### Steps:

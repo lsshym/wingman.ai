@@ -1,6 +1,6 @@
 ---
 name: find
-description: Find existing components, utilities, and reusable assets when the user asks to search for similar implementations or reusable modules.
+description: Find existing reusable assets in the project registry. Use when searching for similar components, utilities, or prior implementations before building new ones.
 ---
 
 # Command: Find Component

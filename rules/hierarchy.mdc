@@ -1,5 +1,5 @@
 ---
-description: Fallback priority protocol that yields to project-specific Cursor rules when they exist.
+description: Fallback precedence rule that yields to project-specific rule files when they exist.
 alwaysApply: true
 ---
 

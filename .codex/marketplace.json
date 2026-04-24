@@ -5,7 +5,7 @@
       "name": "wingman",
       "version": "1.0.0",
       "source": "../",
-      "description": "Cross-platform AI engineering plugin packaged for Codex from the same shared core."
+      "description": "Cross-platform AI engineering plugin for execution, context, and reuse."
     }
   ]
 }

@@ -1,6 +1,6 @@
 ---
 name: zod-gen
-description: Generate strict Zod schemas for backend payload validation, transformation, and TypeScript type inference.
+description: Generate strict Zod schemas for backend data contracts. Use when validating API payloads, transforming response shapes, or inferring TypeScript types.
 ---
 
 # Modern Data Validation & Transformation

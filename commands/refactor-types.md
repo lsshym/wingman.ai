@@ -1,6 +1,6 @@
 ---
 name: refactor-types
-description: Start the interactive type refactor workflow with path-aware diagnostics before extracting or reorganizing types.
+description: Start an interactive type refactor workflow. Use when separating types from logic and deciding target paths before making code changes.
 ---
 
 # Interactive Type Refactoring (Table Mode V5 - Path Aware)

@@ -1,6 +1,6 @@
 ---
 name: reg
-description: Register a component, hook, or utility into the project registry when the user asks to catalog or index reusable code.
+description: Register reusable project assets into the project registry. Use when cataloging components, hooks, or utilities for later reuse.
 ---
 
 # Command: Register Component

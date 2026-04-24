@@ -30,7 +30,7 @@ This upgrade uses the approved "balanced" migration mode:
 - Rename global rules into `.mdc` files with required frontmatter
 - Use frontmatter `name` for manual trigger identity
 - Use frontmatter `description` for automatic recall hints
-- Resolve the public `/init` naming mismatch without preserving the old misspelling as the primary public entry
+- Resolve the public `/memory-setup` and `/memory-sync` naming without preserving older entrypoints as the primary public entry
 - Keep repository metadata and README aligned with the new structure
 - Preserve a platform-neutral shared core that can be wrapped by Cursor, Codex, and future platforms
 
@@ -50,7 +50,7 @@ This upgrade uses the approved "balanced" migration mode:
 ├── .cursor-plugin/
 │   └── plugin.json
 ├── commands/
-│   ├── memo.md
+│   ├── memory-sync.md
 │   ├── refactor-types.md
 │   └── refactor.md
 ├── rules/
@@ -61,7 +61,7 @@ This upgrade uses the approved "balanced" migration mode:
 │   │   └── SKILL.md
 │   ├── find/
 │   │   └── SKILL.md
-│   ├── init/
+│   ├── memory-setup/
 │   │   └── SKILL.md
 │   ├── reg/
 │   │   └── SKILL.md
@@ -79,7 +79,7 @@ The following capabilities move into `skills/` because they should be available 
 
 - `api-bind`
 - `find`
-- `init`
+- `memory-setup`
 - `reg`
 - `zod-gen`
 
@@ -87,21 +87,21 @@ The following capabilities move into `skills/` because they should be available 
 
 The following capabilities stay manual-first inside `commands/` because they are workflow-driven and should remain explicit:
 
-- `memo`
+- `memory-sync`
 - `refactor`
 - `refactor-types`
 
 ## Naming Decisions
 
-### `/init`
+### `/memory-setup`
 
-The public entry is normalized to `/init`.
+The public entry is normalized to `/memory-setup`.
 
 Implementation decision:
 
-- the physical path becomes `skills/init/SKILL.md`
-- the frontmatter `name` becomes `init`
-- the previous `init-momory` misspelling is retired as a public packaging identifier
+- the physical path becomes `skills/memory-setup/SKILL.md`
+- the frontmatter `name` becomes `memory-setup`
+- the previous init misspelling is retired as a public packaging identifier
 
 This resolves the release-facing naming inconsistency while preserving the existing strategy body content.
 
@@ -113,7 +113,7 @@ The following public names remain unchanged in this stage:
 - `find`
 - `reg`
 - `zod-gen`
-- `memo`
+- `memory-sync`
 - `refactor`
 - `refactor-types`
 
@@ -189,7 +189,7 @@ The README must be updated to reflect:
 - the project as a cross-platform plugin package rather than a Cursor-only artifact
 - Cursor retained as the most explicit compatibility target for structure and metadata
 - Codex retained as a packaging wrapper, not as a fully equivalent trigger model claim
-- the normalized `/init` public entry
+- the normalized `/memory-setup` and `/memory-sync` public entries
 
 ## Content Preservation Boundary
 
@@ -226,7 +226,7 @@ The following conditions must remain true after the migration:
 - each skill lives in its own directory and uses `SKILL.md`
 - each rule uses `.mdc` plus `alwaysApply: true`
 - core strategy bodies are not substantively rewritten
-- `/init` is the normalized public entry
+- `/memory-setup` and `/memory-sync` are the normalized public entries
 - the repository remains a shared core rather than a Cursor-only package
 
 ## Validation Criteria

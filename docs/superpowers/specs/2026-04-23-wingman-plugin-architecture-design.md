@@ -1,5 +1,7 @@
 # Wingman Plugin Architecture Design
 
+> Historical note: this document captures the first-stage flat-file migration design from April 23, 2026. The current repository shape and public memory entrypoints are defined by the newer April 24, 2026 specs, including [2026-04-24-wingman-cursor-native-skills-upgrade-design.md](./2026-04-24-wingman-cursor-native-skills-upgrade-design.md) and [2026-04-24-wingman-product-positioning-design.md](./2026-04-24-wingman-product-positioning-design.md).
+
 ## Overview
 
 This design defines the first-stage engineering migration of the current repository into a market-ready, multi-platform plugin package named `wingman`.

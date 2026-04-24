@@ -1,19 +1,8 @@
 # Wingman
 
-> Shared core, platform shells.
+> A cross-platform AI engineering plugin for execution, context, and reuse.
 
-Wingman is a cross-platform AI engineering plugin package built around one shared content core and thin platform-specific wrappers.
-
-The shared core lives at the repository root:
-
-- `rules/` contains global rule files in `.mdc` format
-- `skills/` contains reusable skill capabilities with YAML frontmatter
-- `commands/` contains manual-first workflows with slash-command metadata
-
-Platform wrappers stay thin:
-
-- `.cursor-plugin/plugin.json` maps Cursor to the shared `rules/`, `skills/`, and `commands/`
-- `.codex/marketplace.json` packages the same repository root for Codex
+Wingman packages one shared content core for practical engineering execution, advanced context workflows, and reusable project asset lookup across multiple AI coding platforms.
 
 ## Principles
 
@@ -36,23 +25,24 @@ Platform wrappers stay thin:
 └── README.md
 ```
 
-## Included Skills
+## Core Engineering
 
 - `/api-bind`
-- `/find`
-- `/init`
-- `/reg`
 - `/zod-gen`
-
-Each skill lives in `skills/<name>/SKILL.md` and exposes its public trigger through frontmatter `name`.
-
-## Included Commands
-
-- `/memo`
 - `/refactor`
 - `/refactor-types`
 
-These manual workflows live directly under `commands/` and also use frontmatter `name` for slash discovery.
+## Advanced Context
+
+- `/memory-setup`
+- `/memory-sync`
+
+Best for repositories with longer timelines, collaborative work, or codebases where durable context matters.
+
+## Project Registry
+
+- `/reg`
+- `/find`
 
 ## Included Rules
 
@@ -63,36 +53,18 @@ Both rule files include `alwaysApply: true` so they behave as always-on rules in
 
 ## Packaging Model
 
-Wingman uses Cursor-compatible directory semantics and frontmatter as the canonical packaging shape because they are explicit, portable, and easy to wrap for other ecosystems.
+Wingman keeps one shared content core at the repository root:
 
-Cursor is one supported target, not the identity of the project.
-Codex and future platforms should consume the same shared core through wrapper metadata rather than through duplicated prompt bodies.
+- `rules/`
+- `skills/`
+- `commands/`
 
-## Cursor Compatibility
+Platform wrappers stay thin:
 
-The current layout follows Cursor's plugin reference:
+- `.cursor-plugin/plugin.json`
+- `.codex/marketplace.json`
 
-- rules live in `rules/*.mdc`
-- skills live in `skills/<name>/SKILL.md`
-- commands live in `commands/*.md`
-- `.cursor-plugin/plugin.json` uses root-relative component paths without `..`
-
-This keeps the package compatible with Cursor's discovery rules while preserving a platform-neutral repository core.
-
-## Public Entry Names
-
-The release-facing command surface is:
-
-- `/api-bind`
-- `/find`
-- `/init`
-- `/memo`
-- `/refactor`
-- `/refactor-types`
-- `/reg`
-- `/zod-gen`
-
-The previous `init-momory` spelling is no longer exposed as the primary public entry.
+Cross-platform means shared content and aligned public capability names, not guaranteed identical runtime behavior on every platform.
 
 ## License
 

@@ -2,7 +2,7 @@
   "name": "wingman",
   "version": "1.0.0",
   "private": false,
-  "description": "Cross-platform AI engineering plugin with shared rules, skills, and manual workflows.",
+  "description": "Cross-platform AI engineering plugin for execution, context, and reuse.",
   "license": "MIT",
   "keywords": [
     "ai",

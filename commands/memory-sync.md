@@ -1,9 +1,9 @@
 ---
-name: memo
-description: Trigger the memory sync workflow to record durable progress, active context, and domain knowledge updates.
+name: memory-sync
+description: Sync progress, decisions, or new records into the memory workflow. Use when users want to manually refresh project memory.
 ---
 
-# Command: Memo Sync v3.1 (Value Funnel Dispatcher)
+# Command: /memory-sync v3.1 (Value Funnel Dispatcher)
 
 **System**: Skill Dispatcher & Project Scribe.
 **Task**: Orchestrate the Memory Bank update by explicitly triggering V3 Value-Funnel Agent Skills.
@@ -12,9 +12,9 @@ description: Trigger the memory sync workflow to record durable progress, active
 ---
 
 ## Step 1: INITIATE & PARSE (触发解析)
-Parse input: `/memo [text]`.
-- Case A: `/memo` (No extra text) -> Analyze current chat session for core changes.
-- Case B: `/memo [text]` -> Focus specifically on the instruction in `[text]`.
+Parse input: `/memory-sync [text]`.
+- Case A: `/memory-sync` (No extra text) -> Analyze current chat session for core changes.
+- Case B: `/memory-sync [text]` -> Focus specifically on the instruction in `[text]`.
 - **User Override**: If user explicitly said "skip update", "不更新" -> STOP entirely.
 
 ---

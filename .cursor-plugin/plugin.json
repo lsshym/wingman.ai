@@ -1,6 +1,6 @@
 {
   "name": "wingman",
   "displayName": "Wingman",
-  "description": "Cross-platform AI engineering plugin with shared rules, skills, and manual workflows.",
+  "description": "Cross-platform AI engineering plugin for execution, context, and reuse.",
   "version": "1.0.0"
 }

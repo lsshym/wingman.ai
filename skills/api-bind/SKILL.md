@@ -1,6 +1,6 @@
 ---
 name: api-bind
-description: Adaptive API binding skill for interface docs, field mapping, backend integration, and API-to-UI sync work.
+description: Bind backend payloads to existing UI components without adapter drift. Use when integrating API responses, field mappings, or backend-to-UI contracts.
 ---
 
 # Adaptive API Integration Protocol

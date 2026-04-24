@@ -117,7 +117,7 @@ This creates the impression of an internal toolbox instead of a coherent product
 
 ### Memory Workflow Naming
 
-The previous `/init` name is too broad and ambiguous because it does not tell users what is being initialized.
+The previous init name is too broad and ambiguous because it does not tell users what is being initialized.
 
 The approved naming direction is:
 
@@ -132,7 +132,7 @@ This name should mean:
 - create the required files and structure
 - establish the memory-system foundation for the repository
 
-It is preferable to `/init` because it makes the target system explicit.
+It is preferable to the previous init entrypoint because it makes the target system explicit.
 
 #### `/memory-sync`
 
@@ -142,7 +142,7 @@ This name should mean:
 - record new progress when needed
 - update the working memory state when users want an explicit refresh
 
-This name is preferred over `/memo` because it is clearer, less internal-sounding, and better aligned with `/memory-setup`.
+This name is preferred over the previous memo entrypoint because it is clearer, less internal-sounding, and better aligned with `/memory-setup`.
 
 ### Registry Naming
 
