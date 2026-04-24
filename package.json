@@ -1,0 +1,16 @@
+{
+  "name": "wingman",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Multi-platform AI engineering playbook for Cursor and Codex.",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "agentic",
+    "cursor",
+    "codex",
+    "prompt",
+    "workflow",
+    "plugin"
+  ]
+}
