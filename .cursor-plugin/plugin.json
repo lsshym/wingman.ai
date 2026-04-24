@@ -1,0 +1,8 @@
+{
+  "name": "wingman",
+  "displayName": "Wingman",
+  "description": "Enterprise-grade architectural workflow and memory system.",
+  "version": "1.0.0",
+  "skills": "../skills/",
+  "rules": "../rules/"
+}
