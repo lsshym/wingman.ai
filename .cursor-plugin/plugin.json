@@ -1,7 +1,7 @@
 {
   "name": "wingman",
   "displayName": "Wingman",
-  "description": "Enterprise-grade architectural workflow and memory system.",
+  "description": "Cursor-native AI engineering skill pack with shared rules, skills, and manual workflows.",
   "version": "1.0.0",
   "skills": "../skills/",
   "rules": "../rules/"

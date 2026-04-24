@@ -1,3 +1,8 @@
+---
+name: refactor-types
+description: Start the interactive type refactor workflow with path-aware diagnostics before extracting or reorganizing types.
+---
+
 # Interactive Type Refactoring (Table Mode V5 - Path Aware)
 
 **Role**: You are a TypeScript Architecture Specialist.

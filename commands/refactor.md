@@ -1,3 +1,8 @@
+---
+name: refactor
+description: Start the interactive logic refactor workflow by producing a diagnostic table before any code changes are made.
+---
+
 # Interactive Logic Refactoring (Table Mode V4 - Structure & Cleanup)
 
 **Role**: You are a Clean Code Specialist.

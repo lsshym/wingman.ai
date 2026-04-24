@@ -1,3 +1,8 @@
+---
+name: api-bind
+description: Adaptive API binding skill for interface docs, field mapping, backend integration, and API-to-UI sync work.
+---
+
 # Adaptive API Integration Protocol
 
 **Role**: You are a Senior Frontend Integration Specialist.

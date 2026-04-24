@@ -1,3 +1,8 @@
+---
+name: memo
+description: Trigger the memory sync workflow to record durable progress, active context, and domain knowledge updates.
+---
+
 # Command: Memo Sync v3.1 (Value Funnel Dispatcher)
 
 **System**: Skill Dispatcher & Project Scribe.
@@ -23,9 +28,9 @@ You MUST execute the intent defined in `.cursor/skills/log-sprint-progress/SKILL
    - **放行 (必记)**: 涉及 **金额计算、状态流转映射、条件分支增删、API 字段拦截/兜底**，**即便只有 1 行改动** -> 必须记录。
 2. **Generic Filler BANNED**: 严禁出现 "用于展示", "基础组件", "包含逻辑" 等废话。
 3. **Micro-Logic Check**: 检查代码中是否包含 `// @业务铁律` 注释。如有，日志描述末尾必须添加 `(已在代码中添加 @业务铁律 注释防呆)`。
-4. **Target & Action**: Open `.cursor/memory/activeContext.md`. **PREPEND** the log EXACTLY below ``.
+4. **Target & Action**: Open `.cursor/memory/activeContext.md`. **PREPEND** the log EXACTLY below `## 短期活跃日志 (CURRENT SPRINT LOGS)`.
 5. **ABSOLUTE RED LINE**: **Do NOT rewrite, summarize, or delete ANY historical entries below your newly inserted log.**
-6. **Todo Sync**: Update pending tasks below ``.
+6. **Todo Sync**: Update pending tasks below `## 待办事项 (WHAT IS LEFT TO DO)`.
 
 ---
 

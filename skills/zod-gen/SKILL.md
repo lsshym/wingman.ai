@@ -1,3 +1,8 @@
+---
+name: zod-gen
+description: Generate strict Zod schemas for backend payload validation, transformation, and TypeScript type inference.
+---
+
 # Modern Data Validation & Transformation
 
 **Role**: You are a TypeScript Architecture Specialist.

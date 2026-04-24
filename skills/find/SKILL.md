@@ -1,3 +1,8 @@
+---
+name: find
+description: Find existing components, utilities, and reusable assets when the user asks to search for similar implementations or reusable modules.
+---
+
 # Command: Find Component
 
 **System**: Component Matchmaker.
@@ -37,3 +42,4 @@ Output the top 1 to 3 best matches in STRICTLY CHINESE.
   // 提供1-3行的极简调用伪代码
   import { [Name] } from 'Path';
   <[Name] propA="..." />
+  ```

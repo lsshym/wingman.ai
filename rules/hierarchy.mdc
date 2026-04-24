@@ -1,3 +1,8 @@
+---
+description: Fallback priority protocol that yields to project-specific Cursor rules when they exist.
+alwaysApply: true
+---
+
 # HIERARCHY PROTOCOL (优先级协议)
 # 核心原则：项目规则 (.cursorrules/.mdc) 绝对优先 | 仅做兜底
 
