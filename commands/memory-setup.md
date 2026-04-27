@@ -156,9 +156,9 @@ Create or update `AGENTS.md` with a Wingman section:
 # Wingman Memory
 
 Before non-trivial coding, debugging, planning, review, API integration, or business-logic work:
-- Use the `memory-load` protocol if `.wingman/memory/projectBrief.md` exists.
-- Read `.wingman/memory/activeContext.md` if it exists.
-- Read only domain files relevant to the current task.
+- Decide whether Wingman memory is needed.
+- Skip memory-load for trivial, isolated tasks with no business, reuse, or existing-behavior impact.
+- Use the `memory-load` protocol when the task is non-trivial, touches existing behavior, or you are uncertain.
 
 Before reporting meaningful coding work as complete:
 - Use the `memory-sync` protocol unless the user explicitly says "skip update", "不更新", "跳过记录", "这个不用记忆", or equivalent.
