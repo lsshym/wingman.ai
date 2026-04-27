@@ -1,0 +1,11 @@
+{
+  "name": "wingman-marketplace",
+  "plugins": [
+    {
+      "name": "wingman",
+      "version": "1.0.0",
+      "source": "../",
+      "description": "Cross-platform AI engineering plugin for execution, context, and reuse."
+    }
+  ]
+}
