@@ -15,12 +15,15 @@ Create:
 
 - `.wingman/memory/`
 - `.wingman/memory/domains/`
+- `.wingman/memory/archive/`
 - `.wingman/registry/`
 
 Seed:
 
 - `.wingman/memory/projectBrief.md`
 - `.wingman/memory/activeContext.md`
+- `.wingman/memory/domains/README.md`
+- `.wingman/memory/archive/README.md`
 - `.wingman/registry/ui-components.md`
 - `.wingman/registry/business-components.md`
 - `.wingman/registry/utils.md`
@@ -80,6 +83,69 @@ Write each registry file with a title only:
 
 ```markdown
 # Utilities
+```
+
+## Domain Template
+
+Write `.wingman/memory/domains/README.md`:
+
+````markdown
+# Domain Memory
+
+Domains store durable business and architecture knowledge, not feature logs.
+
+## Rules
+
+- Do not create one domain file per small feature.
+- Prefer stable business domains such as `checkout`, `auth`, `order`, or `billing`.
+- Small domains may use `domains/<domain>.md`.
+- Large domains should use `domains/<domain>/index.md` plus topic files.
+- Keep `index.md` small and navigational.
+- If a domain exceeds 250 lines or contains 3+ unrelated knowledge clusters, split it into a folder.
+
+## Folder Domain Shape
+
+```text
+domains/checkout/
+  index.md
+  pricing.md
+  status-flow.md
+  api-contracts.md
+  edge-cases.md
+```
+
+## Index Shape
+
+```markdown
+# Checkout Domain
+
+## When To Read This Domain
+- Checkout page
+- Payment flow
+- Discounts
+- Amount calculations
+
+## Current Truths
+- `checkout_type` is the canonical checkout type. [WHY]: ...
+
+## Subfiles
+- `pricing.md`: amount, discount, currency, display rules
+- `status-flow.md`: checkout, payment, and order state mapping
+- `api-contracts.md`: request/response fields and backend contracts
+- `edge-cases.md`: historical pitfalls and debugging conclusions
+```
+````
+
+## Archive Template
+
+Write `.wingman/memory/archive/README.md`:
+
+```markdown
+# Memory Archive
+
+Cold storage for old active-context logs that should not load by default.
+
+Use monthly files such as `2026-04.md`. Move complete log blocks here; do not summarize archived logs unless the user asks.
 ```
 
 ## Platform Entry Rules

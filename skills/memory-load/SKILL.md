@@ -15,7 +15,10 @@ Expected files:
 
 - `.wingman/memory/projectBrief.md`
 - `.wingman/memory/activeContext.md`
+- `.wingman/memory/domains/README.md`
 - `.wingman/memory/domains/*.md`
+- `.wingman/memory/domains/*/index.md`
+- `.wingman/memory/archive/*.md` is cold storage and should not be read by default.
 
 If `.wingman/memory/` does not exist, continue normally without warning unless the user asked about memory.
 
@@ -24,12 +27,19 @@ If `.wingman/memory/` does not exist, continue normally without warning unless t
 1. Read `.wingman/memory/projectBrief.md` if it exists.
 2. Read `.wingman/memory/activeContext.md` if it exists.
 3. Use the domain registry in `projectBrief.md` and the user's task to choose relevant domain files.
-4. Read only relevant `.wingman/memory/domains/*.md` files.
-5. Before editing code, identify:
+4. If `.wingman/memory/domains/README.md` exists, use it as the domain structure contract.
+5. For a file domain, read only the relevant `.wingman/memory/domains/<domain>.md`.
+6. For a folder domain, read `.wingman/memory/domains/<domain>/index.md` first, then use its `Subfiles` section to choose relevant topic files. Do not read every subfile by default.
+7. Read archive files only when the user asks for history or when active memory points to a specific archived month.
+8. Before editing code, build an internal Memory Context Checklist:
+   - Active task.
+   - Relevant memory files read.
    - Which memory rule or domain truth applies.
    - Which exact fields, symbols, contracts, or files are binding.
+   - Reusable assets to check.
    - Whether the requested change would conflict with memory.
-6. If required context is missing or contradictory, stop and ask the user instead of inventing substitutes.
+9. Do not show the checklist by default. Surface it only when there is a conflict, missing context, or the user asks.
+10. If required context is missing or contradictory, stop and ask the user instead of inventing substitutes.
 
 ## Binding Rules
 

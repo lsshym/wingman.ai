@@ -15,7 +15,10 @@ Expected files:
 
 - `.wingman/memory/projectBrief.md`
 - `.wingman/memory/activeContext.md`
+- `.wingman/memory/domains/README.md`
 - `.wingman/memory/domains/*.md`
+- `.wingman/memory/domains/*/index.md`
+- `.wingman/memory/archive/*.md`
 
 If the memory root is missing, tell the user to run `memory-setup` before syncing.
 
@@ -95,13 +98,35 @@ If durable knowledge exists:
 
 1. Extract the durable rule and include `[WHY]`: the pitfall, business reason, or technical reasoning.
 2. Read `.wingman/memory/projectBrief.md`.
-3. Route the knowledge:
+3. Read `.wingman/memory/domains/README.md` if it exists and follow its structure rules.
+4. Route the knowledge:
    - Global rule or ADR -> update `## 1. 核心架构决策 (ADR - Global Rules)` in `projectBrief.md`.
-   - New domain -> create `.wingman/memory/domains/<domain-name>.md` and register it in `projectBrief.md`.
-   - Existing domain -> update that domain file.
-4. In domain files, write under `## 当前业务真理`.
-5. Overwrite outdated or contradictory logic. Do not leave conflicting truths alive.
-6. Remove only active-context logs that were fully distilled into durable knowledge, or trivial logs older than 5 days.
+   - Existing small domain -> update `.wingman/memory/domains/<domain>.md`.
+   - Existing folder domain -> read `<domain>/index.md`, choose the relevant topic file, then update the index when adding or moving subfiles.
+   - New domain -> create either `.wingman/memory/domains/<domain>.md` for small domains or `.wingman/memory/domains/<domain>/index.md` plus topic files for large domains.
+5. Do not create one domain file per small feature. Route feature knowledge into a stable business domain whenever possible.
+6. If a domain file exceeds 250 lines or contains 3+ unrelated knowledge clusters, split it into `<domain>/index.md` plus topic files and update `projectBrief.md`.
+7. In domain files, write durable rules under `## 当前业务真理`.
+8. Overwrite outdated or contradictory logic. Do not leave conflicting truths alive.
+9. Remove only active-context logs that were fully distilled into durable knowledge, or trivial logs older than 5 days.
+
+## Phase 3: Active Context Maintenance
+
+Treat `activeContext.md` as hot working memory, not permanent history.
+
+Run maintenance when:
+
+- `activeContext.md` has more than 20 log entries.
+- `activeContext.md` is longer than 300 lines.
+- The user asks to clean, compact, or summarize memory.
+
+Maintenance rules:
+
+- Keep current todos and recent high-signal logs in `activeContext.md`.
+- Move complete old log blocks to `.wingman/memory/archive/YYYY-MM.md`; do not summarize them unless the user asks.
+- Prefer distilling stable rules into `domains/*.md` before archiving.
+- Delete only logs proven obsolete, contradicted, or replaced by a same-task correction.
+- Never rewrite `activeContext.md` wholesale.
 
 ## Completion
 
