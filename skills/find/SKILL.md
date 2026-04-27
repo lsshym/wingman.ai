@@ -6,7 +6,7 @@ description: Find existing reusable assets in the project registry. Use when sea
 # Command: Find Component
 
 **System**: Component Matchmaker.
-**Task**: Match user requirements with existing components/utils in the `.cursor/brain/` registries.
+**Task**: Match user requirements with existing components/utils in the `.wingman/registry/` registries.
 
 ---
 ## Step 1: Trigger & Gate Function
@@ -19,9 +19,9 @@ IF NO:
 
 ## Step 2: Context Retrieval (静默读取)
 Silently use your file reading tools to scan the following files (if they exist):
-1. `.cursor/brain/ui-components.md`
-2. `.cursor/brain/business-components.md`
-3. `.cursor/brain/utils.md`
+1. `.wingman/registry/ui-components.md`
+2. `.wingman/registry/business-components.md`
+3. `.wingman/registry/utils.md`
 
 ## Step 3: Feature Matching Logic (高精度特征比对)
 Extract core keywords, UI patterns, and logic intent from the user's query.

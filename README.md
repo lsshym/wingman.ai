@@ -16,7 +16,9 @@ Wingman packages one shared content core for practical engineering execution, ad
 ```text
 .
 ├── .codex/
+├── .codex-plugin/
 ├── .cursor-plugin/
+├── .claude-plugin/
 ├── commands/
 ├── docs/
 ├── skills/
@@ -34,10 +36,13 @@ Wingman packages one shared content core for practical engineering execution, ad
 
 ## Advanced Context
 
+- `memory-load`
+- `memory-sync`
 - `/memory-setup`
-- `/memory-sync`
 
 Best for repositories with longer timelines, collaborative work, or codebases where durable context matters.
+
+Wingman stores project memory in `.wingman/memory/` inside the target repository. Platform entry files such as `AGENTS.md`, `CLAUDE.md`, and `.cursor/rules/wingman-memory.mdc` should point agents to the same memory root.
 
 ## Project Registry
 
@@ -62,7 +67,10 @@ Wingman keeps one shared content core at the repository root:
 Platform wrappers stay thin:
 
 - `.cursor-plugin/plugin.json`
+- `.codex-plugin/plugin.json`
 - `.codex/marketplace.json`
+- `.claude-plugin/plugin.json`
+- `.claude-plugin/marketplace.json`
 
 Cross-platform means shared content and aligned public capability names, not guaranteed identical runtime behavior on every platform.
 

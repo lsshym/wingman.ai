@@ -85,13 +85,13 @@ From the source code, extract EXACTLY these 5 elements:
 Choose the target registry file based on the target’s actual nature:
 
 - Pure presentation UI components
-  -> `.cursor/brain/ui-components.md`
+  -> `.wingman/registry/ui-components.md`
 
 - Components with business logic, API calls, routing, global state, device branching, or workflow logic
-  -> `.cursor/brain/business-components.md`
+  -> `.wingman/registry/business-components.md`
 
 - Pure logic functions, helpers, or React hooks
-  -> `.cursor/brain/utils.md`
+  -> `.wingman/registry/utils.md`
 
 ### Important classification rule
 If a component wraps low-level UI primitives but also contains behavioral branching or environment/device logic,
@@ -107,9 +107,9 @@ Before writing anything, you MUST check for duplicates.
 
 ### 5.1 Read registry files first
 Read:
-- `.cursor/brain/ui-components.md` if it exists
-- `.cursor/brain/business-components.md` if it exists
-- `.cursor/brain/utils.md` if it exists
+- `.wingman/registry/ui-components.md` if it exists
+- `.wingman/registry/business-components.md` if it exists
+- `.wingman/registry/utils.md` if it exists
 
 ### 5.2 Duplicate key
 Use **Path** as the primary deduplication key.
