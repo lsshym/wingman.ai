@@ -44,6 +44,10 @@ Best for repositories with longer timelines, collaborative work, or codebases wh
 
 Wingman stores project memory in `.wingman/memory/` inside the target repository. Platform entry files such as `AGENTS.md`, `CLAUDE.md`, and `.cursor/rules/wingman-memory.mdc` should point agents to the same memory root.
 
+## Language Policy
+
+Wingman's published plugin instructions are written in English. Generated memory content is adaptive: it follows `.wingman/memory/projectBrief.md` -> `Memory Settings` -> `Language` when configured, otherwise it follows the existing memory language, the user's current language, then English as fallback.
+
 ## Project Registry
 
 - `/reg`

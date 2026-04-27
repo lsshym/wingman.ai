@@ -39,34 +39,39 @@ Platform entry rules:
 Write `.wingman/memory/projectBrief.md`:
 
 ```markdown
-# 项目全局大脑 (Project Brief)
+# Project Brief
 
-## 1. 核心架构决策 (ADR - Global Rules)
-> 记录影响全站的全局规则。每条必须包含 `[WHY]`。
+## 0. Memory Settings
+- **Language**: `auto`
 
-## 2. 领域索引表 (Domain Registry)
-> 根据当前任务判断业务领域，只读取相关 domain 文件。
-> 当沉淀出新领域时，在 `.wingman/memory/domains/` 下创建对应 `.md` 文件，并在这里登记。
+## 1. Architecture Decisions (ADR - Global Rules)
+> Record global rules that affect the whole project. Each rule must include `[WHY]`.
+
+## 2. Domain Registry
+> Use the current task to identify the relevant business domain, then read only the relevant domain files.
+> When durable knowledge creates a new domain, create a matching `.md` file or domain folder under `.wingman/memory/domains/` and register it here.
 ```
+
+Set `Language` to the user's preferred memory language when clear, such as `zh-CN` or `en`. Use `auto` when unclear. Future memory updates should follow this setting.
 
 ## Active Context Template
 
 Write `.wingman/memory/activeContext.md`:
 
 ```markdown
-# 核心记忆与进度 (Active Context)
+# Active Context
 
-## 待办事项 (WHAT IS LEFT TO DO)
-- [ ] 待规划
+## Pending Tasks
+- [ ] To be planned
 
 ---
-## 短期活跃日志 (CURRENT SPRINT LOGS)
-### [初始化] Wingman 记忆系统启用
-- **目标**: 启用跨平台 Wingman 记忆系统，用于任务开始前加载项目上下文，并在任务结束后同步重要进度与长期知识。
-- **核心文件明细**:
-  - `.wingman/memory/projectBrief.md`: [Project Brief] - 记录全局 ADR 与领域索引。
-  - `.wingman/memory/activeContext.md`: [Active Context] - 记录短期任务进度、待办与近期决策。
-- **遗留问题/备注**: 领域文件将在出现具体业务领域时创建。
+## Current Sprint Logs
+### [Init] Wingman memory enabled
+- **Goal**: Enable cross-platform Wingman memory so agents can load project context before work and sync important progress after work.
+- **Core Files**:
+  - `.wingman/memory/projectBrief.md`: [Project Brief] - Stores global ADRs and the domain registry.
+  - `.wingman/memory/activeContext.md`: [Active Context] - Stores short-term progress, pending tasks, and recent decisions.
+- **Notes**: Domain files should be created when concrete business domains emerge.
 ```
 
 ## Registry Templates
@@ -187,7 +192,7 @@ The memory system enforces:
 
 - **No silent semantic fallback**: Never use semantically different fields as backups for each other.
 - **No rule substitution**: If memory specifies a canonical field or contract, do not replace it with a proxy field.
-- **Micro-logic comments**: For tiny code changes with large business impact, add `// @业务铁律: [WHY]` in the target code.
+- **Micro-logic comments**: For tiny code changes with large business impact, add a localized invariant comment in the target code, such as `// @business-rule: [WHY]` for English memory or `// @业务铁律: [WHY]` for Chinese memory.
 - **User override**: If the user says not to update memory, do not update memory.
 
 ## Finish

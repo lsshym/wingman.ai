@@ -57,7 +57,7 @@ If uncertain, load memory.
 
 - **No silent semantic fallback**: Never use `??`, `||`, or chained ternaries to substitute one business field for a semantically different field. Missing data should render an empty state or explicit absence.
 - **No rule substitution**: If memory specifies a canonical field or contract, do not replace it with a proxy field for convenience.
-- **Micro-logic comments**: For tiny code changes with large business impact, add an inline comment in the target code using `// @业务铁律: [WHY]`.
+- **Micro-logic comments**: For tiny code changes with large business impact, add a localized invariant comment in the target code, such as `// @business-rule: [WHY]` for English memory or `// @业务铁律: [WHY]` for Chinese memory.
 - **Reuse gate**: Before creating a new React component, hook, utility, or reusable workflow, check `.wingman/registry/` and loaded memory for an existing asset. If a match exists, reuse it or explain why it does not fit.
 
 ## Platform Entry Rules
