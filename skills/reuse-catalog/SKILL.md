@@ -41,28 +41,28 @@ Seed `.wingman/registry/index.md` with:
 
 ## Components
 
-| Entry | Card | Source | Tags | Best For |
-| :--- | :--- | :--- | :--- | :--- |
+| Entry | Card | Source | Status | Tags | Best For |
+| :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## Modules
 
-| Entry | Card | Source | Tags | Best For |
-| :--- | :--- | :--- | :--- | :--- |
+| Entry | Card | Source | Status | Tags | Best For |
+| :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## Utilities
 
-| Entry | Card | Source | Tags | Best For |
-| :--- | :--- | :--- | :--- | :--- |
+| Entry | Card | Source | Status | Tags | Best For |
+| :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## Patterns
 
-| Entry | Card | Source | Tags | Best For |
-| :--- | :--- | :--- | :--- | :--- |
+| Entry | Card | Source | Status | Tags | Best For |
+| :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## Contracts
 
-| Entry | Card | Source | Tags | Best For |
-| :--- | :--- | :--- | :--- | :--- |
+| Entry | Card | Source | Status | Tags | Best For |
+| :--- | :--- | :--- | :--- | :--- | :--- |
 ```
 
 ## Categories
@@ -90,14 +90,16 @@ Extract decision-focused information:
 1. **Name**: Stable implementation name.
 2. **Source Path**: Relative source path, import path, doc path, or contract location.
 3. **Category**: One of `components`, `modules`, `utilities`, `patterns`, `contracts`.
-4. **Tags**: 3-7 precise keywords for behavior, domain, data shape, platform traits, or selection clues.
-5. **Best For**: One short phrase for index scanning.
-6. **What It Does**: 1-2 sentences based on evidence.
-7. **Use When**: Concrete situations where this implementation fits.
-8. **Do Not Use When**: Concrete situations where this implementation should be avoided.
-9. **Interface**: Main props, params, return shape, config keys, exported symbols, or contract fields.
-10. **Similar Implementations**: Related entries from the registry and how they differ. Use `None known` only after reading the index.
-11. **Selection Notes**: How an AI should decide whether to reuse, extend, wrap, or create something new.
+4. **Status**: One of `Preferred`, `Stable`, `Experimental`, `Legacy`, `Deprecated`, or `Unknown`.
+5. **Last Verified**: Current date and the source evidence used for verification.
+6. **Tags**: 3-7 precise keywords for behavior, domain, data shape, platform traits, or selection clues.
+7. **Best For**: One short phrase for index scanning.
+8. **What It Does**: 1-2 sentences based on evidence.
+9. **Use When**: Concrete situations where this implementation fits.
+10. **Do Not Use When**: Concrete situations where this implementation should be avoided.
+11. **Interface**: Main props, params, return shape, config keys, exported symbols, or contract fields.
+12. **Similar Implementations**: Related entries from the registry and how they differ. Use `None known` only after reading the index.
+13. **Selection Notes**: How an AI should decide whether to reuse, extend, wrap, or create something new.
 
 ## Deduplication
 
@@ -108,6 +110,16 @@ Before writing:
 3. Use source path as the primary duplicate key.
 4. If the same source path already has a card, update that card only when the new information is more accurate; otherwise skip.
 5. If the same name exists with a different source path, treat it as a related implementation, not a duplicate. Record the distinction in `Similar Implementations`.
+
+## Card Update Safety
+
+When updating an existing card:
+
+- Preserve user-authored decision knowledge in `Status`, `Use When`, `Do Not Use When`, `Similar Implementations`, and `Selection Notes`.
+- Replace those sections only when source evidence or explicit user instruction proves the existing content is outdated or wrong.
+- Do not regenerate a decision-focused card into a generic source summary.
+- Refresh `Last Verified` when you read current source evidence.
+- If source evidence conflicts with existing human notes, keep both signals visible and mention the conflict in `Selection Notes`.
 
 ## Card Template
 
@@ -121,6 +133,13 @@ Use this exact heading structure:
 ## Source
 - Path: `[source path]`
 - Type: `[component | module | utility | pattern | contract]`
+
+## Status
+`Preferred | Stable | Experimental | Legacy | Deprecated | Unknown`
+
+## Last Verified
+- Date: `YYYY-MM-DD`
+- Evidence: `[source path, docs path, schema path, or user-confirmed context]`
 
 ## Tags
 - `[tag]`
@@ -155,7 +174,7 @@ Do not omit a section. If a section has no known content, write `None known` and
 Update `.wingman/registry/index.md` with exactly one row under the selected category:
 
 ```markdown
-| [Implementation Name] | `[category]/[implementation-slug].md` | `[source path]` | `[tag1, tag2, tag3]` | [Best For] |
+| [Implementation Name] | `[category]/[implementation-slug].md` | `[source path]` | `[Status]` | `[tag1, tag2, tag3]` | [Best For] |
 ```
 
 Rules:
@@ -171,6 +190,7 @@ Report:
 
 - registered or updated implementation name
 - card path
+- status
 - index row status
 - 1-3 tags
 - any likely similar implementations found

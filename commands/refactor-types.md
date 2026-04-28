@@ -29,32 +29,32 @@ Evaluate each type/interface against the codebase and map it to the **Status** c
 
 1.  **Logic: MATCH** (Perfect Match)
     * *Condition*: Local type has exact fields as Shared Type.
-    * *Output Status*: **✅ 完美匹配**
+    * *Output Status*: **Exact match**
     * *Action*: Merge and import from shared.
 2.  **Logic: EXTRACT** (Inline Definition)
     * *Condition*: Code uses inline types (e.g., inside `useState`, `props`, or `zod` schemas).
-    * *Output Status*: **📦 内联定义**
+    * *Output Status*: **Inline definition**
     * *Action*: Extract to the detected Target Path.
 3.  **Logic: PARTIAL** (Superset/Subset)
     * *Condition*: Local type extends or narrows a Shared Type.
-    * *Output Status*: **🔗 部分复用**
+    * *Output Status*: **Partial reuse**
     * *Action*: Use `Pick`, `Omit`, or `extends`.
 4.  **Logic: CONFLICT** (Hard Conflict)
     * *Condition*: Same name but incompatible types/meanings.
-    * *Output Status*: **🛑 命名冲突**
+    * *Output Status*: **Naming conflict**
     * *Action*: Rename Local type (e.g., prefix with Component name).
 5.  **Logic: SAFE** (Ignored)
     * *Condition*: Standard types (`Record`, `string`) or already valid imports.
-    * *Output Status*: **⚪️ 无需处理**
+    * *Output Status*: **No action**
     * *Action*: Ignore.
 
 ### 📊 Required Output Format (Example)
-| 类型名称 (Type) | 状态 (Status) | 📂 目标路径 (Target Path) | 执行计划 (Action Plan) |
+| Type | Status | Target Path | Action Plan |
 | :--- | :--- | :--- | :--- |
-| `GoalItem` | ✅ 完美匹配 | `@/types/goal.ts` | 删除本地定义，引入该路径 |
-| `PlanInfo` | 📦 内联定义 | `./models.ts` (New) | 提取并创建新文件 |
-| `User` | 🛑 命名冲突 | `@/models/user.ts` | 修改本地名称为 `LocalUser` |
-| `Record` | ⚪️ 无需处理 | - | TS 原生类型，跳过 |
+| `GoalItem` | Exact match | `@/types/goal.ts` | Remove the local definition and import the shared type. |
+| `PlanInfo` | Inline definition | `./models.ts` (New) | Extract the inline shape into a new colocated type file. |
+| `User` | Naming conflict | `@/models/user.ts` | Rename the local type to `LocalUser` before importing the shared type. |
+| `Record` | No action | - | Native TypeScript utility type; leave unchanged. |
 
 ## PHASE 2: EXECUTION RULES (Wait for Approval)
 *Do not execute these yet. Wait for explicit approval such as "Go", "Apply", "Proceed", or the user's equivalent in their language.*

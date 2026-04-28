@@ -36,12 +36,12 @@ Evaluate functions, components, and logic blocks against these criteria:
     * *Action*: Extract Method / Early Return.
 
 ### 📊 Required Output Format (Example)
-| 目标模块 (Target) | 问题类型 (Category) | 严重度 (Severity) | 优化方案 (Action Plan) |
+| Target | Category | Severity | Action Plan |
 | :--- | :--- | :--- | :--- |
-| `AcgShopCard` | 📦 属性爆炸 (PROPS) | 🔴 高 | 将 8 个独立属性合并为 `product={moreProduct}` 传递 |
-| `AdminOrderRecord`| 🗑 冗余定义 (REDUNDANT)| 🟢 低 | 删除别名，直接使用 `CommissionItem` |
-| `ShopPage` | 🧹 解构优化 (DESTRUCT) | 🟡 中 | 提取 `const { id, name } = data` 以简化引用 |
-| `ComponentBody` | 🗂 顺序混乱 (ORDER) | 🟢 低 | 将 `useEffect` 移至 `useState` 之后，Handler 之前 |
+| `ProductCard` | PROPS | High | Consolidate 8 related scalar props into `product={product}` and update the child interface. |
+| `OrderRecord` | REDUNDANT | Low | Remove the alias and use `CommissionItem` directly when strict type compatibility is confirmed. |
+| `ShopPage` | DESTRUCT | Medium | Extract `const { id, name } = data` to simplify repeated access. |
+| `ComponentBody` | ORDER | Low | Move hooks/state before derived values, handlers, and render logic. |
 
 ## PHASE 2: EXECUTION RULES (Wait for Approval)
 *Do not execute these yet. Wait for explicit approval such as "Go", "Apply", "Proceed", or the user's equivalent in their language.*

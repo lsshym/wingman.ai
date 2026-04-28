@@ -34,6 +34,8 @@ Expected layout:
 Each implementation card should contain:
 
 - `Source`
+- `Status`
+- `Last Verified`
 - `Tags`
 - `Best For`
 - `What It Does`
@@ -45,23 +47,28 @@ Each implementation card should contain:
 
 ## Lookup Workflow
 
-1. Read `.wingman/registry/index.md` first.
-2. If `index.md` does not exist, fall back to legacy registry files if present:
+1. Check whether `.wingman/registry/` exists.
+2. If the registry does not exist, say no Wingman reuse registry exists yet. Offer to continue with source-code search if useful, but do not present source-search results as registry results. Suggest `reuse-catalog` for confirmed reusable implementations.
+3. Read `.wingman/registry/index.md` first when it exists.
+4. If `index.md` does not exist, fall back to legacy registry files if present:
    - `.wingman/registry/ui-components.md`
    - `.wingman/registry/business-components.md`
    - `.wingman/registry/utils.md`
-3. Extract the user's required behavior, domain, interface needs, platform constraints, and deal-breakers.
-4. From the index, choose up to 5 candidate cards by `Tags`, `Best For`, `Source`, and category.
-5. Read only those candidate cards.
-6. Compare `Use When`, `Do Not Use When`, `Interface`, `Similar Implementations`, and `Selection Notes`.
-7. Decide whether to reuse, extend, wrap, or create a new implementation.
+5. Extract the user's required behavior, domain, interface needs, platform constraints, and deal-breakers.
+6. From the index, choose up to 5 candidate cards by `Tags`, `Best For`, `Source`, category, and `Status`.
+7. If the index exists but candidate coverage is weak, the user asks for a broad/full search, or legacy registry files may contain relevant older entries, read the legacy files as supplemental evidence.
+8. Read only the selected candidate cards.
+9. Compare `Status`, `Last Verified`, `Use When`, `Do Not Use When`, `Interface`, `Similar Implementations`, and `Selection Notes`.
+10. Decide whether to reuse, extend, wrap, or create a new implementation.
 
 Do not read every card unless the index is missing, stale, or clearly insufficient.
+Clearly label any recommendation based on legacy registry files rather than a modern implementation card.
 
 ## Decision Criteria
 
 Prefer reuse when:
 
+- status is `Preferred` or `Stable`, or the card explains why another status still fits
 - required behavior matches `Use When`
 - no deal-breaker appears in `Do Not Use When`
 - interface can be used without semantic adapters or fake data
@@ -101,6 +108,7 @@ Not Chosen:
 Use:
 - Card: `.wingman/registry/[category]/[implementation].md`
 - Source: `[source path]`
+- Status: `[Preferred | Stable | Experimental | Legacy | Deprecated | Unknown]`
 
 Notes:
 - [Any caveat, missing registry info, or suggested follow-up registration.]
