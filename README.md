@@ -15,7 +15,6 @@ Wingman packages one shared content core for practical engineering execution, ad
 
 ```text
 .
-├── .codex/
 ├── .agents/
 ├── .codex-plugin/
 ├── .cursor-plugin/
@@ -247,7 +246,7 @@ Platform wrappers stay thin:
 - `.claude-plugin/plugin.json`
 - `.claude-plugin/marketplace.json`
 
-Cross-platform means shared content and aligned public capability names, not guaranteed identical runtime behavior on every platform. The Codex manifest points at `skills/`; the Cursor manifest points at `skills/` and `commands/`; Claude wiring stays conservative until its manifest semantics are verified. Platform-specific startup hooks or project entry files should invoke `using-wingman` instead of duplicating the plugin-level protocol.
+Cross-platform means shared content and aligned public capability names, not guaranteed identical runtime behavior on every platform. The Codex manifest points at `skills/`; the Cursor manifest points at `skills/` and `commands/`; the Claude plugin manifest stays metadata-only, while `.claude-plugin/marketplace.json` is kept as a Claude Code marketplace shell. Platform-specific startup hooks or project entry files should invoke `using-wingman` instead of duplicating the plugin-level protocol.
 
 ## License
 

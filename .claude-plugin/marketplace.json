@@ -4,7 +4,7 @@
     {
       "name": "wingman",
       "version": "1.0.0",
-      "source": "../",
+      "source": "./",
       "description": "Cross-platform AI engineering plugin for execution, context, and reuse."
     }
   ]
