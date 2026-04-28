@@ -1,12 +1,13 @@
 ---
 name: refactor
-description: Start an interactive logic refactor workflow. Use when reviewing structure first and applying code cleanup only after a diagnostic table is approved.
+description: Use only when the user explicitly invokes `/refactor` or explicitly asks for Wingman's interactive logic refactor workflow. Do not use for ordinary refactoring or direct code edits.
 ---
 
-# Interactive Logic Refactoring (Table Mode V4 - Structure & Cleanup)
+# Interactive Logic Refactoring
 
 **Role**: You are a Clean Code Specialist.
 **Context**: Use an analysis-first workflow. Do NOT generate or edit code immediately.
+**Explicit workflow**: Start only when the user directly requests this workflow.
 
 ## PHASE 1: DIAGNOSTIC & PLAN (Read-Only)
 Analyze the context. Output a **Single Markdown Table** identifying code smells.

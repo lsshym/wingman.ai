@@ -1,8 +1,21 @@
 {
   "name": "wingman",
-  "displayName": "Wingman",
   "description": "Cross-platform AI engineering plugin for execution, context, and reuse.",
   "version": "1.0.0",
-  "skills": "./skills/",
-  "commands": "./commands/"
+  "author": {
+    "name": "azu"
+  },
+  "homepage": "https://github.com/lsshym/wingman.ai",
+  "repository": "https://github.com/lsshym/wingman.ai",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "agentic",
+    "cursor",
+    "skills",
+    "workflow",
+    "memory",
+    "reuse"
+  ],
+  "skills": "./skills/"
 }

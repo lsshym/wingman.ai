@@ -19,22 +19,30 @@ Wingman packages one shared content core for practical engineering execution, ad
 ├── .codex-plugin/
 ├── .cursor-plugin/
 ├── .claude-plugin/
-├── commands/
-├── docs/
 ├── skills/
 ├── package.json
 └── README.md
 ```
 
+## Capability Types
+
+Wingman ships all capabilities as skills. Some skills are situational and may be used when their trigger conditions apply. Explicit workflow skills must only run when the user asks for them directly.
+
+Explicit workflow skills:
+
+- `memory-setup`
+- `refactor`
+- `refactor-types`
+
+Slash-prefixed forms such as `/zod-gen`, `/reuse-catalog`, `/reuse-select`, `/memory-setup`, `/refactor`, or `/refactor-types` are user-facing invocation aliases for skills.
+
 ## Core Engineering
 
 - `using-wingman`
 - `align-contracts`
-- `/zod-gen`
-- `/refactor`
-- `/refactor-types`
-
-Slash-prefixed entries such as `/zod-gen`, `/reuse-catalog`, `/reuse-select`, or `/refactor` are user-facing manual invocation names. The backing content may live under `skills/` or `commands/` depending on platform support. Names without `/` are canonical skill or agent protocol names.
+- `zod-gen`
+- `refactor`
+- `refactor-types`
 
 ### `using-wingman`
 
@@ -44,7 +52,7 @@ It defines:
 
 - instruction priority between users, project-local instructions, Wingman, and default model behavior
 - safe editing rules for real file changes versus abbreviated chat snippets
-- capability discovery across Wingman skills and commands
+- capability discovery across Wingman skills
 - language behavior and platform wrapper expectations
 
 ### `align-contracts`
@@ -80,7 +88,7 @@ Use align-contracts to bind this API response into the existing React component.
 Use align-contracts to migrate this legacy DTO to the new domain model.
 ```
 
-### `/zod-gen`
+### `zod-gen`
 
 Use when generating TypeScript Zod schemas for backend or external data contracts.
 
@@ -96,7 +104,7 @@ Example prompt:
 /zod-gen Generate a strict schema for this API payload and expose the transformed type.
 ```
 
-### `/refactor`
+### `refactor`
 
 Use for plan-first logic refactoring. It produces a diagnostic table first and waits for approval before code changes.
 
@@ -108,7 +116,7 @@ Good fit:
 - disorganized component logic
 - nested or oversized functions
 
-### `/refactor-types`
+### `refactor-types`
 
 Use for plan-first type refactoring. It helps separate types from logic and choose target type paths before editing code.
 
@@ -123,13 +131,13 @@ Good fit:
 
 - `memory-load`
 - `memory-sync`
-- `/memory-setup`
+- `memory-setup`
 
 Best for repositories with longer timelines, collaborative work, or codebases where durable context matters.
 
 Wingman stores project memory in `.wingman/memory/` inside the target repository. Platform entry files such as `AGENTS.md`, `CLAUDE.md`, and `.cursor/rules/wingman-memory.mdc` should point agents to the same memory root.
 
-### `/memory-setup`
+### `memory-setup`
 
 Use once in a target repository to initialize Wingman memory and platform entry files.
 
@@ -236,8 +244,6 @@ It reads `.wingman/registry/index.md` first, opens only the most relevant implem
 Wingman keeps one shared content core at the repository root:
 
 - `skills/`
-- `commands/`
-
 Platform wrappers stay thin:
 
 - `.cursor-plugin/plugin.json`
@@ -246,7 +252,7 @@ Platform wrappers stay thin:
 - `.claude-plugin/plugin.json`
 - `.claude-plugin/marketplace.json`
 
-Cross-platform means shared content and aligned public capability names, not guaranteed identical runtime behavior on every platform. The Codex manifest points at `skills/`; the Cursor manifest points at `skills/` and `commands/`; the Claude plugin manifest stays metadata-only, while `.claude-plugin/marketplace.json` is kept as a Claude Code marketplace shell. Platform-specific startup hooks or project entry files should invoke `using-wingman` instead of duplicating the plugin-level protocol.
+Cross-platform means shared content and aligned public capability names, not guaranteed identical runtime behavior on every platform. The Codex manifest points at `skills/`; the Cursor manifest points at `skills/`; the Claude plugin manifest stays metadata-only, while `.claude-plugin/marketplace.json` is kept as a Claude Code marketplace shell. Platform-specific startup hooks or project entry files should invoke `using-wingman` instead of duplicating the plugin-level protocol.
 
 ## License
 

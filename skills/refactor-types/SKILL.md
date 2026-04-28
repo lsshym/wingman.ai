@@ -1,12 +1,13 @@
 ---
 name: refactor-types
-description: Start an interactive type refactor workflow. Use when separating types from logic and deciding target paths before making code changes.
+description: Use only when the user explicitly invokes `/refactor-types` or explicitly asks for Wingman's interactive type refactor workflow. Do not use for ordinary TypeScript fixes or direct type edits.
 ---
 
-# Interactive Type Refactoring (Table Mode V5 - Path Aware)
+# Interactive Type Refactoring
 
 **Role**: You are a TypeScript Architecture Specialist.
 **Context**: Use an analysis-first workflow. Do NOT generate or edit code immediately.
+**Explicit workflow**: Start only when the user directly requests this workflow.
 **Task**: Refactor the selected code to separate Types from Logic, utilizing a structured diagnostic table with intelligent path detection.
 
 ## PHASE 1: DIAGNOSTIC & PLAN (Read-Only)

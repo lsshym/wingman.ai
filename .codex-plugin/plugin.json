@@ -1,7 +1,39 @@
 {
   "name": "wingman",
-  "displayName": "Wingman",
-  "description": "Cross-platform AI engineering plugin for execution, context, and reuse.",
   "version": "1.0.0",
-  "skills": "./skills/"
+  "description": "Cross-platform AI engineering plugin for execution, context, and reuse.",
+  "author": {
+    "name": "azu"
+  },
+  "homepage": "https://github.com/lsshym/wingman.ai",
+  "repository": "https://github.com/lsshym/wingman.ai",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "agentic",
+    "codex",
+    "cursor",
+    "skills",
+    "workflow",
+    "memory",
+    "reuse"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Wingman",
+    "shortDescription": "Execution, memory, and reuse workflows for coding agents",
+    "longDescription": "Wingman packages reusable engineering skills for contract alignment, durable project memory, reuse selection, schema generation, and explicit refactor workflows.",
+    "developerName": "azu",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Wingman to load project context before this refactor.",
+      "Use Wingman to decide whether an existing implementation should be reused."
+    ],
+    "websiteURL": "https://github.com/lsshym/wingman.ai"
+  }
 }

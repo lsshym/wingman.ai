@@ -1,11 +1,13 @@
 ---
 name: memory-setup
-description: Initialize Wingman memory files and platform entry rules. Use once when a repository needs durable AI-readable project context.
+description: Use only when the user explicitly invokes `/memory-setup` or explicitly asks to initialize Wingman memory files in the current repository. Do not use for ordinary work, memory loading, memory syncing, or setup of unrelated tools.
 ---
 
-# Command: /memory-setup
+# Memory Setup
 
 Initialize the Wingman memory workflow for the current repository. Create files on disk; do not merely print templates.
+
+This is an explicit workflow skill. Only proceed when the user directly asks for Wingman memory setup.
 
 ## Paths
 
