@@ -22,17 +22,30 @@ Wingman packages one shared content core for practical engineering execution, ad
 ├── commands/
 ├── docs/
 ├── skills/
-├── rules/
 ├── package.json
 └── README.md
 ```
 
 ## Core Engineering
 
+- `using-wingman`
 - `align-contracts`
 - `/zod-gen`
 - `/refactor`
 - `/refactor-types`
+
+Slash-prefixed entries such as `/zod-gen`, `/reg`, or `/refactor` are user-facing manual invocation names. The backing content may live under `skills/` or `commands/` depending on platform support. Names without `/` are canonical skill or agent protocol names.
+
+### `using-wingman`
+
+Use as Wingman's plugin entry protocol when a platform supports startup or explicit skill invocation.
+
+It defines:
+
+- instruction priority between users, project-local instructions, Wingman, and default model behavior
+- safe editing rules for real file changes versus abbreviated chat snippets
+- capability discovery across Wingman skills and commands
+- language behavior and platform wrapper expectations
 
 ### `align-contracts`
 
@@ -215,18 +228,10 @@ Good fit:
 
 It searches `.wingman/registry/ui-components.md`, `.wingman/registry/business-components.md`, and `.wingman/registry/utils.md`, then returns the best reuse candidates.
 
-## Included Rules
-
-- `rules/system-core.mdc`
-- `rules/hierarchy.mdc`
-
-Both rule files include `alwaysApply: true` so they behave as always-on rules in platforms that support this metadata.
-
 ## Packaging Model
 
 Wingman keeps one shared content core at the repository root:
 
-- `rules/`
 - `skills/`
 - `commands/`
 
@@ -238,7 +243,7 @@ Platform wrappers stay thin:
 - `.claude-plugin/plugin.json`
 - `.claude-plugin/marketplace.json`
 
-Cross-platform means shared content and aligned public capability names, not guaranteed identical runtime behavior on every platform.
+Cross-platform means shared content and aligned public capability names, not guaranteed identical runtime behavior on every platform. Platforms that support skills should load `skills/`; platforms that support command workflows may also load `commands/`. Platform-specific startup hooks or project entry files should invoke `using-wingman` instead of duplicating the plugin-level protocol.
 
 ## License
 
