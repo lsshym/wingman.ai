@@ -48,7 +48,7 @@ If uncertain, load memory.
    - Relevant memory files read.
    - Which memory rule or domain truth applies.
    - Which exact fields, symbols, contracts, or files are binding.
-   - Reusable assets to check.
+   - Whether reusable asset lookup may be needed.
    - Whether the requested change would conflict with memory.
 11. Do not show the checklist by default. Surface it only when there is a conflict, missing context, or the user asks.
 12. If required context is missing or contradictory, stop and ask the user instead of inventing substitutes.
@@ -58,7 +58,7 @@ If uncertain, load memory.
 - **No silent semantic fallback**: Never use `??`, `||`, or chained ternaries to substitute one business field for a semantically different field. Missing data should render an empty state or explicit absence.
 - **No rule substitution**: If memory specifies a canonical field or contract, do not replace it with a proxy field for convenience.
 - **Micro-logic comments**: For tiny code changes with large business impact, add a localized invariant comment in the target code, such as `// @business-rule: [WHY]` for English memory or `// @业务铁律: [WHY]` for Chinese memory.
-- **Reuse gate**: Before creating a new React component, hook, utility, or reusable workflow, check `.wingman/registry/` and loaded memory for an existing asset. If a match exists, reuse it or explain why it does not fit.
+- **Asset lookup boundary**: Reusable asset lookup belongs to `find`. Do not read registry files during `memory-load` unless the user explicitly asks for registry context. If the task may require choosing an existing asset, mention that `find` is the appropriate next capability.
 
 ## Platform Entry Rules
 

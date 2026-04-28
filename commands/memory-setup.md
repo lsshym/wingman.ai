@@ -16,7 +16,6 @@ Create:
 - `.wingman/memory/`
 - `.wingman/memory/domains/`
 - `.wingman/memory/archive/`
-- `.wingman/registry/`
 
 Seed:
 
@@ -24,9 +23,6 @@ Seed:
 - `.wingman/memory/activeContext.md`
 - `.wingman/memory/domains/README.md`
 - `.wingman/memory/archive/README.md`
-- `.wingman/registry/ui-components.md`
-- `.wingman/registry/business-components.md`
-- `.wingman/registry/utils.md`
 
 Platform entry rules:
 
@@ -72,22 +68,6 @@ Write `.wingman/memory/activeContext.md`:
   - `.wingman/memory/projectBrief.md`: [Project Brief] - Stores global ADRs and the domain registry.
   - `.wingman/memory/activeContext.md`: [Active Context] - Stores short-term progress, pending tasks, and recent decisions.
 - **Notes**: Domain files should be created when concrete business domains emerge.
-```
-
-## Registry Templates
-
-Write each registry file with a title only:
-
-```markdown
-# UI Components
-```
-
-```markdown
-# Business Components
-```
-
-```markdown
-# Utilities
 ```
 
 ## Domain Template

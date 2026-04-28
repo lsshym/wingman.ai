@@ -139,7 +139,6 @@ It creates:
 - `.wingman/memory/activeContext.md`
 - `.wingman/memory/domains/README.md`
 - `.wingman/memory/archive/README.md`
-- `.wingman/registry/*.md`
 - `AGENTS.md`
 - `CLAUDE.md`
 - `.cursor/rules/wingman-memory.mdc`
@@ -206,15 +205,16 @@ Wingman's published plugin instructions are written in English. Generated memory
 
 ### `/reg`
 
-Use to register one reusable component, hook, utility, or business component into `.wingman/registry/`.
+Use to register one reusable project asset into `.wingman/registry/`.
 
 Good fit:
 
 - after creating a reusable UI component
 - after extracting a shared hook or utility
 - after identifying a business component worth reusing
+- after formalizing a reusable module, pattern, contract, or workflow
 
-It reads the actual source file, extracts precise features and interface shape, deduplicates by path, and appends to exactly one registry file.
+It reads the actual source evidence, creates or updates one asset card, and keeps `.wingman/registry/index.md` as a short discovery index. Registry cards focus on selection decisions: when to use an asset, when not to use it, similar assets, and whether future agents should reuse, extend, wrap, or create something new.
 
 ### `/find`
 
@@ -225,8 +225,9 @@ Good fit:
 - finding similar components
 - locating existing utilities
 - checking previous reusable implementations
+- deciding whether to reuse, extend, wrap, or create an asset
 
-It searches `.wingman/registry/ui-components.md`, `.wingman/registry/business-components.md`, and `.wingman/registry/utils.md`, then returns the best reuse candidates.
+It reads `.wingman/registry/index.md` first, opens only the most relevant asset cards, compares use cases and boundaries, then returns the best reuse decision.
 
 ## Packaging Model
 

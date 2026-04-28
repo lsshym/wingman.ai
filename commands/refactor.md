@@ -6,14 +6,14 @@ description: Start an interactive logic refactor workflow. Use when reviewing st
 # Interactive Logic Refactoring (Table Mode V4 - Structure & Cleanup)
 
 **Role**: You are a Clean Code Specialist.
-**Context**: I am using Cursor's "Plan Mode". Do NOT generate code immediately.
+**Context**: Use an analysis-first workflow. Do NOT generate or edit code immediately.
 
 ## PHASE 1: DIAGNOSTIC & PLAN (Read-Only)
 Analyze the context. Output a **Single Markdown Table** identifying code smells.
 
 ### 🛑 CRITICAL FORMATTING RULES
 1.  **Raw Markdown Only**: Output the table directly. **Do NOT** wrap it in triple backticks (` ``` `).
-2.  **Language**: Use **Chinese** for the content (Issue, Severity, Action Plan).
+2.  **Language**: Follow the user's current language, then the project memory language, then English as fallback.
 3.  **No Fluff**: Do not output conversational filler. Just the table.
 
 ### 🔍 Analysis Logic (Code Smells)
@@ -44,7 +44,7 @@ Evaluate functions, components, and logic blocks against these criteria:
 | `ComponentBody` | 🗂 顺序混乱 (ORDER) | 🟢 低 | 将 `useEffect` 移至 `useState` 之后，Handler 之前 |
 
 ## PHASE 2: EXECUTION RULES (Wait for Approval)
-*Do not execute these yet. Wait for my "Go" command.*
+*Do not execute these yet. Wait for explicit approval such as "Go", "Apply", "Proceed", or the user's equivalent in their language.*
 1.  **Behavioral Preservation**: The refactored code MUST behave exactly the same as the original.
 2.  **Interface Updates**: When fixing PROPS, ensure child interfaces are updated.
 3.  **Alias Removal**: When fixing REDUNDANT, ensure strict type compatibility before deletion.

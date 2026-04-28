@@ -1,194 +1,190 @@
 ---
 name: reg
-description: Register reusable project assets into the project registry. Use when cataloging components, hooks, or utilities for later reuse.
+description: Register reusable project assets into the Wingman registry. Use when cataloging components, modules, utilities, patterns, contracts, or other reusable implementation assets for later selection.
 ---
 
-# Command: Register Component
+# Command: Register Asset
 
-**System**: Component Registrar.
-**Task**: Extract the exact features of one component/utility and append them to the correct registry file without overwriting or duplicating existing entries.
+Register exactly one reusable project asset into `.wingman/registry/`. The registry is not a source-code dump; it is an AI-readable selection map that helps future agents decide whether to reuse, extend, wrap, or create an asset.
 
----
+## Trigger
 
-## Step 1: Trigger & Locate
-Triggered when the user types `/reg [component/path]` or `/reg`.
+Triggered when the user types `/reg [asset path or name]` or `/reg`.
 
-- If a target is explicitly provided, use that exact target.
-- If no target is provided, silently use the currently active file in the editor.
-- If there is no active file, use the most recently modified relevant source file from the current context.
-- **Process exactly ONE target per invocation.**
-- Do **NOT** batch-register multiple components in one `/reg` run.
+- If a target is provided, use that exact target.
+- If no target is provided, use the active file when available.
+- If there is no active file, use the most recent relevant source file from the current context.
+- Process exactly one target per invocation.
 
----
+## Language
 
-## Step 2: Iron Laws (Hard Safety Gates)
+Keep registry field headings in English for stable parsing. Write field content and final responses in the configured memory language when known, otherwise follow the user's current language, then English.
 
-### Gate 1: Source Read Required
-You MUST read the actual source code of the target before doing anything else.
+## Registry Layout
 
-Ask yourself:
-> "Did I read the source code and understand its exact props/params and behavior?"
+Initialize this structure if missing:
 
-If NO:
-- STOP
-- Read the source file first
-- Do NOT infer behavior from file name, folder name, or usage sites alone
+```text
+.wingman/registry/
+  index.md
+  components/
+  modules/
+  utilities/
+  patterns/
+  contracts/
+```
 
-### Gate 2: No Broad Scanning
-Do NOT scan the whole codebase for “similar” components unless the user explicitly asked for bulk registration.
-This command is for **one component only**.
+Seed `.wingman/registry/index.md` with:
 
-### Gate 3: No Destructive Writes
-You must never overwrite an existing registry file just to add a new entry.
-This command is **append-only**.
+```markdown
+# Registry Index
 
-If a registry file already exists:
-- You MUST read its current contents first
-- You MUST preserve all existing entries exactly as they are
-- You MUST append a new block only when the target is not already registered
+## Components
 
----
+| Asset | Card | Source | Tags | Best For |
+| :--- | :--- | :--- | :--- | :--- |
 
-## Step 3: Extract Features
-From the source code, extract EXACTLY these 5 elements:
+## Modules
 
-1. **Name**
-   - Component, function, hook, or utility name
+| Asset | Card | Source | Tags | Best For |
+| :--- | :--- | :--- | :--- | :--- |
 
-2. **Path**
-   - Relative import path
-   - Example: `@/components/ui/button`
+## Utilities
 
-3. **Tags**
-   - Extract 3-6 precise keywords describing:
-     - UI type
-     - core behavior
-     - state/control model
-     - API/data behavior
-     - platform traits (responsive, mobile drawer, etc.)
-   - Example:
-     `[form interaction, async upload, Zustand, mobile-friendly]`
+| Asset | Card | Source | Tags | Best For |
+| :--- | :--- | :--- | :--- | :--- |
 
-4. **Description**
-   - 1-2 concise sentences describing what it actually does
+## Patterns
 
-5. **Interface Signature**
-   - For UI/business components:
-     - list only the props that control the main behavior
-     - skip generic native props such as `className`, `style`, etc.
-   - For hooks/utils:
-     - list the main parameters and return value
+| Asset | Card | Source | Tags | Best For |
+| :--- | :--- | :--- | :--- | :--- |
 
----
+## Contracts
 
-## Step 4: Categorize
-Choose the target registry file based on the target’s actual nature:
+| Asset | Card | Source | Tags | Best For |
+| :--- | :--- | :--- | :--- | :--- |
+```
 
-- Pure presentation UI components
-  -> `.wingman/registry/ui-components.md`
+## Asset Categories
 
-- Components with business logic, API calls, routing, global state, device branching, or workflow logic
-  -> `.wingman/registry/business-components.md`
+Choose exactly one category:
 
-- Pure logic functions, helpers, or React hooks
-  -> `.wingman/registry/utils.md`
+- `components`: UI components, presentational components, widgets, controls, hooks tightly coupled to a component.
+- `modules`: business or workflow units that coordinate state, routing, data loading, permissions, domain logic, or multiple components.
+- `utilities`: reusable functions, hooks, adapters, helpers, scripts, parsers, formatters, and low-level logic.
+- `patterns`: reusable implementation approaches, architectural patterns, recipes, and conventions that are not one source artifact.
+- `contracts`: schemas, DTOs, API/event payloads, config shapes, database rows, validation contracts, and type boundaries.
 
-### Important classification rule
-If a component wraps low-level UI primitives but also contains behavioral branching or environment/device logic,
-classify it as a **business component only if the business logic is primary**.
-Otherwise classify it as a **UI component**.
+If uncertain, prefer the category that best describes how another agent would decide to reuse it.
 
-Never register the same component in two registry files.
+## Source Read Gate
 
----
+For source-backed assets, read the actual source file before writing the card. Do not infer behavior from file name, folder name, or usage sites alone.
 
-## Step 5: Deduplication (Strict)
-Before writing anything, you MUST check for duplicates.
+For patterns or contracts, read the source artifact, schema, documentation, or representative implementation that proves the registry entry.
 
-### 5.1 Read registry files first
-Read:
-- `.wingman/registry/ui-components.md` if it exists
-- `.wingman/registry/business-components.md` if it exists
-- `.wingman/registry/utils.md` if it exists
+## Extraction
 
-### 5.2 Duplicate key
-Use **Path** as the primary deduplication key.
-Do NOT use Name alone, because different components may share the same name in different folders.
+Extract decision-focused information:
 
-### 5.3 Deduplication rules
-- If the same **Path** already exists in the chosen target registry:
-  - DO NOT append again
-  - Return the duplicate-skip response
+1. **Name**: Stable asset name.
+2. **Source Path**: Relative source path, import path, doc path, or contract location.
+3. **Category**: One of `components`, `modules`, `utilities`, `patterns`, `contracts`.
+4. **Tags**: 3-7 precise keywords for behavior, domain, data shape, platform traits, or selection clues.
+5. **Best For**: One short phrase for index scanning.
+6. **What It Does**: 1-2 sentences based on evidence.
+7. **Use When**: Concrete situations where this asset fits.
+8. **Do Not Use When**: Concrete situations where this asset should be avoided.
+9. **Interface**: Main props, params, return shape, config keys, exported symbols, or contract fields.
+10. **Similar Assets**: Related assets from the registry and how they differ. Use `None known` only after reading the index.
+11. **Selection Notes**: How an AI should decide whether to reuse, extend, wrap, or create something new.
 
-- If the same **Path** already exists in a different registry file:
-  - DO NOT append again
-  - Return the cross-registry warning response
+## Deduplication
 
-- If the same **Name** exists but the **Path** is different:
-  - This is **not** a duplicate
-  - You may register it normally
+Before writing:
 
----
+1. Read `.wingman/registry/index.md` if it exists.
+2. Search `.wingman/registry/**/*.md` for the same source path.
+3. Use source path as the primary duplicate key.
+4. If the same source path already has a card, update that card only when the new information is more accurate; otherwise skip.
+5. If the same name exists with a different source path, treat it as a related asset, not a duplicate. Record the distinction in `Similar Assets`.
 
-## Step 6: Safe Append Procedure
-You must use a safe append workflow.
+## Card Template
 
-### Case A: Target registry file does not exist
-Create it with a minimal header, then append the new block.
+Create or update one card at `.wingman/registry/<category>/<asset-slug>.md`.
 
-### Case B: Target registry file exists
-- Read the existing file
-- Preserve all current content exactly
-- Append the new block to the end of the file
-- Do NOT rewrite or replace the whole file
-- Do NOT remove older entries
-- Do NOT reorder older entries
+Use this exact heading structure:
 
-### Forbidden behaviors
-- Never use a write operation that replaces the entire existing file content
-- Never delete prior records
-- Never “refresh” the file by rewriting all entries
-- Never merge multiple newly found components into one `/reg` call
+```markdown
+# [Asset Name]
 
----
+## Source
+- Path: `[source path]`
+- Type: `[component | module | utility | pattern | contract]`
 
-## Step 7: Target Write Format (Strictly Chinese)
-Append exactly this block format:
+## Tags
+- `[tag]`
+- `[tag]`
 
-### [Name]
-- **路径**: `Path`
-- **特征/标签**: `[Tags]`
-- **功能描述**: (Description)
-- **核心接口**: (Props/Params details)
+## Best For
+[One short phrase.]
 
----
+## What It Does
+[1-2 evidence-based sentences.]
 
-## Step 8: Confirmation Responses
+## Use When
+- [Concrete fit.]
 
-### Success response
-Reply EXACTLY:
-`✅ **[Name]** 已成功提取特征并注册至 \`[Target File]\`。提取标签：[Tags]。后续可通过 \`/find\` 命令检索。`
+## Do Not Use When
+- [Concrete mismatch.]
 
-### Duplicate-in-same-file response
-Reply EXACTLY:
-`⚠️ **[Name]** 已存在于 \`[Target File]\` 中，已跳过重复登记。判重依据：路径 \`[Path]\`。`
+## Interface
+- [Main props, params, exports, return shape, config keys, or contract fields.]
 
-### Duplicate-in-other-registry response
-Reply EXACTLY:
-`⚠️ **[Name]** 已存在于 \`[Existing File]\` 中，已跳过跨表重复登记。判重依据：路径 \`[Path]\`。`
+## Similar Assets
+- `[AssetName]`: [How it differs.]
 
----
+## Selection Notes
+[How to choose reuse, extension, wrapper, or new asset.]
+```
 
-## Step 9: Final Checklist
-Before finishing, verify all of the following:
+Do not omit a section. If a section has no known content, write `None known` and explain what evidence is missing.
 
-- [ ] I read the actual source code
-- [ ] I processed exactly one target
-- [ ] I chose exactly one registry file
-- [ ] I read existing registry files before writing
-- [ ] I checked duplicates by **Path**
-- [ ] I did not overwrite existing registry content
-- [ ] I did not delete prior entries
-- [ ] I did not register the same component twice
+## Index Update
 
---- End Command ---
+Update `.wingman/registry/index.md` with exactly one row under the selected category:
+
+```markdown
+| [Asset Name] | `[category]/[asset-slug].md` | `[source path]` | `[tag1, tag2, tag3]` | [Best For] |
+```
+
+Rules:
+
+- Keep the index short. It is for candidate discovery, not full documentation.
+- Preserve existing rows and section order.
+- Do not duplicate rows for the same source path.
+- Do not remove legacy files such as `ui-components.md`, `business-components.md`, or `utils.md` if they already exist.
+
+## Final Response
+
+Report:
+
+- registered or updated asset name
+- card path
+- index row status
+- 1-3 tags
+- any likely similar assets found
+
+Keep the response concise.
+
+## Checklist
+
+Before finishing, verify:
+
+- [ ] I read the source evidence.
+- [ ] I processed exactly one asset.
+- [ ] I selected exactly one category.
+- [ ] I read the registry index before writing.
+- [ ] I checked duplicates by source path.
+- [ ] I created or updated exactly one asset card.
+- [ ] I updated the index without duplicating rows.

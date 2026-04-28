@@ -28,8 +28,8 @@ Use Wingman capabilities by trigger, not by platform-specific file names:
 - `memory-sync`: after meaningful work that should be recorded as durable context.
 - `align-contracts`: when data, schema, type, or boundary meanings may drift.
 - `zod-gen`: when generating strict TypeScript Zod schemas for data contracts.
-- `reg`: after creating or identifying a reusable project asset.
-- `find`: before rebuilding something that may already exist.
+- `reg`: after creating or identifying a reusable project asset that should become part of the selection map.
+- `find`: before rebuilding something that may already exist, or when deciding whether to reuse, extend, wrap, or create an asset.
 - `memory-setup`, `refactor`, `refactor-types`: manual command workflows.
 
 Slash-prefixed forms such as `/zod-gen`, `/reg`, or `/refactor` are user-facing manual invocation names. The backing content may live under `skills/` or `commands/` depending on platform support.
