@@ -1,15 +1,15 @@
 ---
-name: reg
-description: Register reusable project assets into the Wingman registry. Use when cataloging components, modules, utilities, patterns, contracts, or other reusable implementation assets for later selection.
+name: reuse-catalog
+description: Catalog reusable project implementations into the Wingman reuse registry. Use when recording components, modules, utilities, patterns, contracts, or other reusable implementations for future selection.
 ---
 
-# Command: Register Asset
+# Command: Reuse Catalog
 
-Register exactly one reusable project asset into `.wingman/registry/`. The registry is not a source-code dump; it is an AI-readable selection map that helps future agents decide whether to reuse, extend, wrap, or create an asset.
+Catalog exactly one reusable project implementation into `.wingman/registry/`. The registry is not a source-code dump; it is an AI-readable selection map that helps future agents decide whether to reuse, extend, wrap, or create an implementation.
 
 ## Trigger
 
-Triggered when the user types `/reg [asset path or name]` or `/reg`.
+Triggered when the user types `/reuse-catalog [implementation path or name]`, `/reuse-catalog`, or legacy `/reg`.
 
 - If a target is provided, use that exact target.
 - If no target is provided, use the active file when available.
@@ -41,31 +41,31 @@ Seed `.wingman/registry/index.md` with:
 
 ## Components
 
-| Asset | Card | Source | Tags | Best For |
+| Entry | Card | Source | Tags | Best For |
 | :--- | :--- | :--- | :--- | :--- |
 
 ## Modules
 
-| Asset | Card | Source | Tags | Best For |
+| Entry | Card | Source | Tags | Best For |
 | :--- | :--- | :--- | :--- | :--- |
 
 ## Utilities
 
-| Asset | Card | Source | Tags | Best For |
+| Entry | Card | Source | Tags | Best For |
 | :--- | :--- | :--- | :--- | :--- |
 
 ## Patterns
 
-| Asset | Card | Source | Tags | Best For |
+| Entry | Card | Source | Tags | Best For |
 | :--- | :--- | :--- | :--- | :--- |
 
 ## Contracts
 
-| Asset | Card | Source | Tags | Best For |
+| Entry | Card | Source | Tags | Best For |
 | :--- | :--- | :--- | :--- | :--- |
 ```
 
-## Asset Categories
+## Categories
 
 Choose exactly one category:
 
@@ -75,11 +75,11 @@ Choose exactly one category:
 - `patterns`: reusable implementation approaches, architectural patterns, recipes, and conventions that are not one source artifact.
 - `contracts`: schemas, DTOs, API/event payloads, config shapes, database rows, validation contracts, and type boundaries.
 
-If uncertain, prefer the category that best describes how another agent would decide to reuse it.
+If uncertain, prefer the category that best describes how another agent would decide to reuse the implementation.
 
 ## Source Read Gate
 
-For source-backed assets, read the actual source file before writing the card. Do not infer behavior from file name, folder name, or usage sites alone.
+For source-backed implementations, read the actual source file before writing the card. Do not infer behavior from file name, folder name, or usage sites alone.
 
 For patterns or contracts, read the source artifact, schema, documentation, or representative implementation that proves the registry entry.
 
@@ -87,16 +87,16 @@ For patterns or contracts, read the source artifact, schema, documentation, or r
 
 Extract decision-focused information:
 
-1. **Name**: Stable asset name.
+1. **Name**: Stable implementation name.
 2. **Source Path**: Relative source path, import path, doc path, or contract location.
 3. **Category**: One of `components`, `modules`, `utilities`, `patterns`, `contracts`.
 4. **Tags**: 3-7 precise keywords for behavior, domain, data shape, platform traits, or selection clues.
 5. **Best For**: One short phrase for index scanning.
 6. **What It Does**: 1-2 sentences based on evidence.
-7. **Use When**: Concrete situations where this asset fits.
-8. **Do Not Use When**: Concrete situations where this asset should be avoided.
+7. **Use When**: Concrete situations where this implementation fits.
+8. **Do Not Use When**: Concrete situations where this implementation should be avoided.
 9. **Interface**: Main props, params, return shape, config keys, exported symbols, or contract fields.
-10. **Similar Assets**: Related assets from the registry and how they differ. Use `None known` only after reading the index.
+10. **Similar Implementations**: Related entries from the registry and how they differ. Use `None known` only after reading the index.
 11. **Selection Notes**: How an AI should decide whether to reuse, extend, wrap, or create something new.
 
 ## Deduplication
@@ -107,16 +107,16 @@ Before writing:
 2. Search `.wingman/registry/**/*.md` for the same source path.
 3. Use source path as the primary duplicate key.
 4. If the same source path already has a card, update that card only when the new information is more accurate; otherwise skip.
-5. If the same name exists with a different source path, treat it as a related asset, not a duplicate. Record the distinction in `Similar Assets`.
+5. If the same name exists with a different source path, treat it as a related implementation, not a duplicate. Record the distinction in `Similar Implementations`.
 
 ## Card Template
 
-Create or update one card at `.wingman/registry/<category>/<asset-slug>.md`.
+Create or update one card at `.wingman/registry/<category>/<implementation-slug>.md`.
 
 Use this exact heading structure:
 
 ```markdown
-# [Asset Name]
+# [Implementation Name]
 
 ## Source
 - Path: `[source path]`
@@ -141,11 +141,11 @@ Use this exact heading structure:
 ## Interface
 - [Main props, params, exports, return shape, config keys, or contract fields.]
 
-## Similar Assets
-- `[AssetName]`: [How it differs.]
+## Similar Implementations
+- `[ImplementationName]`: [How it differs.]
 
 ## Selection Notes
-[How to choose reuse, extension, wrapper, or new asset.]
+[How to choose reuse, extension, wrapper, or new implementation.]
 ```
 
 Do not omit a section. If a section has no known content, write `None known` and explain what evidence is missing.
@@ -155,7 +155,7 @@ Do not omit a section. If a section has no known content, write `None known` and
 Update `.wingman/registry/index.md` with exactly one row under the selected category:
 
 ```markdown
-| [Asset Name] | `[category]/[asset-slug].md` | `[source path]` | `[tag1, tag2, tag3]` | [Best For] |
+| [Implementation Name] | `[category]/[implementation-slug].md` | `[source path]` | `[tag1, tag2, tag3]` | [Best For] |
 ```
 
 Rules:
@@ -169,11 +169,11 @@ Rules:
 
 Report:
 
-- registered or updated asset name
+- registered or updated implementation name
 - card path
 - index row status
 - 1-3 tags
-- any likely similar assets found
+- any likely similar implementations found
 
 Keep the response concise.
 
@@ -182,9 +182,9 @@ Keep the response concise.
 Before finishing, verify:
 
 - [ ] I read the source evidence.
-- [ ] I processed exactly one asset.
+- [ ] I processed exactly one implementation.
 - [ ] I selected exactly one category.
 - [ ] I read the registry index before writing.
 - [ ] I checked duplicates by source path.
-- [ ] I created or updated exactly one asset card.
+- [ ] I created or updated exactly one registry card.
 - [ ] I updated the index without duplicating rows.

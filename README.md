@@ -2,7 +2,7 @@
 
 > A cross-platform AI engineering plugin for execution, context, and reuse.
 
-Wingman packages one shared content core for practical engineering execution, advanced context workflows, and reusable project asset lookup across multiple AI coding platforms.
+Wingman packages one shared content core for practical engineering execution, advanced context workflows, and reusable implementation lookup across multiple AI coding platforms.
 
 ## Principles
 
@@ -34,7 +34,7 @@ Wingman packages one shared content core for practical engineering execution, ad
 - `/refactor`
 - `/refactor-types`
 
-Slash-prefixed entries such as `/zod-gen`, `/reg`, or `/refactor` are user-facing manual invocation names. The backing content may live under `skills/` or `commands/` depending on platform support. Names without `/` are canonical skill or agent protocol names.
+Slash-prefixed entries such as `/zod-gen`, `/reuse-catalog`, `/reuse-select`, or `/refactor` are user-facing manual invocation names. The backing content may live under `skills/` or `commands/` depending on platform support. Names without `/` are canonical skill or agent protocol names.
 
 ### `using-wingman`
 
@@ -155,7 +155,7 @@ Example prompt:
 
 Use before non-trivial work when existing project context may affect the task.
 
-It first decides whether memory is needed. It skips trivial isolated tasks such as small copy edits, formatting, simple style tweaks, or throwaway experiments. It loads memory when work touches existing behavior, business logic, API integration, state flow, permissions, money, orders, field mappings, reusable assets, review, debugging, or refactoring. If uncertain, it loads memory.
+It first decides whether memory is needed. It skips trivial isolated tasks such as small copy edits, formatting, simple style tweaks, or throwaway experiments. It loads memory when work touches existing behavior, business logic, API integration, state flow, permissions, money, orders, field mappings, reusable implementations, review, debugging, or refactoring. If uncertain, it loads memory.
 
 What it reads:
 
@@ -198,14 +198,16 @@ Sync memory for the checkout bug fix, but do not archive unrelated history.
 
 Wingman's published plugin instructions are written in English. Generated memory content is adaptive: it follows `.wingman/memory/projectBrief.md` -> `Memory Settings` -> `Language` when configured, otherwise it follows the existing memory language, the user's current language, then English as fallback.
 
-## Project Registry
+## Reuse Registry
 
-- `/reg`
-- `/find`
+- `reuse-catalog`
+- `reuse-select`
 
-### `/reg`
+Legacy aliases: `/reg` maps to `reuse-catalog`; `/find` maps to `reuse-select`.
 
-Use to register one reusable project asset into `.wingman/registry/`.
+### `reuse-catalog`
+
+Use to catalog one reusable project implementation into `.wingman/registry/`.
 
 Good fit:
 
@@ -214,20 +216,20 @@ Good fit:
 - after identifying a business component worth reusing
 - after formalizing a reusable module, pattern, contract, or workflow
 
-It reads the actual source evidence, creates or updates one asset card, and keeps `.wingman/registry/index.md` as a short discovery index. Registry cards focus on selection decisions: when to use an asset, when not to use it, similar assets, and whether future agents should reuse, extend, wrap, or create something new.
+It reads the actual source evidence, creates or updates one registry card, and keeps `.wingman/registry/index.md` as a short discovery index. Registry cards focus on selection decisions: when to use an implementation, when not to use it, similar implementations, and whether future agents should reuse, extend, wrap, or create something new.
 
-### `/find`
+### `reuse-select`
 
-Use before building something new when an existing reusable asset may already exist.
+Use before building something new when an existing reusable implementation may already exist.
 
 Good fit:
 
 - finding similar components
 - locating existing utilities
 - checking previous reusable implementations
-- deciding whether to reuse, extend, wrap, or create an asset
+- deciding whether to reuse, extend, wrap, or create an implementation
 
-It reads `.wingman/registry/index.md` first, opens only the most relevant asset cards, compares use cases and boundaries, then returns the best reuse decision.
+It reads `.wingman/registry/index.md` first, opens only the most relevant implementation cards, compares use cases and boundaries, then returns the best reuse decision.
 
 ## Packaging Model
 

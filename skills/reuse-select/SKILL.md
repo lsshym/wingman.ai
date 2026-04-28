@@ -1,17 +1,17 @@
 ---
-name: find
-description: Find reusable assets in the Wingman registry. Use when deciding whether to reuse, extend, wrap, or create components, modules, utilities, patterns, contracts, or prior implementations.
+name: reuse-select
+description: Select reusable project implementations from the Wingman reuse registry. Use when deciding whether to reuse, extend, wrap, or create components, modules, utilities, patterns, contracts, or prior implementations.
 ---
 
-# Command: Find Asset
+# Command: Reuse Select
 
-Use `.wingman/registry/` as an AI-readable selection map. Prefer index-first discovery, then read only the most relevant asset cards.
+Use `.wingman/registry/` as an AI-readable selection map. Prefer index-first discovery, then read only the most relevant implementation cards.
 
 ## Trigger
 
-Triggered when the user types `/find [requirement]` or asks whether an existing reusable asset should be used.
+Triggered when the user types `/reuse-select [requirement]`, asks whether an existing reusable implementation should be used, or uses legacy `/find`.
 
-If the user provides no requirement, ask for the needed behavior, domain, or asset type before searching.
+If the user provides no requirement, ask for the needed behavior, domain, or implementation type before searching.
 
 ## Language
 
@@ -31,7 +31,7 @@ Expected layout:
   contracts/
 ```
 
-Each asset card should contain:
+Each implementation card should contain:
 
 - `Source`
 - `Tags`
@@ -40,7 +40,7 @@ Each asset card should contain:
 - `Use When`
 - `Do Not Use When`
 - `Interface`
-- `Similar Assets`
+- `Similar Implementations`
 - `Selection Notes`
 
 ## Lookup Workflow
@@ -53,8 +53,8 @@ Each asset card should contain:
 3. Extract the user's required behavior, domain, interface needs, platform constraints, and deal-breakers.
 4. From the index, choose up to 5 candidate cards by `Tags`, `Best For`, `Source`, and category.
 5. Read only those candidate cards.
-6. Compare `Use When`, `Do Not Use When`, `Interface`, `Similar Assets`, and `Selection Notes`.
-7. Decide whether to reuse, extend, wrap, or create a new asset.
+6. Compare `Use When`, `Do Not Use When`, `Interface`, `Similar Implementations`, and `Selection Notes`.
+7. Decide whether to reuse, extend, wrap, or create a new implementation.
 
 Do not read every card unless the index is missing, stale, or clearly insufficient.
 
@@ -65,19 +65,19 @@ Prefer reuse when:
 - required behavior matches `Use When`
 - no deal-breaker appears in `Do Not Use When`
 - interface can be used without semantic adapters or fake data
-- selection notes recommend the asset for this case
+- selection notes recommend the implementation for this case
 
-Prefer extending an asset when:
+Prefer extending an implementation when:
 
-- the existing asset owns the same semantic responsibility
+- the existing implementation owns the same semantic responsibility
 - the new need is a natural option or variation
-- the extension will not make the asset ambiguous
+- the extension will not make the implementation ambiguous
 
-Prefer wrapping an asset when:
+Prefer wrapping an implementation when:
 
-- the base asset is correct but the current context needs domain defaults, permissions, tracking, or layout composition
+- the base implementation is correct but the current context needs domain defaults, permissions, tracking, or layout composition
 
-Prefer creating a new asset when:
+Prefer creating a new implementation when:
 
 - all candidates are semantically different
 - reuse would require misleading props, fake fields, or unrelated behavior
@@ -88,7 +88,7 @@ Prefer creating a new asset when:
 Return the top recommendation first:
 
 ```markdown
-Recommended: `[AssetName]`
+Recommended: `[ImplementationName]`
 
 Decision: Reuse | Extend | Wrap | Create New
 
@@ -96,14 +96,14 @@ Why:
 - [Reason tied to the card.]
 
 Not Chosen:
-- `[OtherAsset]`: [Specific mismatch or distinction.]
+- `[OtherImplementation]`: [Specific mismatch or distinction.]
 
 Use:
-- Card: `.wingman/registry/[category]/[asset].md`
+- Card: `.wingman/registry/[category]/[implementation].md`
 - Source: `[source path]`
 
 Notes:
 - [Any caveat, missing registry info, or suggested follow-up registration.]
 ```
 
-If no good match exists, say so directly and explain what new asset should be created and which existing assets it must not overlap with.
+If no good match exists, say so directly and explain what new implementation should be created and which existing implementations it must not overlap with.

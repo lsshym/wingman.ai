@@ -26,7 +26,7 @@ If `.wingman/memory/` does not exist, continue normally without warning unless t
 
 Skip memory loading for trivial, isolated tasks with no business, reuse, or existing-behavior impact, such as small copy edits, simple formatting, isolated style tweaks, or throwaway experiments.
 
-Load memory before non-trivial coding, debugging, planning, review, refactor, API integration, reusable asset creation, or changes touching business logic, state flow, permissions, money, orders, field mappings, or existing behavior.
+Load memory before non-trivial coding, debugging, planning, review, refactor, API integration, reusable implementation creation, or changes touching business logic, state flow, permissions, money, orders, field mappings, or existing behavior.
 
 Also load memory when the user mentions previous work, consistency, "之前", "上次", "沿用", "保持一致", "不要破坏", or asks to use memory.
 
@@ -48,7 +48,7 @@ If uncertain, load memory.
    - Relevant memory files read.
    - Which memory rule or domain truth applies.
    - Which exact fields, symbols, contracts, or files are binding.
-   - Whether reusable asset lookup may be needed.
+   - Whether reusable implementation lookup may be needed.
    - Whether the requested change would conflict with memory.
 11. Do not show the checklist by default. Surface it only when there is a conflict, missing context, or the user asks.
 12. If required context is missing or contradictory, stop and ask the user instead of inventing substitutes.
@@ -58,7 +58,7 @@ If uncertain, load memory.
 - **No silent semantic fallback**: Never use `??`, `||`, or chained ternaries to substitute one business field for a semantically different field. Missing data should render an empty state or explicit absence.
 - **No rule substitution**: If memory specifies a canonical field or contract, do not replace it with a proxy field for convenience.
 - **Micro-logic comments**: For tiny code changes with large business impact, add a localized invariant comment in the target code, such as `// @business-rule: [WHY]` for English memory or `// @业务铁律: [WHY]` for Chinese memory.
-- **Asset lookup boundary**: Reusable asset lookup belongs to `find`. Do not read registry files during `memory-load` unless the user explicitly asks for registry context. If the task may require choosing an existing asset, mention that `find` is the appropriate next capability.
+- **Reuse lookup boundary**: Reusable implementation lookup belongs to `reuse-select`. Do not read registry files during `memory-load` unless the user explicitly asks for registry context. If the task may require choosing an existing implementation, mention that `reuse-select` is the appropriate next capability.
 
 ## Platform Entry Rules
 
