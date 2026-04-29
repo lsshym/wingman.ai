@@ -19,7 +19,10 @@ Wingman packages one shared content core for practical engineering execution, ad
 ├── .codex-plugin/
 ├── .cursor-plugin/
 ├── .claude-plugin/
+├── assets/
 ├── skills/
+├── PRIVACY.md
+├── TERMS.md
 ├── package.json
 └── README.md
 ```
@@ -34,7 +37,7 @@ Explicit workflow skills:
 - `refactor`
 - `refactor-types`
 
-Slash-prefixed forms such as `/reuse-catalog`, `/reuse-select`, `/memory-setup`, `/refactor`, or `/refactor-types` are user-facing invocation aliases for skills.
+Slash-prefixed forms such as `/reuse-catalog`, `/reuse-select`, `/memory-setup`, `/refactor`, or `/refactor-types` are conceptual invocation aliases for skills. Specific platforms may namespace or display them differently, such as `/wingman:memory-setup` in Claude Code.
 
 ## Core Engineering
 
@@ -236,7 +239,7 @@ Platform wrappers stay thin:
 - `.claude-plugin/plugin.json`
 - `.claude-plugin/marketplace.json`
 
-Cross-platform means shared content and aligned public capability names, not guaranteed identical runtime behavior on every platform. The Codex manifest points at `skills/`; the Cursor manifest points at `skills/`; the Claude plugin manifest stays metadata-only, while `.claude-plugin/marketplace.json` is kept as a Claude Code marketplace shell. Platform-specific startup hooks or project entry files should invoke `using-wingman` instead of duplicating the plugin-level protocol.
+Cross-platform means shared content and aligned public capability names, not guaranteed identical runtime behavior on every platform. The Codex manifest points at `skills/`; the Cursor manifest points at `skills/`; the Claude plugin manifest provides conservative metadata and relies on default `skills/` discovery, while `.claude-plugin/marketplace.json` is kept as a Claude Code marketplace shell. Platform-specific startup hooks or project entry files should invoke `using-wingman` instead of duplicating the plugin-level protocol.
 
 ## Local Testing
 
@@ -244,7 +247,7 @@ For Codex, use `.agents/plugins/marketplace.json` as the local marketplace entry
 
 For Cursor, use `.cursor-plugin/plugin.json`; Cursor discovers the shared `skills/` directory through the plugin manifest.
 
-For Claude Code, `.claude-plugin/marketplace.json` is kept as a compatibility shell. Treat Claude wiring as conservative until the target Claude plugin surface confirms the supported fields.
+For Claude Code, `.claude-plugin/marketplace.json` is kept as a compatibility shell. Skill invocation may be namespaced by the plugin name, for example `/wingman:memory-setup`.
 
 ## License
 

@@ -17,5 +17,6 @@
     "memory",
     "reuse"
   ],
+  "logo": "assets/logo.svg",
   "skills": "./skills/"
 }

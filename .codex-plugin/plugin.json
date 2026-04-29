@@ -34,6 +34,12 @@
       "Use Wingman to load project context before this refactor.",
       "Use Wingman to decide whether an existing implementation should be reused."
     ],
-    "websiteURL": "https://github.com/lsshym/wingman.ai"
+    "websiteURL": "https://github.com/lsshym/wingman.ai",
+    "privacyPolicyURL": "https://github.com/lsshym/wingman.ai/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/lsshym/wingman.ai/blob/main/TERMS.md",
+    "brandColor": "#2563EB",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/logo.svg",
+    "screenshots": []
   }
 }
