@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Cross-platform AI engineering plugin for execution, context, and reuse.",
   "author": {
-    "name": "azu"
+    "name": "keni"
   },
   "homepage": "https://github.com/lsshym/wingman.ai",
   "repository": "https://github.com/lsshym/wingman.ai",
@@ -23,7 +23,7 @@
     "displayName": "Wingman",
     "shortDescription": "Execution, memory, and reuse workflows for coding agents",
     "longDescription": "Wingman packages reusable engineering skills for contract alignment, durable project memory, reuse selection, and explicit refactor workflows.",
-    "developerName": "azu",
+    "developerName": "keni",
     "category": "Coding",
     "capabilities": [
       "Interactive",
