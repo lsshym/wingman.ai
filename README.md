@@ -4,6 +4,24 @@
 
 Wingman packages one shared content core for practical engineering execution, advanced context workflows, and reusable implementation lookup across multiple AI coding platforms.
 
+## How It Works
+
+Wingman is a set of coding-agent skills for working safely inside real projects. It focuses on three problems agents often run into:
+
+- **Project memory**: load relevant context before meaningful work and sync durable outcomes afterward.
+- **Contract alignment**: keep API, type, schema, event, config, and UI boundaries honest when shapes or meanings drift.
+- **Reuse decisions**: catalog reusable implementations and decide whether to reuse, extend, wrap, or create something new.
+
+A typical Wingman-assisted task looks like this:
+
+1. Before non-trivial work, `memory-load` decides whether project memory matters and reads only relevant memory files.
+2. During implementation, `align-contracts` protects provider/consumer boundaries, and `reuse-select` checks whether existing implementations should be reused.
+3. After creating or identifying something reusable, `reuse-catalog` records it in the reuse registry.
+4. Before reporting meaningful work as complete, `memory-sync` records durable progress and decisions when they are worth remembering.
+5. `memory-setup`, `refactor`, and `refactor-types` are explicit workflows. They run only when the user directly asks for them.
+
+Wingman is not a full development methodology. It does not force TDD, subagents, hooks, or a universal planning process. It focuses on making agents steadier in existing projects by preserving context, aligning contracts, and avoiding duplicate implementations.
+
 ## Principles
 
 - One shared content core
