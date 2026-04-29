@@ -3,7 +3,7 @@ name: reuse-catalog
 description: Catalog reusable project implementations into the Wingman reuse registry. Use when recording components, modules, utilities, patterns, contracts, or other reusable implementations for future selection.
 ---
 
-# Command: Reuse Catalog
+# Reuse Catalog
 
 Catalog exactly one reusable project implementation into `.wingman/registry/`. The registry is not a source-code dump; it is an AI-readable selection map that helps future agents decide whether to reuse, extend, wrap, or create an implementation.
 

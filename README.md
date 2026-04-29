@@ -34,13 +34,12 @@ Explicit workflow skills:
 - `refactor`
 - `refactor-types`
 
-Slash-prefixed forms such as `/zod-gen`, `/reuse-catalog`, `/reuse-select`, `/memory-setup`, `/refactor`, or `/refactor-types` are user-facing invocation aliases for skills.
+Slash-prefixed forms such as `/reuse-catalog`, `/reuse-select`, `/memory-setup`, `/refactor`, or `/refactor-types` are user-facing invocation aliases for skills.
 
 ## Core Engineering
 
 - `using-wingman`
 - `align-contracts`
-- `zod-gen`
 - `refactor`
 - `refactor-types`
 
@@ -86,22 +85,6 @@ Example prompts:
 Use align-contracts to connect this webhook payload to our internal payment event.
 Use align-contracts to bind this API response into the existing React component.
 Use align-contracts to migrate this legacy DTO to the new domain model.
-```
-
-### `zod-gen`
-
-Use when generating TypeScript Zod schemas for backend or external data contracts.
-
-Good fit:
-
-- validating API payloads at runtime
-- transforming `snake_case` API data into clean application types
-- deriving TypeScript types from validated schemas
-
-Example prompt:
-
-```text
-/zod-gen Generate a strict schema for this API payload and expose the transformed type.
 ```
 
 ### `refactor`
@@ -244,6 +227,7 @@ It reads `.wingman/registry/index.md` first, opens only the most relevant implem
 Wingman keeps one shared content core at the repository root:
 
 - `skills/`
+
 Platform wrappers stay thin:
 
 - `.cursor-plugin/plugin.json`
@@ -253,6 +237,14 @@ Platform wrappers stay thin:
 - `.claude-plugin/marketplace.json`
 
 Cross-platform means shared content and aligned public capability names, not guaranteed identical runtime behavior on every platform. The Codex manifest points at `skills/`; the Cursor manifest points at `skills/`; the Claude plugin manifest stays metadata-only, while `.claude-plugin/marketplace.json` is kept as a Claude Code marketplace shell. Platform-specific startup hooks or project entry files should invoke `using-wingman` instead of duplicating the plugin-level protocol.
+
+## Local Testing
+
+For Codex, use `.agents/plugins/marketplace.json` as the local marketplace entry and restart Codex after changing plugin files.
+
+For Cursor, use `.cursor-plugin/plugin.json`; Cursor discovers the shared `skills/` directory through the plugin manifest.
+
+For Claude Code, `.claude-plugin/marketplace.json` is kept as a compatibility shell. Treat Claude wiring as conservative until the target Claude plugin surface confirms the supported fields.
 
 ## License
 

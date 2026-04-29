@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "Wingman",
     "shortDescription": "Execution, memory, and reuse workflows for coding agents",
-    "longDescription": "Wingman packages reusable engineering skills for contract alignment, durable project memory, reuse selection, schema generation, and explicit refactor workflows.",
+    "longDescription": "Wingman packages reusable engineering skills for contract alignment, durable project memory, reuse selection, and explicit refactor workflows.",
     "developerName": "azu",
     "category": "Coding",
     "capabilities": [

@@ -137,9 +137,20 @@ Use monthly files such as `2026-04.md`. Move complete log blocks here; do not su
 
 ## Platform Entry Rules
 
+Preserve existing project instructions. Only create, append, or replace the Wingman-managed block marked by:
+
+```markdown
+<!-- Wingman Memory:start -->
+...
+<!-- Wingman Memory:end -->
+```
+
+If a target file already exists, keep all non-Wingman content unchanged. If the marked block exists, replace only that block. If it does not exist, append the marked block.
+
 Create or update `AGENTS.md` with a Wingman section:
 
 ```markdown
+<!-- Wingman Memory:start -->
 # Wingman Memory
 
 Before non-trivial coding, debugging, planning, review, API integration, or business-logic work:
@@ -149,12 +160,15 @@ Before non-trivial coding, debugging, planning, review, API integration, or busi
 
 Before reporting meaningful coding work as complete:
 - Use the `memory-sync` protocol unless the user explicitly says "skip update", "不更新", "跳过记录", "这个不用记忆", or equivalent.
+<!-- Wingman Memory:end -->
 ```
 
 Create or update `CLAUDE.md`:
 
 ```markdown
+<!-- Wingman Memory:start -->
 @AGENTS.md
+<!-- Wingman Memory:end -->
 ```
 
 Create or update `.cursor/rules/wingman-memory.mdc`:

@@ -1,6 +1,6 @@
 ---
 name: using-wingman
-description: Use when starting a Wingman-enabled coding session, adapting Wingman across AI coding platforms, deciding which Wingman skill or command applies, or interpreting Wingman plugin-level instructions versus project-local instructions.
+description: Use when starting a Wingman-enabled coding session, adapting Wingman across AI coding platforms, deciding which Wingman skill applies, or interpreting Wingman plugin-level instructions versus project-local instructions.
 ---
 
 # Using Wingman
@@ -29,7 +29,6 @@ Situational skills may be used when their trigger conditions apply:
 - `memory-load`: before non-trivial work where durable project context may matter.
 - `memory-sync`: after meaningful work that should be recorded as durable context.
 - `align-contracts`: when data, schema, type, or boundary meanings may drift.
-- `zod-gen`: when generating strict TypeScript Zod schemas for data contracts.
 - `reuse-catalog`: after creating or identifying a reusable project implementation that should become part of the selection map.
 - `reuse-select`: before rebuilding something that may already exist, or when deciding whether to reuse, extend, wrap, or create an implementation.
 
@@ -39,7 +38,7 @@ Explicit workflow skills must only run when the user asks for them directly:
 - `refactor`: run the interactive logic refactor workflow.
 - `refactor-types`: run the interactive type refactor workflow.
 
-Slash-prefixed forms such as `/zod-gen`, `/reuse-catalog`, `/reuse-select`, `/memory-setup`, `/refactor`, or `/refactor-types` are user-facing invocation aliases for skills.
+Slash-prefixed forms such as `/reuse-catalog`, `/reuse-select`, `/memory-setup`, `/refactor`, or `/refactor-types` are user-facing invocation aliases for skills.
 
 ## Safe Editing
 

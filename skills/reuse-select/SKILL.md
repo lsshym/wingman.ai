@@ -3,7 +3,7 @@ name: reuse-select
 description: Select reusable project implementations from the Wingman reuse registry. Use when deciding whether to reuse, extend, wrap, or create components, modules, utilities, patterns, contracts, or prior implementations.
 ---
 
-# Command: Reuse Select
+# Reuse Select
 
 Use `.wingman/registry/` as an AI-readable selection map. Prefer index-first discovery, then read only the most relevant implementation cards.
 
