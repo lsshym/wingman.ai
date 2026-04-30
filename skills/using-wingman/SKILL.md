@@ -7,7 +7,7 @@ description: Use when starting a Wingman-enabled coding session, adapting Wingma
 
 ## Overview
 
-Wingman is a cross-platform engineering plugin built around reusable skills. Treat this skill as the plugin entry protocol: it explains how Wingman works, capability discovery, instruction priority, safe editing, language behavior, and platform-specific wrappers.
+Wingman is a cross-platform engineering plugin built around reusable skills. Treat `using-wingman` as the plugin entry protocol: it explains how Wingman works, capability discovery, instruction priority, safe editing, language behavior, and platform-specific wrappers.
 
 ## How Wingman Works
 

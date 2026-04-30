@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "private": false,
   "description": "Cross-platform AI engineering plugin for execution, context, and reuse.",
+  "scripts": {
+    "test": "node --test",
+    "check:plugin": "node scripts/check-plugin.mjs"
+  },
   "author": "keni",
   "homepage": "https://github.com/lsshym/wingman.ai",
   "repository": {

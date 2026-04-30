@@ -1,6 +1,6 @@
 ---
 name: memory-setup
-description: Use only when the user explicitly invokes `/memory-setup` or explicitly asks to initialize Wingman memory files in the current repository. Do not use for ordinary work, memory loading, memory syncing, or setup of unrelated tools.
+description: Use when the user explicitly invokes `/memory-setup` or explicitly asks to initialize Wingman memory files in the current repository. Do not use for ordinary work, memory loading, memory syncing, or setup of unrelated tools.
 ---
 
 # Memory Setup

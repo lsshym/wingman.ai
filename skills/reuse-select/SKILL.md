@@ -1,6 +1,6 @@
 ---
 name: reuse-select
-description: Select reusable project implementations from the Wingman reuse registry. Use when deciding whether to reuse, extend, wrap, or create components, modules, utilities, patterns, contracts, or prior implementations.
+description: Use when deciding whether to reuse, extend, wrap, or create components, modules, utilities, patterns, contracts, or prior implementations from the Wingman reuse registry.
 ---
 
 # Reuse Select

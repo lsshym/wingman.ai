@@ -261,6 +261,15 @@ Cross-platform means shared content and aligned public capability names, not gua
 
 ## Local Testing
 
+Run release checks before publishing or installing from a marketplace source:
+
+```bash
+npm test
+npm run check:plugin
+```
+
+These checks validate plugin manifests, marketplace metadata, referenced assets and hooks, skill frontmatter, explicit workflow gating, and `using-wingman` capability coverage.
+
 For Codex, use `.agents/plugins/marketplace.json` as the local marketplace entry and restart Codex after changing plugin files.
 
 For Cursor, use `.cursor-plugin/plugin.json`; Cursor discovers the shared `skills/` directory through the plugin manifest.

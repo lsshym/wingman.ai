@@ -1,6 +1,6 @@
 ---
 name: refactor
-description: Use only when the user explicitly invokes `/refactor` or explicitly asks for Wingman's interactive logic refactor workflow. Do not use for ordinary refactoring or direct code edits.
+description: Use when the user explicitly invokes `/refactor` or explicitly asks for Wingman's interactive logic refactor workflow. Do not use for ordinary refactoring or direct code edits.
 ---
 
 # Interactive Logic Refactoring

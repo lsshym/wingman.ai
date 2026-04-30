@@ -1,6 +1,6 @@
 ---
 name: refactor-types
-description: Use only when the user explicitly invokes `/refactor-types` or explicitly asks for Wingman's interactive type refactor workflow. Do not use for ordinary TypeScript fixes or direct type edits.
+description: Use when the user explicitly invokes `/refactor-types` or explicitly asks for Wingman's interactive type refactor workflow. Do not use for ordinary TypeScript fixes or direct type edits.
 ---
 
 # Interactive Type Refactoring
