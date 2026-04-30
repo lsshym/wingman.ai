@@ -1,5 +1,9 @@
 {
   "name": "wingman-marketplace",
+  "owner": {
+    "name": "keni",
+    "email": "lsshym9@gmail.com"
+  },
   "plugins": [
     {
       "name": "wingman",
