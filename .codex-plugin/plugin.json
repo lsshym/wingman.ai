@@ -39,7 +39,7 @@
     "termsOfServiceURL": "https://github.com/lsshym/wingman.ai/blob/main/TERMS.md",
     "brandColor": "#2563EB",
     "composerIcon": "./assets/icon.svg",
-    "logo": "./assets/logo.svg",
+    "logo": "./assets/icon.svg",
     "screenshots": []
   }
 }
