@@ -220,3 +220,17 @@ test("显式 workflow skill 必须保持只在用户明确请求时触发", asyn
     );
   }
 });
+
+test("Codex 发布同步脚本必须指向 plugins/wingman 嵌入目录", async () => {
+  const script = await readFile(
+    path.join(repoRoot, "scripts", "sync-to-codex-plugin.sh"),
+    "utf8",
+  );
+
+  assert.match(script, /DEST_REL="plugins\/wingman"/);
+  assert.match(script, /DEFAULT_FORK="lsshym\/openai-codex-plugins"/);
+  assert.match(script, /--bootstrap/);
+  assert.match(script, /\.codex-plugin\/plugin\.json/);
+  assert.match(script, /--exclude "plugins\/"/);
+  assert.match(script, /--exclude "\.agents\/"/);
+});

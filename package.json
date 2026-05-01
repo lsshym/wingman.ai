@@ -23,7 +23,8 @@
     "test:plugin": "node --test tests/plugin/*.test.mjs",
     "test:package": "node --test tests/package/*.test.mjs",
     "test:behavior": "node --test tests/behavior/*.test.mjs",
-    "check:plugin": "node scripts/check-plugin.mjs"
+    "check:plugin": "node scripts/check-plugin.mjs",
+    "sync:codex": "bash scripts/sync-to-codex-plugin.sh"
   },
   "author": "keni",
   "homepage": "https://github.com/lsshym/wingman.ai",
