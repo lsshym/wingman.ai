@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "scenarios": [
+    {
+      "id": "memory-sync-explicit",
+      "prompt": "prompts/memory-sync-explicit.md",
+      "requestedSkill": "memory-sync",
+      "mustInvokeBeforeOtherTools": true,
+      "reason": "The user explicitly requests memory-sync, so the agent should load and follow that skill before doing unrelated work."
+    },
+    {
+      "id": "refactor-explicit",
+      "prompt": "prompts/refactor-explicit.md",
+      "requestedSkill": "refactor",
+      "mustInvokeBeforeOtherTools": true,
+      "reason": "The slash-prefixed /refactor request is an explicit workflow invocation and should not be replaced by ordinary editing."
+    },
+    {
+      "id": "refactor-types-explicit",
+      "prompt": "prompts/refactor-types-explicit.md",
+      "requestedSkill": "refactor-types",
+      "mustInvokeBeforeOtherTools": true,
+      "reason": "The slash-prefixed /refactor-types request is an explicit workflow invocation and should run before direct type edits."
+    }
+  ]
+}

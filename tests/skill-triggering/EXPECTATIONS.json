@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "scenarios": [
+    {
+      "id": "memory-load-nontrivial",
+      "prompt": "prompts/memory-load-nontrivial.md",
+      "expectedSkills": ["memory-load"],
+      "forbiddenSkills": ["memory-setup"],
+      "reason": "Non-trivial bug fixes touching existing checkout state should load durable project context before implementation."
+    },
+    {
+      "id": "align-contracts-api-ui",
+      "prompt": "prompts/align-contracts-api-ui.md",
+      "expectedSkills": ["align-contracts"],
+      "forbiddenSkills": ["memory-setup"],
+      "reason": "API response to UI binding is a provider/consumer contract boundary and should trigger contract alignment."
+    },
+    {
+      "id": "reuse-select-before-building",
+      "prompt": "prompts/reuse-select-before-building.md",
+      "expectedSkills": ["reuse-select"],
+      "forbiddenSkills": ["memory-setup"],
+      "reason": "The user explicitly asks to check for existing reusable implementations before building."
+    },
+    {
+      "id": "no-memory-setup-for-ordinary-task",
+      "prompt": "prompts/no-memory-setup-for-ordinary-task.md",
+      "expectedSkills": [],
+      "forbiddenSkills": ["memory-setup", "refactor", "refactor-types"],
+      "reason": "A typo fix is trivial and must not initialize memory or enter explicit workflows."
+    }
+  ]
+}

@@ -84,8 +84,9 @@ Reviews code and writes a summary
 
 ```bash
 npm test
-npm run check:plugin
 ```
+
+`npm test` 会运行完整测试入口。如果只想检查新增 skill 相关规则，可以先运行 `npm run test:plugin`。
 
 如果测试失败，优先看失败信息属于哪一类：
 

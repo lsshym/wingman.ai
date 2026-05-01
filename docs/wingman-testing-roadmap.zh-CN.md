@@ -15,8 +15,14 @@ Wingman 的现有测试集中在发布前静态校验和轻量行为约束上。
 已经新增：
 
 - `scripts/check-plugin.mjs`
-- `test/plugin-check.test.mjs`
+- `tests/plugin/plugin-check.test.mjs`
+- `tests/package/package-fixtures.test.mjs`
+- `tests/behavior/behavior-assets.test.mjs`
 - `npm test`
+- `npm run test:plugin`
+- `npm run test:package`
+- `npm run test:behavior`
+- `npm run test:all`
 - `npm run check:plugin`
 
 当前覆盖内容：
@@ -34,6 +40,7 @@ Wingman 的现有测试集中在发布前静态校验和轻量行为约束上。
 - 当 manifest 链接到 `PRIVACY.md` 或 `TERMS.md` 时，检查这些 policy 文件是否进入发布包。
 - 检查 Cursor、Codex、Claude/Codex marketplace wrapper 是否保持本地安装布局。
 - 执行 hook smoke test，验证 `hooks/session-start` 和 `hooks/run-hook.cmd session-start` 能返回 Wingman context JSON。
+- 检查 `tests/skill-triggering/` 和 `tests/explicit-skill-requests/` 的 prompt、expectation、人工审核记录是否完整。
 
 ## 为什么这样设计
 
@@ -63,8 +70,8 @@ Wingman 的现有测试集中在发布前静态校验和轻量行为约束上。
 
 当前测试还没有完全对标 Superpowers，主要缺少以下能力：
 
-- `skill-triggering` 行为测试：还没有用 prompt 场景验证模型是否会自动触发 `memory-load`、`reuse-select`、`align-contracts` 等 skill。
-- `explicit-skill-requests` 运行时测试：还没有验证用户明确说“使用 memory-sync / refactor”时，agent 是否真的加载并遵守对应 skill。
+- live `skill-triggering` 行为测试：还没有用真实 Claude Code、Codex 或 Cursor runner 自动验证模型是否会触发 `memory-load`、`reuse-select`、`align-contracts` 等 skill。
+- live `explicit-skill-requests` 运行时测试：还没有用真实 agent 日志验证用户明确说“使用 memory-sync / refactor”时，agent 是否真的先加载并遵守对应 skill。
 - 平台运行时加载测试：还没有真的启动 Claude Code、Cursor、Codex、OpenCode 去验证插件能被平台发现和加载。
 - marketplace 安装测试：还没有从 GitHub marketplace source 模拟安装 Wingman。
 - 跨平台同步测试：还没有类似 Superpowers `codex-plugin-sync` 的测试，验证多个平台 wrapper 是否从同一个内容源同步生成。
@@ -92,24 +99,27 @@ Wingman 的现有测试集中在发布前静态校验和轻量行为约束上。
 
 ### Phase 3: 增加 Superpowers 风格行为测试
 
-- 建立 `tests/skill-triggering/`。
-- 为每个核心 skill 写 prompt 场景：
+- 已完成：建立 `tests/skill-triggering/`。
+- 已完成：为核心 skill 写 prompt 场景：
   - 非平凡任务应触发 `memory-load`。
   - API、schema、type 边界任务应触发 `align-contracts`。
   - 重建已有实现前应触发 `reuse-select`。
   - 普通任务不应触发 `memory-setup`。
-- 建立 `tests/explicit-skill-requests/`。
-- 验证用户明确请求某个 skill 时，agent 不跳过、不替换、不只口头确认。
+- 已完成：建立 `tests/explicit-skill-requests/`。
+- 已完成：为 `memory-sync`、`refactor`、`refactor-types` 写显式请求场景。
+- 已完成：新增 `EXPECTATIONS.json` 和 `manual-results.zh-CN.md`，由 `npm test` 检查 prompt、expectation、引用 skill、人工审核记录是否完整。
+- 待后续可选：接入真实 Claude Code、Codex 或 Cursor live runner，自动读取这些 prompt 并断言 agent 日志。
 
 ### Phase 4: CI 与发布 gate
 
 - 添加 GitHub Actions。
-- PR 必须通过 `npm test` 和 `npm run check:plugin`。
+- PR 必须通过 `npm test`。需要定位问题时，可分别运行 `npm run test:plugin`、`npm run test:package`、`npm run test:behavior`、`npm run check:plugin`。
 - 发布前必须通过完整 plugin health check。
 
 ## 验收标准
 
-- `npm test` 覆盖当前静态发布检查。
+- `npm test` 作为总入口，覆盖 plugin contract、package fixture、behavior assets 和 plugin health check。
+- 分项测试命令能单独运行，便于定位失败来源。
 - `npm run check:plugin` 可作为发布前健康检查入口。
 - 新增 skill 时，如果忘记更新 `using-wingman`，测试会失败。
 - 修改 manifest 时，如果缺少关键字段或路径失效，测试会失败。

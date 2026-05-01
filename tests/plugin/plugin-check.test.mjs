@@ -12,9 +12,9 @@ import {
   validateReadmeSkillCoverage,
   validateSkillFile,
   validateSkillTriggerContracts,
-} from "../scripts/check-plugin.mjs";
+} from "../../scripts/check-plugin.mjs";
 
-const repoRoot = path.resolve(import.meta.dirname, "..");
+const repoRoot = path.resolve(import.meta.dirname, "../..");
 
 test("当前插件包通过全部发布前检查", async () => {
   const issues = await collectProjectIssues(repoRoot);

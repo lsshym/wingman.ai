@@ -263,10 +263,21 @@ Run release checks before publishing or installing from a marketplace source:
 
 ```bash
 npm test
-npm run check:plugin
 ```
 
-These checks validate plugin manifests, marketplace metadata, referenced assets and hooks, skill frontmatter, explicit workflow gating, and `using-wingman` capability coverage.
+Useful test entry points:
+
+```bash
+npm run test:plugin    # Current repo plugin contracts, skills, aliases, docs, hooks
+npm run test:package   # Full package fixtures and negative package scenarios
+npm run test:behavior  # Superpowers-style prompt/expectation/manual-review assets
+npm run check:plugin   # Release health check for this plugin package
+npm run test:all       # Everything above
+```
+
+`npm test` is an alias for `npm run test:all`.
+
+These checks validate plugin manifests, marketplace metadata, referenced assets and hooks, skill frontmatter, explicit workflow gating, `using-wingman` capability coverage, package fixtures, and behavior-test assets.
 
 For Codex, use `.agents/plugins/marketplace.json` as the local marketplace entry and restart Codex after changing plugin files.
 

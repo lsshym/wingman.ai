@@ -3,7 +3,7 @@ import { rm } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 
-import { collectProjectIssues } from "../scripts/check-plugin.mjs";
+import { collectProjectIssues } from "../../scripts/check-plugin.mjs";
 import { createPluginFixture } from "./helpers/plugin-fixture.mjs";
 
 test("完整 package fixture 通过全部插件健康检查", async () => {
