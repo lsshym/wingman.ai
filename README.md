@@ -215,8 +215,6 @@ Wingman's published plugin instructions are written in English. Generated memory
 - `reuse-catalog`
 - `reuse-select`
 
-Legacy aliases: `/reg` maps to `reuse-catalog`; `/find` maps to `reuse-select`.
-
 ### `reuse-catalog`
 
 Use to catalog one reusable project implementation into `.wingman/registry/`.

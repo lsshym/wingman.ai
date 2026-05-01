@@ -9,7 +9,7 @@ Use `.wingman/registry/` as an AI-readable selection map. Prefer index-first dis
 
 ## Trigger
 
-Triggered when the user types `/reuse-select [requirement]`, asks whether an existing reusable implementation should be used, or uses legacy `/find`.
+Triggered when the user types `/reuse-select [requirement]` or asks whether an existing reusable implementation should be used.
 
 If the user provides no requirement, ask for the needed behavior, domain, or implementation type before searching.
 

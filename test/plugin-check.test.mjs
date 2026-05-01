@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -7,19 +7,22 @@ import test from "node:test";
 import {
   collectProjectIssues,
   parseSkillFrontmatter,
+  validateAliasCoverage,
   validateClaudeMarketplace,
+  validateReadmeSkillCoverage,
   validateSkillFile,
+  validateSkillTriggerContracts,
 } from "../scripts/check-plugin.mjs";
 
 const repoRoot = path.resolve(import.meta.dirname, "..");
 
-test("current plugin package passes all release checks", async () => {
+test("当前插件包通过全部发布前检查", async () => {
   const issues = await collectProjectIssues(repoRoot);
 
   assert.deepEqual(issues, []);
 });
 
-test("Claude marketplace requires an owner with name and email", () => {
+test("Claude marketplace 必须填写 owner.name 和 owner.email", () => {
   const issues = validateClaudeMarketplace({
     name: "wingman-marketplace",
     plugins: [
@@ -38,7 +41,7 @@ test("Claude marketplace requires an owner with name and email", () => {
   ]);
 });
 
-test("skill frontmatter parser returns the YAML block and body", () => {
+test("skill frontmatter 解析器能拆出 YAML 区块和正文", () => {
   const parsed = parseSkillFrontmatter(`---
 name: memory-load
 description: Use when restoring project context before implementation
@@ -55,7 +58,7 @@ description: Use when restoring project context before implementation
   assert.match(parsed.body, /# Memory Load/);
 });
 
-test("skill files require trigger-focused frontmatter", async () => {
+test("skill 文件必须使用面向触发条件的 frontmatter", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "wingman-skill-"));
   const skillPath = path.join(root, "SKILL.md");
 
@@ -82,7 +85,7 @@ description: Writes a summary of what this workflow does
   }
 });
 
-test("using-wingman documents every packaged skill", async () => {
+test("using-wingman 必须说明所有已打包的 skill", async () => {
   const skillsRoot = path.join(repoRoot, "skills");
   const skillNames = (
     await readdir(skillsRoot, { withFileTypes: true })
@@ -104,7 +107,98 @@ test("using-wingman documents every packaged skill", async () => {
   }
 });
 
-test("explicit workflow skills stay gated to direct user requests", async () => {
+test("README 必须说明所有已打包的 skill", async () => {
+  const issues = await validateReadmeSkillCoverage(repoRoot);
+
+  assert.deepEqual(issues, []);
+});
+
+test("README 漏写已打包 skill 时必须报错", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "wingman-readme-"));
+
+  try {
+    await mkdir(path.join(root, "skills", "memory-load"), { recursive: true });
+    await writeFile(path.join(root, "README.md"), "# Fixture\n");
+
+    const issues = await validateReadmeSkillCoverage(root);
+
+    assert.deepEqual(issues, [
+      "README.md: should mention skill `memory-load`",
+    ]);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("斜杠别名必须映射到真实存在的 skill 契约", async () => {
+  const issues = await validateAliasCoverage(repoRoot);
+
+  assert.deepEqual(issues, []);
+});
+
+test("斜杠别名缺少 README 或 skill 说明时必须报错", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "wingman-alias-"));
+
+  try {
+    await mkdir(path.join(root, "skills", "reuse-select"), { recursive: true });
+    await writeFile(path.join(root, "README.md"), "# Fixture\n");
+    await writeFile(
+      path.join(root, "skills", "reuse-select", "SKILL.md"),
+      `---
+name: reuse-select
+description: Use when choosing reusable implementations
+---
+
+# Reuse Select
+`,
+    );
+
+    const issues = await validateAliasCoverage(root, { "/reuse-select": "reuse-select" });
+
+    assert.deepEqual(issues, [
+      "README.md: should document alias /reuse-select",
+      "skills/reuse-select/SKILL.md: should document alias /reuse-select",
+    ]);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("核心 skill 的触发契约必须保留在 skill 文本中", async () => {
+  const issues = await validateSkillTriggerContracts(repoRoot);
+
+  assert.deepEqual(issues, []);
+});
+
+test("skill 触发契约缺少关键触发语言时必须报错", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "wingman-trigger-"));
+
+  try {
+    await mkdir(path.join(root, "skills", "memory-load"), { recursive: true });
+    await writeFile(
+      path.join(root, "skills", "memory-load", "SKILL.md"),
+      `---
+name: memory-load
+description: Use when loading memory
+---
+
+# Memory Load
+`,
+    );
+
+    const issues = await validateSkillTriggerContracts(root, [
+      { skill: "memory-load", phrases: ["non-trivial"] },
+    ]);
+
+    assert.deepEqual(issues, [
+      'skills/memory-load/SKILL.md: trigger contract should mention "non-trivial"',
+    ]);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("显式 workflow skill 必须保持只在用户明确请求时触发", async () => {
   const explicitSkills = ["memory-setup", "refactor", "refactor-types"];
 
   for (const skillName of explicitSkills) {

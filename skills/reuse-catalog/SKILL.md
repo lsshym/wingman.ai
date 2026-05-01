@@ -9,7 +9,7 @@ Catalog exactly one reusable project implementation into `.wingman/registry/`. T
 
 ## Trigger
 
-Triggered when the user types `/reuse-catalog [implementation path or name]`, `/reuse-catalog`, or legacy `/reg`.
+Triggered when the user types `/reuse-catalog [implementation path or name]` or `/reuse-catalog`.
 
 - If a target is provided, use that exact target.
 - If no target is provided, use the active file when available.

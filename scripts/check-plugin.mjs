@@ -20,6 +20,49 @@ const rootFromImport = path.resolve(
   "..",
 );
 
+const defaultAliasMap = {
+  "/reuse-catalog": "reuse-catalog",
+  "/reuse-select": "reuse-select",
+  "/memory-setup": "memory-setup",
+  "/refactor": "refactor",
+  "/refactor-types": "refactor-types",
+};
+
+const defaultSkillTriggerContracts = [
+  {
+    skill: "memory-load",
+    phrases: ["non-trivial", "business logic", "debugging", "refactor", "trivial"],
+  },
+  {
+    skill: "align-contracts",
+    phrases: ["boundary", "schema", "type", "api", "pure formatting"],
+  },
+  {
+    skill: "reuse-select",
+    phrases: ["reuse", "extend", "wrap", "create", "/reuse-select"],
+  },
+  {
+    skill: "reuse-catalog",
+    phrases: ["recording", "registry", "exactly one", "/reuse-catalog"],
+  },
+  {
+    skill: "memory-sync",
+    phrases: ["meaningful work", "business rules", "durable"],
+  },
+  {
+    skill: "memory-setup",
+    phrases: ["explicitly", "ordinary work", "/memory-setup"],
+  },
+  {
+    skill: "refactor",
+    phrases: ["explicitly", "ordinary refactoring", "direct code edits"],
+  },
+  {
+    skill: "refactor-types",
+    phrases: ["explicitly", "ordinary typescript fixes", "direct type edits"],
+  },
+];
+
 export function parseSkillFrontmatter(content) {
   const match = content.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
   if (!match) {
@@ -144,6 +187,81 @@ export async function collectProjectIssues(repoRoot = rootFromImport) {
   issues.push(...validateCrossPlatformMetadata(json));
   issues.push(...(await validateReferencedPaths(repoRoot, json)));
   issues.push(...(await validateSkills(repoRoot)));
+  issues.push(...(await validateReadmeSkillCoverage(repoRoot)));
+  issues.push(...(await validateAliasCoverage(repoRoot)));
+  issues.push(...(await validateSkillTriggerContracts(repoRoot)));
+
+  return issues;
+}
+
+export async function validateReadmeSkillCoverage(repoRoot = rootFromImport) {
+  const issues = [];
+  const readmePath = path.join(repoRoot, "README.md");
+  if (!(await exists(readmePath))) {
+    return ["README.md: file is required"];
+  }
+
+  const readme = await readFile(readmePath, "utf8");
+  const skillNames = await collectSkillNames(repoRoot);
+  for (const skillName of skillNames) {
+    if (!readme.includes(`\`${skillName}\``)) {
+      issues.push(`README.md: should mention skill \`${skillName}\``);
+    }
+  }
+
+  return issues;
+}
+
+export async function validateAliasCoverage(
+  repoRoot = rootFromImport,
+  aliasMap = defaultAliasMap,
+) {
+  const issues = [];
+  const readmePath = path.join(repoRoot, "README.md");
+  const readme = (await exists(readmePath)) ? await readFile(readmePath, "utf8") : "";
+
+  for (const [alias, skillName] of Object.entries(aliasMap)) {
+    const skillPath = path.join(repoRoot, "skills", skillName, "SKILL.md");
+    if (!(await exists(skillPath))) {
+      issues.push(`${alias}: target skill does not exist: ${skillName}`);
+      continue;
+    }
+
+    if (!readme.includes(alias)) {
+      issues.push(`README.md: should document alias ${alias}`);
+    }
+
+    const skillContent = await readFile(skillPath, "utf8");
+    if (!skillContent.includes(alias)) {
+      issues.push(`skills/${skillName}/SKILL.md: should document alias ${alias}`);
+    }
+  }
+
+  return issues;
+}
+
+export async function validateSkillTriggerContracts(
+  repoRoot = rootFromImport,
+  contracts = defaultSkillTriggerContracts,
+) {
+  const issues = [];
+
+  for (const contract of contracts) {
+    const skillPath = path.join(repoRoot, "skills", contract.skill, "SKILL.md");
+    if (!(await exists(skillPath))) {
+      issues.push(`${contract.skill}: skill file is required for trigger contract`);
+      continue;
+    }
+
+    const skillText = (await readFile(skillPath, "utf8")).toLowerCase();
+    for (const phrase of contract.phrases) {
+      if (!skillText.includes(phrase.toLowerCase())) {
+        issues.push(
+          `skills/${contract.skill}/SKILL.md: trigger contract should mention "${phrase}"`,
+        );
+      }
+    }
+  }
 
   return issues;
 }
@@ -287,6 +405,17 @@ async function validateSkills(repoRoot) {
   }
 
   return issues;
+}
+
+async function collectSkillNames(repoRoot) {
+  const skillsRoot = path.join(repoRoot, "skills");
+  if (!(await exists(skillsRoot))) return [];
+
+  const entries = await readdir(skillsRoot, { withFileTypes: true });
+  return entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
 }
 
 async function requireJsonPath(repoRoot, value, issues, label) {
