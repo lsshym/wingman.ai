@@ -80,7 +80,7 @@ Wingman 的现有测试集中在发布前静态校验和轻量行为约束上。
 - 已完成：检查 README 是否覆盖所有 `skills/` 目录中的 skill。
 - 已完成：检查当前正式 alias，比如 `/reuse-catalog`、`/reuse-select`、`/memory-setup` 是否有对应 skill 或命令说明。
 - 已完成：增加轻量 trigger contract 检查，确保 `memory-load`、`align-contracts`、`reuse-select` 等核心 skill 的触发语义仍然留在 skill 文本中。
-- 待补充：扩大 fixtures 到完整 package 级别，覆盖 good package、missing owner、missing skill、invalid path、invalid frontmatter 等端到端场景。
+- 已完成：扩大 fixtures 到完整 package 级别，覆盖 good package、missing owner、missing skill、invalid path、invalid frontmatter 等端到端场景。
 
 ### Phase 2: 增加平台与包检查
 

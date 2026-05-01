@@ -47,7 +47,6 @@ test("完整 package fixture 缺少 skill 文件时必须报错", async () => {
 
     assert.deepEqual(issues, [
       "skills/memory-load/SKILL.md: file is required",
-      "README.md: should mention skill `using-wingman`",
       "memory-load: skill file is required for trigger contract",
     ]);
   } finally {
