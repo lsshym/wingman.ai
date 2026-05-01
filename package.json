@@ -3,6 +3,20 @@
   "version": "1.0.0",
   "private": false,
   "description": "Cross-platform AI engineering plugin for execution, context, and reuse.",
+  "files": [
+    ".agents/",
+    ".claude-plugin/",
+    ".codex-plugin/",
+    ".cursor-plugin/",
+    "assets/",
+    "docs/",
+    "hooks/",
+    "skills/",
+    "README.md",
+    "LICENSE",
+    "PRIVACY.md",
+    "TERMS.md"
+  ],
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "check:plugin": "node scripts/check-plugin.mjs"

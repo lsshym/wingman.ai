@@ -6,6 +6,20 @@ const defaultPackageJson = {
   name: "wingman",
   version: "1.0.0",
   description: "Cross-platform AI engineering plugin for execution, context, and reuse.",
+  files: [
+    ".agents/",
+    ".claude-plugin/",
+    ".codex-plugin/",
+    ".cursor-plugin/",
+    "assets/",
+    "docs/",
+    "hooks/",
+    "skills/",
+    "README.md",
+    "LICENSE",
+    "PRIVACY.md",
+    "TERMS.md",
+  ],
 };
 
 const defaultClaudeMarketplace = {
@@ -131,9 +145,13 @@ export async function createPluginFixture(options = {}) {
       },
     });
 
-    await writeText(root, "hooks/run-hook.cmd", "@echo off\n");
-    await writeText(root, "hooks/session-start", "#!/usr/bin/env sh\nexit 0\n");
+    await writeText(root, "hooks/run-hook.cmd", runHookContent());
+    await writeText(root, "hooks/session-start", "#!/usr/bin/env sh\nprintf '{\"additionalContext\":\"You have Wingman\"}\\n'\n");
     await writeText(root, "assets/icon.svg", "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>\n");
+    await writeText(root, "docs/README.md", "# Docs\n");
+    await writeText(root, "LICENSE", "MIT\n");
+    await writeText(root, "PRIVACY.md", "# Privacy\n");
+    await writeText(root, "TERMS.md", "# Terms\n");
     await writeText(root, "README.md", renderReadme());
 
     for (const skillName of skillNames) {
@@ -142,6 +160,10 @@ export async function createPluginFixture(options = {}) {
         `skills/${skillName}/SKILL.md`,
         options.skillOverrides?.[skillName] ?? renderSkill(skillName),
       );
+    }
+
+    for (const [rel, content] of Object.entries(options.fileOverrides ?? {})) {
+      await writeText(root, rel, content);
     }
 
     for (const rel of options.omitPaths ?? []) {
@@ -153,6 +175,19 @@ export async function createPluginFixture(options = {}) {
     await rm(root, { recursive: true, force: true });
     throw error;
   }
+}
+
+function runHookContent() {
+  return `: << 'CMDBLOCK'
+@echo off
+exit /b 0
+CMDBLOCK
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_NAME="$1"
+shift
+exec bash "\${SCRIPT_DIR}/\${SCRIPT_NAME}" "$@"
+`;
 }
 
 function renderReadme() {

@@ -30,6 +30,9 @@ Wingman 的现有测试集中在发布前静态校验和轻量行为约束上。
 - 检查 skill `description` 是否以 `Use when` 开头，保持 trigger-focused 写法。
 - 检查 `using-wingman` 是否显式覆盖所有已打包 skill。
 - 检查 `memory-setup`、`refactor`、`refactor-types` 这类显式 workflow 是否仍然保留“必须用户明确请求”的 gating。
+- 检查 `package.json.files` 是否覆盖发布包必须包含的 manifests、skills、hooks、assets、docs 和根文档。
+- 检查 Cursor、Codex、Claude/Codex marketplace wrapper 是否保持本地安装布局。
+- 执行 hook smoke test，验证 `hooks/session-start` 和 `hooks/run-hook.cmd session-start` 能返回 Wingman context JSON。
 
 ## 为什么这样设计
 
@@ -63,11 +66,8 @@ Wingman 的现有测试集中在发布前静态校验和轻量行为约束上。
 - `explicit-skill-requests` 运行时测试：还没有验证用户明确说“使用 memory-sync / refactor”时，agent 是否真的加载并遵守对应 skill。
 - 平台运行时加载测试：还没有真的启动 Claude Code、Cursor、Codex、OpenCode 去验证插件能被平台发现和加载。
 - marketplace 安装测试：还没有从 GitHub marketplace source 模拟安装 Wingman。
-- hook 执行测试：目前只检查 hook 文件路径存在，没有实际运行 `hooks/session-start` 或 `hooks/run-hook.cmd`。
 - 跨平台同步测试：还没有类似 Superpowers `codex-plugin-sync` 的测试，验证多个平台 wrapper 是否从同一个内容源同步生成。
-- 负面 fixture 测试集：目前只有少量错误样例，还没有系统性测试“缺 manifest、错 path、坏 frontmatter、漏 skill、错 alias”等失败场景。
 - CI 集成：测试命令已经存在，但还没有 GitHub Actions 或发布前自动 gate。
-- packaging/tarball 测试：还没有验证发布包里是否包含所有必须文件、排除无关文件。
 - 文档一致性测试：README、`using-wingman`、manifest 描述之间目前只做了很少的覆盖检查。
 
 ## 推进计划
@@ -84,9 +84,10 @@ Wingman 的现有测试集中在发布前静态校验和轻量行为约束上。
 
 ### Phase 2: 增加平台与包检查
 
-- 增加 packaging check，确认发布包包含 manifest、skills、hooks、assets、docs。
-- 增加 local install layout check，模拟 Cursor、Codex、Claude wrapper 目录结构。
-- 增加 hook smoke test，至少验证脚本能执行并返回预期状态。
+- 已完成：增加 packaging check，确认发布包 allowlist 包含 manifest、skills、hooks、assets、docs 和根文档。
+- 已完成：增加 local install layout check，固定 Cursor、Codex、Claude/Codex marketplace wrapper 的本地布局契约。
+- 已完成：增加 hook smoke test，验证 `hooks/session-start` 和 `hooks/run-hook.cmd session-start` 能执行并返回 Wingman context JSON。
+- 已验证：使用 `npm pack --dry-run --json` 确认真实 npm 发布包清单包含 manifest、skills、hooks、assets、docs。
 
 ### Phase 3: 增加 Superpowers 风格行为测试
 

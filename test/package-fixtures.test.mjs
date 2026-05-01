@@ -104,3 +104,71 @@ description: Loads memory before work
     await rm(root, { recursive: true, force: true });
   }
 });
+
+test("完整 package fixture 发布包缺少 docs allowlist 时必须报错", async () => {
+  const root = await createPluginFixture({
+    packageJson: {
+      files: [
+        ".agents/",
+        ".claude-plugin/",
+        ".codex-plugin/",
+        ".cursor-plugin/",
+        "assets/",
+        "hooks/",
+        "skills/",
+        "README.md",
+        "LICENSE",
+        "PRIVACY.md",
+        "TERMS.md",
+      ],
+    },
+  });
+
+  try {
+    const issues = await collectProjectIssues(root);
+
+    assert.deepEqual(issues, [
+      "package.json: files should include docs/",
+    ]);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("完整 package fixture 平台本地安装布局漂移时必须报错", async () => {
+  const root = await createPluginFixture({
+    cursorPlugin: {
+      skills: "./cursor-skills/",
+    },
+  });
+
+  try {
+    const issues = await collectProjectIssues(root);
+
+    assert.deepEqual(issues, [
+      ".cursor-plugin/plugin.json: skills path should be ./skills/ for shared local install layout",
+      ".cursor-plugin/plugin.json: skills path does not exist: cursor-skills",
+    ]);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("完整 package fixture hook smoke test 失败时必须报错", async () => {
+  const root = await createPluginFixture({
+    fileOverrides: {
+      "hooks/session-start": "#!/usr/bin/env sh\nexit 7\n",
+    },
+  });
+
+  try {
+    const issues = await collectProjectIssues(root);
+
+    assert.deepEqual(issues, [
+      "hooks/session-start: smoke test failed with exit code 7",
+      "hooks/run-hook.cmd session-start: smoke test failed with exit code 7",
+    ]);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});

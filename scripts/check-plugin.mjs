@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 
+import { execFile } from "node:child_process";
 import { access, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
+
+const execFileAsync = promisify(execFile);
 
 const requiredJsonFiles = [
   "package.json",
@@ -19,6 +23,21 @@ const rootFromImport = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
 );
+
+const requiredPackageFiles = [
+  ".agents/",
+  ".claude-plugin/",
+  ".codex-plugin/",
+  ".cursor-plugin/",
+  "assets/",
+  "docs/",
+  "hooks/",
+  "skills/",
+  "README.md",
+  "LICENSE",
+  "PRIVACY.md",
+  "TERMS.md",
+];
 
 const defaultAliasMap = {
   "/reuse-catalog": "reuse-catalog",
@@ -185,11 +204,98 @@ export async function collectProjectIssues(repoRoot = rootFromImport) {
   issues.push(...validatePluginManifest(".cursor-plugin/plugin.json", json[".cursor-plugin/plugin.json"]));
   issues.push(...validateCodexMarketplace(json[".agents/plugins/marketplace.json"]));
   issues.push(...validateCrossPlatformMetadata(json));
+  issues.push(...(await validatePackageContents(repoRoot, json["package.json"])));
+  issues.push(...validateLocalInstallLayout(json));
   issues.push(...(await validateReferencedPaths(repoRoot, json)));
   issues.push(...(await validateSkills(repoRoot)));
   issues.push(...(await validateReadmeSkillCoverage(repoRoot)));
   issues.push(...(await validateAliasCoverage(repoRoot)));
   issues.push(...(await validateSkillTriggerContracts(repoRoot)));
+  issues.push(...(await validateHookSmokeTests(repoRoot)));
+
+  return issues;
+}
+
+export async function validatePackageContents(repoRoot, packageJson) {
+  const issues = [];
+  if (packageJson == null) return issues;
+
+  if (!Array.isArray(packageJson.files) || packageJson.files.length === 0) {
+    issues.push("package.json: files must be a non-empty array for packaging allowlist");
+    return issues;
+  }
+
+  const normalizedFiles = new Set(packageJson.files.map(normalizePackageFile));
+  for (const rel of requiredPackageFiles) {
+    if (!normalizedFiles.has(rel)) {
+      issues.push(`package.json: files should include ${rel}`);
+      continue;
+    }
+    await requirePath(repoRoot, rel, issues, `package.json: packaged path ${rel}`);
+  }
+
+  return issues;
+}
+
+export function validateLocalInstallLayout(json) {
+  const issues = [];
+
+  requireExactJsonValue(
+    json[".codex-plugin/plugin.json"]?.skills,
+    "./skills/",
+    ".codex-plugin/plugin.json: skills path",
+    issues,
+    "for shared local install layout",
+  );
+  requireExactJsonValue(
+    json[".cursor-plugin/plugin.json"]?.skills,
+    "./skills/",
+    ".cursor-plugin/plugin.json: skills path",
+    issues,
+    "for shared local install layout",
+  );
+  requireExactJsonValue(
+    json[".cursor-plugin/plugin.json"]?.hooks,
+    "./hooks/hooks-cursor.json",
+    ".cursor-plugin/plugin.json: hooks path",
+    issues,
+    "for local install layout",
+  );
+
+  const marketplacePlugin = json[".agents/plugins/marketplace.json"]?.plugins?.[0];
+  requireExactJsonValue(
+    marketplacePlugin?.source?.source,
+    "local",
+    ".agents/plugins/marketplace.json: plugins[0].source.source",
+    issues,
+    "for local install layout",
+  );
+  requireExactJsonValue(
+    marketplacePlugin?.source?.path,
+    "./",
+    ".agents/plugins/marketplace.json: plugins[0].source.path",
+    issues,
+    "for local install layout",
+  );
+
+  return issues;
+}
+
+export async function validateHookSmokeTests(repoRoot) {
+  const issues = [];
+
+  await smokeHook(
+    repoRoot,
+    "hooks/session-start",
+    ["hooks/session-start"],
+    issues,
+  );
+  await smokeHook(
+    repoRoot,
+    "hooks/run-hook.cmd session-start",
+    ["hooks/run-hook.cmd", "session-start"],
+    issues,
+  );
 
   return issues;
 }
@@ -428,6 +534,12 @@ async function requireJsonPath(repoRoot, value, issues, label) {
   await requirePath(repoRoot, normalizeRelativePath(value), issues, label);
 }
 
+function requireExactJsonValue(value, expected, label, issues, reason) {
+  if (value !== expected) {
+    issues.push(`${label} should be ${expected} ${reason}`);
+  }
+}
+
 async function requirePath(repoRoot, rel, issues, label) {
   const absolute = path.join(repoRoot, rel);
   if (!(await exists(absolute))) {
@@ -437,6 +549,14 @@ async function requirePath(repoRoot, rel, issues, label) {
 
 function normalizeRelativePath(value) {
   return value.replace(/^\.\//, "").replace(/\/$/, "");
+}
+
+function normalizePackageFile(value) {
+  const normalized = value.replace(/^\.\//, "");
+  if (requiredPackageFiles.includes(`${normalized}/`)) {
+    return `${normalized}/`;
+  }
+  return normalized;
 }
 
 function isNonEmptyString(value) {
@@ -454,6 +574,42 @@ async function exists(absolute) {
 
 function relativePath(repoRoot, absolute) {
   return path.relative(repoRoot, absolute).split(path.sep).join("/");
+}
+
+async function smokeHook(repoRoot, label, args, issues) {
+  try {
+    const { stdout } = await execFileAsync("bash", args, {
+      cwd: repoRoot,
+      env: {
+        ...process.env,
+        WINGMAN_HOOK_SMOKE_TEST: "1",
+      },
+      maxBuffer: 1024 * 1024,
+      timeout: 5000,
+    });
+    const parsed = JSON.parse(stdout);
+    const context = extractHookContext(parsed);
+    if (!context.includes("Wingman")) {
+      issues.push(`${label}: smoke test output should include Wingman context`);
+    }
+  } catch (error) {
+    if (typeof error?.code === "number") {
+      issues.push(`${label}: smoke test failed with exit code ${error.code}`);
+    } else if (error instanceof SyntaxError) {
+      issues.push(`${label}: smoke test did not return valid JSON`);
+    } else {
+      issues.push(`${label}: smoke test failed (${error.message})`);
+    }
+  }
+}
+
+function extractHookContext(output) {
+  return String(
+    output?.additionalContext ??
+      output?.additional_context ??
+      output?.hookSpecificOutput?.additionalContext ??
+      "",
+  );
 }
 
 async function main() {
