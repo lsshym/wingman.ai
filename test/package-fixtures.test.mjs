@@ -105,7 +105,7 @@ description: Loads memory before work
   }
 });
 
-test("完整 package fixture 发布包缺少 docs allowlist 时必须报错", async () => {
+test("完整 package fixture 发布包缺少已链接 policy 文件时必须报错", async () => {
   const root = await createPluginFixture({
     packageJson: {
       files: [
@@ -118,7 +118,6 @@ test("完整 package fixture 发布包缺少 docs allowlist 时必须报错", as
         "skills/",
         "README.md",
         "LICENSE",
-        "PRIVACY.md",
         "TERMS.md",
       ],
     },
@@ -128,7 +127,7 @@ test("完整 package fixture 发布包缺少 docs allowlist 时必须报错", as
     const issues = await collectProjectIssues(root);
 
     assert.deepEqual(issues, [
-      "package.json: files should include docs/",
+      "package.json: files should include linked policy file PRIVACY.md",
     ]);
   } finally {
     await rm(root, { recursive: true, force: true });

@@ -54,6 +54,8 @@ const defaultCodexPlugin = {
     displayName: "Wingman",
     composerIcon: "./assets/icon.svg",
     logo: "./assets/icon.svg",
+    privacyPolicyURL: "https://github.com/lsshym/wingman.ai/blob/main/PRIVACY.md",
+    termsOfServiceURL: "https://github.com/lsshym/wingman.ai/blob/main/TERMS.md",
   },
 };
 

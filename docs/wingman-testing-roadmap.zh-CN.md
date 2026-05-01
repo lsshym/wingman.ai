@@ -30,7 +30,8 @@ Wingman 的现有测试集中在发布前静态校验和轻量行为约束上。
 - 检查 skill `description` 是否以 `Use when` 开头，保持 trigger-focused 写法。
 - 检查 `using-wingman` 是否显式覆盖所有已打包 skill。
 - 检查 `memory-setup`、`refactor`、`refactor-types` 这类显式 workflow 是否仍然保留“必须用户明确请求”的 gating。
-- 检查 `package.json.files` 是否覆盖发布包必须包含的 manifests、skills、hooks、assets、docs 和根文档。
+- 检查 `package.json.files` 是否覆盖发布包必须包含的 manifests、skills、hooks、assets 和根文档。
+- 当 manifest 链接到 `PRIVACY.md` 或 `TERMS.md` 时，检查这些 policy 文件是否进入发布包。
 - 检查 Cursor、Codex、Claude/Codex marketplace wrapper 是否保持本地安装布局。
 - 执行 hook smoke test，验证 `hooks/session-start` 和 `hooks/run-hook.cmd session-start` 能返回 Wingman context JSON。
 
@@ -84,10 +85,10 @@ Wingman 的现有测试集中在发布前静态校验和轻量行为约束上。
 
 ### Phase 2: 增加平台与包检查
 
-- 已完成：增加 packaging check，确认发布包 allowlist 包含 manifest、skills、hooks、assets、docs 和根文档。
+- 已完成：增加 packaging check，确认发布包 allowlist 包含 manifest、skills、hooks、assets 和根文档；policy 文件按 manifest 链接条件检查。
 - 已完成：增加 local install layout check，固定 Cursor、Codex、Claude/Codex marketplace wrapper 的本地布局契约。
 - 已完成：增加 hook smoke test，验证 `hooks/session-start` 和 `hooks/run-hook.cmd session-start` 能执行并返回 Wingman context JSON。
-- 已验证：使用 `npm pack --dry-run --json` 确认真实 npm 发布包清单包含 manifest、skills、hooks、assets、docs。
+- 已验证：使用 `npm pack --dry-run --json` 确认真实 npm 发布包清单包含 manifest、skills、hooks、assets、docs 和已链接 policy 文件。
 
 ### Phase 3: 增加 Superpowers 风格行为测试
 

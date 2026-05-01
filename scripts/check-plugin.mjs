@@ -30,13 +30,10 @@ const requiredPackageFiles = [
   ".codex-plugin/",
   ".cursor-plugin/",
   "assets/",
-  "docs/",
   "hooks/",
   "skills/",
   "README.md",
   "LICENSE",
-  "PRIVACY.md",
-  "TERMS.md",
 ];
 
 const defaultAliasMap = {
@@ -204,7 +201,7 @@ export async function collectProjectIssues(repoRoot = rootFromImport) {
   issues.push(...validatePluginManifest(".cursor-plugin/plugin.json", json[".cursor-plugin/plugin.json"]));
   issues.push(...validateCodexMarketplace(json[".agents/plugins/marketplace.json"]));
   issues.push(...validateCrossPlatformMetadata(json));
-  issues.push(...(await validatePackageContents(repoRoot, json["package.json"])));
+  issues.push(...(await validatePackageContents(repoRoot, json)));
   issues.push(...validateLocalInstallLayout(json));
   issues.push(...(await validateReferencedPaths(repoRoot, json)));
   issues.push(...(await validateSkills(repoRoot)));
@@ -216,8 +213,9 @@ export async function collectProjectIssues(repoRoot = rootFromImport) {
   return issues;
 }
 
-export async function validatePackageContents(repoRoot, packageJson) {
+export async function validatePackageContents(repoRoot, json) {
   const issues = [];
+  const packageJson = json?.["package.json"];
   if (packageJson == null) return issues;
 
   if (!Array.isArray(packageJson.files) || packageJson.files.length === 0) {
@@ -232,6 +230,14 @@ export async function validatePackageContents(repoRoot, packageJson) {
       continue;
     }
     await requirePath(repoRoot, rel, issues, `package.json: packaged path ${rel}`);
+  }
+
+  for (const rel of collectLinkedPolicyFiles(json)) {
+    if (!normalizedFiles.has(rel)) {
+      issues.push(`package.json: files should include linked policy file ${rel}`);
+      continue;
+    }
+    await requirePath(repoRoot, rel, issues, `package.json: packaged linked policy file ${rel}`);
   }
 
   return issues;
@@ -549,6 +555,29 @@ async function requirePath(repoRoot, rel, issues, label) {
 
 function normalizeRelativePath(value) {
   return value.replace(/^\.\//, "").replace(/\/$/, "");
+}
+
+function collectLinkedPolicyFiles(json) {
+  const links = Object.values(json ?? {}).flatMap((manifest) => [
+    manifest?.privacyPolicyURL,
+    manifest?.termsOfServiceURL,
+    manifest?.interface?.privacyPolicyURL,
+    manifest?.interface?.termsOfServiceURL,
+  ]);
+  const files = new Set();
+
+  for (const link of links) {
+    const rel = policyFileFromUrl(link);
+    if (rel) files.add(rel);
+  }
+
+  return [...files].sort();
+}
+
+function policyFileFromUrl(value) {
+  if (!isNonEmptyString(value)) return null;
+  const match = value.match(/\/([^/?#]+\.md)(?:[?#].*)?$/i);
+  return match?.[1] ?? null;
 }
 
 function normalizePackageFile(value) {
