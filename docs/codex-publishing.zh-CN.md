@@ -24,7 +24,7 @@ wingman.ai/
   .agents/plugins/marketplace.json
 ```
 
-为了符合 Codex marketplace 的读取模型，本地测试时会生成一个忽略提交的插件副本：
+为了符合 Codex marketplace 的读取模型，仓库里提交了一个 Codex payload 副本：
 
 ```text
 wingman.ai/
@@ -48,7 +48,7 @@ wingman.ai/
 }
 ```
 
-`plugins/` 是生成目录，已在 `.gitignore` 中忽略。
+每次修改根目录的 `.codex-plugin/`、`skills/`、`assets/` 或 policy 文件后，都要运行 `npm run prepare:codex-local`，把变更同步到 `plugins/wingman/`。
 
 ## 安装 Codex CLI
 
@@ -116,6 +116,29 @@ Use /refactor to analyze this file. Produce the diagnostic table first and wait 
 
 预期：只输出诊断表，不直接编辑代码。
 
+## 推荐安装方式
+
+给普通用户使用时，推荐用安装脚本，而不是只让用户手动运行 `codex plugin marketplace add`：
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/lsshym/wingman.ai/main/scripts/install-codex-wingman.sh
+bash install-codex-wingman.sh
+```
+
+脚本会做四件事：
+
+1. 执行 `codex plugin marketplace add lsshym/wingman.ai`。
+2. 检查 Codex 是否自动创建了 `~/.codex/plugins/cache/wingman-marketplace/wingman/1.0.0/`。
+3. 如果 Codex 没有自动创建 cache，就从 `~/.codex/.tmp/marketplaces/wingman-marketplace/plugins/wingman/` 复制一份过去。
+4. 确保 `~/.codex/config.toml` 里有：
+
+```toml
+[plugins."wingman@wingman-marketplace"]
+enabled = true
+```
+
+最后用户重启 Codex 即可。
+
 ## 如果 `/plugins` 看不到 Wingman
 
 按这个顺序排查：
@@ -152,9 +175,14 @@ source = "/Users/apple/Documents/GitHub/wingman.ai"
 
 ## 发布给别人使用
 
-如果只是自己本地测试，当前仓库就够了。
+当前采用方案 B：直接把 `wingman.ai` 作为公开 Codex marketplace 仓库。用户安装：
 
-如果要让别人安装，推荐建一个单独的公开 marketplace 仓库，例如：
+```bash
+curl -fsSLO https://raw.githubusercontent.com/lsshym/wingman.ai/main/scripts/install-codex-wingman.sh
+bash install-codex-wingman.sh
+```
+
+等 Codex 官方开放明确收录渠道，或需要更干净的 marketplace 仓库时，再拆出单独仓库，例如：
 
 ```text
 wingman-codex-plugins/
@@ -170,7 +198,7 @@ wingman-codex-plugins/
       TERMS.md
 ```
 
-别人可以这样添加：
+如果拆出单独仓库，别人可以这样添加：
 
 ```bash
 codex plugin marketplace add lsshym/wingman-codex-plugins

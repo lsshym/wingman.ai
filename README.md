@@ -279,7 +279,14 @@ npm run test:all       # Everything above
 
 These checks validate plugin manifests, marketplace metadata, referenced assets and hooks, skill frontmatter, explicit workflow gating, `using-wingman` capability coverage, package fixtures, and behavior-test assets.
 
-For Codex, use `.agents/plugins/marketplace.json` as the local marketplace entry and restart Codex after changing plugin files.
+For Codex, install Wingman from this repository marketplace:
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/lsshym/wingman.ai/main/scripts/install-codex-wingman.sh
+bash install-codex-wingman.sh
+```
+
+The script adds `lsshym/wingman.ai` as a Codex marketplace, installs a cache fallback if Codex does not create one automatically, enables `wingman@wingman-marketplace`, and asks you to restart Codex.
 
 For Cursor, use `.cursor-plugin/plugin.json`; Cursor discovers the shared `skills/` directory through the plugin manifest.
 
