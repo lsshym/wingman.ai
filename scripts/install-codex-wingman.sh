@@ -4,6 +4,7 @@ set -euo pipefail
 MARKETPLACE="wingman-marketplace"
 PLUGIN="wingman"
 VERSION="1.0.0"
+SELF_DELETE=0
 CODEX_HOME="${CODEX_HOME:-${HOME}/.codex}"
 MARKETPLACE_ROOT="${CODEX_HOME}/.tmp/marketplaces/${MARKETPLACE}"
 SOURCE_DIR="${MARKETPLACE_ROOT}/plugins/${PLUGIN}"
@@ -19,6 +20,29 @@ fail() {
   printf 'Error: %s\n' "$*" >&2
   exit 1
 }
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --self-delete)
+      SELF_DELETE=1
+      shift
+      ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: bash install-codex-wingman.sh [--self-delete]
+
+Installs Wingman for Codex from the lsshym/wingman.ai marketplace.
+
+Options:
+  --self-delete  Remove this downloaded script after a successful install.
+EOF
+      exit 0
+      ;;
+    *)
+      fail "unknown option: $1"
+      ;;
+  esac
+done
 
 if ! command -v codex >/dev/null 2>&1; then
   fail "codex CLI was not found. Install it first: npm install -g @openai/codex"
@@ -60,3 +84,8 @@ fi
 
 info "Wingman installed for Codex."
 info "Restart Codex, then test: Use /refactor to analyze this file."
+
+if [[ "${SELF_DELETE}" -eq 1 && -f "${BASH_SOURCE[0]}" ]]; then
+  rm -f -- "${BASH_SOURCE[0]}"
+  info "Removed installer script: ${BASH_SOURCE[0]}"
+fi

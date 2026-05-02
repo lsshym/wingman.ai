@@ -233,6 +233,7 @@ test("Codex 发布同步脚本必须指向 plugins/wingman 嵌入目录", async 
   assert.match(script, /\.codex-plugin\/plugin\.json/);
   assert.match(script, /--exclude "plugins\/"/);
   assert.match(script, /--exclude "\.agents\/"/);
+  assert.match(script, /--exclude "install-codex-wingman\.sh"/);
 });
 
 test("Codex marketplace payload 必须提交在 plugins/wingman 并与源码同步", async () => {
@@ -281,5 +282,7 @@ test("Codex 安装脚本必须提供 marketplace 添加和 cache 兜底安装", 
   assert.match(script, /CACHE_DIR="\$\{CODEX_HOME\}\/plugins\/cache\/\$\{MARKETPLACE\}\/\$\{PLUGIN\}\/\$\{VERSION\}"/);
   assert.match(script, /PLUGIN_CONFIG="\[plugins\.\\"\$\{PLUGIN\}@\$\{MARKETPLACE\}\\"\]"/);
   assert.match(script, /SOURCE_DIR="\$\{MARKETPLACE_ROOT\}\/plugins\/\$\{PLUGIN\}"/);
+  assert.match(script, /--self-delete/);
+  assert.match(script, /rm -f -- "\$\{BASH_SOURCE\[0\]\}"/);
   assert.match(script, /Restart Codex/);
 });

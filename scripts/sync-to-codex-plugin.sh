@@ -95,6 +95,7 @@ mkdir -p "${DEST_DIR}"
 RSYNC_ARGS=(
   -a
   --delete
+  --delete-excluded
   --exclude ".DS_Store"
   --exclude ".git/"
   --exclude ".gitignore"
@@ -103,6 +104,7 @@ RSYNC_ARGS=(
   --exclude ".cursor-plugin/"
   --exclude "docs/"
   --exclude "hooks/"
+  --exclude "install-codex-wingman.sh"
   --exclude "node_modules/"
   --exclude "package.json"
   --exclude "package-lock.json"

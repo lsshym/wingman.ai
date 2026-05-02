@@ -122,8 +122,10 @@ Use /refactor to analyze this file. Produce the diagnostic table first and wait 
 
 ```bash
 curl -fsSLO https://raw.githubusercontent.com/lsshym/wingman.ai/main/scripts/install-codex-wingman.sh
-bash install-codex-wingman.sh
+bash install-codex-wingman.sh --self-delete
 ```
+
+`raw.githubusercontent.com` 是 GitHub 的“原始文件下载”域名。这里下载的是脚本文本本身，不是 GitHub 网页。`--self-delete` 会在安装成功后删除刚下载到当前目录的 `install-codex-wingman.sh`。
 
 脚本会做四件事：
 
@@ -179,7 +181,7 @@ source = "/Users/apple/Documents/GitHub/wingman.ai"
 
 ```bash
 curl -fsSLO https://raw.githubusercontent.com/lsshym/wingman.ai/main/scripts/install-codex-wingman.sh
-bash install-codex-wingman.sh
+bash install-codex-wingman.sh --self-delete
 ```
 
 等 Codex 官方开放明确收录渠道，或需要更干净的 marketplace 仓库时，再拆出单独仓库，例如：

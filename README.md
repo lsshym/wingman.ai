@@ -279,14 +279,14 @@ npm run test:all       # Everything above
 
 These checks validate plugin manifests, marketplace metadata, referenced assets and hooks, skill frontmatter, explicit workflow gating, `using-wingman` capability coverage, package fixtures, and behavior-test assets.
 
-For Codex, install Wingman from this repository marketplace:
+For Codex, Wingman is not currently listed in the official Codex plugin directory. Install it from this GitHub repository marketplace:
 
 ```bash
 curl -fsSLO https://raw.githubusercontent.com/lsshym/wingman.ai/main/scripts/install-codex-wingman.sh
-bash install-codex-wingman.sh
+bash install-codex-wingman.sh --self-delete
 ```
 
-The script adds `lsshym/wingman.ai` as a Codex marketplace, installs a cache fallback if Codex does not create one automatically, enables `wingman@wingman-marketplace`, and asks you to restart Codex.
+The `raw.githubusercontent.com` URL downloads the plain script file from GitHub. The script adds `lsshym/wingman.ai` as a Codex marketplace, installs a cache fallback if Codex does not create one automatically, enables `wingman@wingman-marketplace`, asks you to restart Codex, and `--self-delete` removes the downloaded installer after a successful run. After restart, Wingman should be available even if it does not appear in the official `/plugins` directory.
 
 For Cursor, use `.cursor-plugin/plugin.json`; Cursor discovers the shared `skills/` directory through the plugin manifest.
 
