@@ -1,0 +1,45 @@
+{
+  "name": "wingman",
+  "version": "1.0.0",
+  "description": "Cross-platform AI engineering plugin for execution, context, and reuse.",
+  "author": {
+    "name": "keni"
+  },
+  "homepage": "https://github.com/lsshym/wingman.ai",
+  "repository": "https://github.com/lsshym/wingman.ai",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "agentic",
+    "codex",
+    "cursor",
+    "skills",
+    "workflow",
+    "memory",
+    "reuse"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Wingman",
+    "shortDescription": "Execution, memory, and reuse workflows for coding agents",
+    "longDescription": "Wingman packages reusable engineering skills for contract alignment, durable project memory, reuse selection, and explicit refactor workflows.",
+    "developerName": "keni",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Wingman to load project context before this refactor.",
+      "Use Wingman to decide whether an existing implementation should be reused."
+    ],
+    "websiteURL": "https://github.com/lsshym/wingman.ai",
+    "privacyPolicyURL": "https://github.com/lsshym/wingman.ai/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/lsshym/wingman.ai/blob/main/TERMS.md",
+    "brandColor": "#2563EB",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg",
+    "screenshots": []
+  }
+}

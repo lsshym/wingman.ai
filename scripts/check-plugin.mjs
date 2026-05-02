@@ -31,6 +31,7 @@ const requiredPackageFiles = [
   ".cursor-plugin/",
   "assets/",
   "hooks/",
+  "plugins/",
   "skills/",
   "README.md",
   "LICENSE",

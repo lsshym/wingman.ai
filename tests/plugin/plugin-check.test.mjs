@@ -234,3 +234,39 @@ test("Codex 发布同步脚本必须指向 plugins/wingman 嵌入目录", async 
   assert.match(script, /--exclude "plugins\/"/);
   assert.match(script, /--exclude "\.agents\/"/);
 });
+
+test("Codex marketplace payload 必须提交在 plugins/wingman 并与源码同步", async () => {
+  const payloadRoot = path.join(repoRoot, "plugins", "wingman");
+  const requiredFiles = [
+    ".codex-plugin/plugin.json",
+    "assets/icon.svg",
+    "README.md",
+    "LICENSE",
+    "PRIVACY.md",
+    "TERMS.md",
+  ];
+
+  for (const rel of requiredFiles) {
+    assert.equal(
+      await readFile(path.join(payloadRoot, rel), "utf8"),
+      await readFile(path.join(repoRoot, rel), "utf8"),
+      `plugins/wingman/${rel} should match ${rel}`,
+    );
+  }
+
+  const skillNames = (
+    await readdir(path.join(repoRoot, "skills"), { withFileTypes: true })
+  )
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+
+  for (const skillName of skillNames) {
+    const rel = path.join("skills", skillName, "SKILL.md");
+    assert.equal(
+      await readFile(path.join(payloadRoot, rel), "utf8"),
+      await readFile(path.join(repoRoot, rel), "utf8"),
+      `plugins/wingman/${rel} should match ${rel}`,
+    );
+  }
+});

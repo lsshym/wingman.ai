@@ -14,6 +14,7 @@ const defaultPackageJson = {
     "assets/",
     "docs/",
     "hooks/",
+    "plugins/",
     "skills/",
     "README.md",
     "LICENSE",
@@ -160,6 +161,20 @@ export async function createPluginFixture(options = {}) {
       await writeText(
         root,
         `skills/${skillName}/SKILL.md`,
+        options.skillOverrides?.[skillName] ?? renderSkill(skillName),
+      );
+    }
+
+    await writeJson(root, "plugins/wingman/.codex-plugin/plugin.json", merge(defaultCodexPlugin, options.codexPlugin));
+    await writeText(root, "plugins/wingman/assets/icon.svg", "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>\n");
+    await writeText(root, "plugins/wingman/README.md", renderReadme());
+    await writeText(root, "plugins/wingman/LICENSE", "MIT\n");
+    await writeText(root, "plugins/wingman/PRIVACY.md", "# Privacy\n");
+    await writeText(root, "plugins/wingman/TERMS.md", "# Terms\n");
+    for (const skillName of skillNames) {
+      await writeText(
+        root,
+        `plugins/wingman/skills/${skillName}/SKILL.md`,
         options.skillOverrides?.[skillName] ?? renderSkill(skillName),
       );
     }
