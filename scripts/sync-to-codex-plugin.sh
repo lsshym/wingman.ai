@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DEFAULT_FORK="lsshym/openai-codex-plugins"
-FORK="${WINGMAN_CODEX_PLUGINS_FORK:-${DEFAULT_FORK}}"
-REMOTE_URL="${WINGMAN_CODEX_PLUGINS_REMOTE:-git@github.com:${FORK}.git}"
+FORK="${WINGMAN_CODEX_PLUGINS_FORK:-}"
+REMOTE_URL="${WINGMAN_CODEX_PLUGINS_REMOTE:-}"
 WORKTREE_DIR="${WINGMAN_CODEX_PLUGINS_DIR:-../openai-codex-plugins}"
 DEST_REL="plugins/wingman"
 BOOTSTRAP=0
@@ -18,8 +17,8 @@ Sync Wingman's Codex plugin payload into an openai-codex-plugins checkout at plu
 Options:
   --bootstrap       Clone the Codex plugins repository if --dest does not exist.
   --dry-run         Show the rsync plan without changing the destination.
-  --dest PATH       Path to the openai-codex-plugins checkout. Defaults to ../openai-codex-plugins.
-  --fork OWNER/REPO GitHub fork used for bootstrap. Defaults to lsshym/openai-codex-plugins.
+  --dest PATH       Path to a Codex marketplace checkout. Defaults to ../openai-codex-plugins.
+  --fork OWNER/REPO GitHub fork used for bootstrap, such as your-org/wingman-codex-plugins.
 
 Environment:
   WINGMAN_CODEX_PLUGINS_DIR      Destination checkout path.
@@ -74,6 +73,14 @@ if [[ ! -d "${WORKTREE_DIR}" ]]; then
     echo "Destination checkout does not exist: ${WORKTREE_DIR}" >&2
     echo "Create it or rerun with --bootstrap." >&2
     exit 1
+  fi
+  if [[ -z "${REMOTE_URL}" ]]; then
+    if [[ -n "${FORK}" ]]; then
+      REMOTE_URL="git@github.com:${FORK}.git"
+    else
+      echo "Bootstrap requires --fork OWNER/REPO or WINGMAN_CODEX_PLUGINS_REMOTE." >&2
+      exit 1
+    fi
   fi
   git clone "${REMOTE_URL}" "${WORKTREE_DIR}"
 fi

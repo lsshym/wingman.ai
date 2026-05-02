@@ -278,7 +278,7 @@ export function validateLocalInstallLayout(json) {
   );
   requireExactJsonValue(
     marketplacePlugin?.source?.path,
-    "./",
+    "./plugins/wingman",
     ".agents/plugins/marketplace.json: plugins[0].source.path",
     issues,
     "for local install layout",

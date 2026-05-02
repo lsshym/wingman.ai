@@ -75,7 +75,7 @@ const defaultCodexMarketplace = {
       name: "wingman",
       source: {
         source: "local",
-        path: "./",
+        path: "./plugins/wingman",
       },
       policy: {
         installation: "AVAILABLE",
