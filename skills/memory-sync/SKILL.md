@@ -41,6 +41,47 @@ Keep field names, code symbols, paths, and API names unchanged.
 
 Before reporting meaningful coding work as complete, run the Value Funnel. If the change passes the funnel and memory has not been synced, do not say done, fixed, completed, or 已完成. Sync memory first unless the user explicitly opted out.
 
+## Memory Routing
+
+Before writing any memory entry, choose the destination(s) for the completed work. A task may route to more than one destination, but each destination must have a reason.
+
+- **IGNORE**: Use when the change is pure formatting, rename-only cleanup, isolated UI pixel tuning, code movement, or behavior-preserving extraction with no state, data, contract, or business impact.
+- **ACTIVE_LOG**: Use when the change records meaningful short-term progress, changed files, debugging outcome, partial work, unresolved follow-ups, or recent implementation context that may matter in the next few sessions.
+- **DOMAIN_TRUTH**: Use when the change creates, confirms, corrects, or removes a stable business rule, API contract, canonical field, state-flow rule, permission rule, money calculation, routing rule, or recurring debugging conclusion that should guide future work in one domain.
+- **PROJECT_ADR**: Use when the durable rule applies across domains or changes global architecture, project-wide agent behavior, coding standards, platform policy, or repository conventions.
+- **ARCHIVE**: Use when active logs are complete, obsolete, contradicted, too old, or already distilled into durable memory and should not load by default.
+
+Routing order:
+
+1. Respect User Override first.
+2. Apply **IGNORE** before any write.
+3. Use **ACTIVE_LOG** for meaningful work even when durable knowledge is uncertain.
+4. Use **DOMAIN_TRUTH** or **PROJECT_ADR** only after the Evidence Gate passes.
+5. Use **ARCHIVE** only during maintenance or when the current sync fully distills an active log.
+
+### Evidence Gate
+
+Before writing **DOMAIN_TRUTH** or **PROJECT_ADR**, verify at least one evidence source:
+
+- The user explicitly stated the rule or decision.
+- Existing Wingman memory already implies the rule.
+- Product docs, API docs, schema, tests, or accepted specs confirm it.
+- The implementation intentionally changed a stable contract or business behavior, not just an incidental implementation detail.
+
+If evidence is weak and the proposed durable rule would constrain future work, ask the user before writing durable memory. Do not promote guessed thresholds, temporary constants, local workarounds, or one-off implementation details into `domains/` or `projectBrief.md`.
+
+### Durable Truth Template
+
+When writing **DOMAIN_TRUTH** or **PROJECT_ADR**, include a compact durable rule with `[WHY]`. Prefer the configured memory language, but keep field names, paths, API names, and code symbols unchanged.
+
+Use this shape when the existing memory file has no stronger local format:
+
+```markdown
+- `<rule>` [WHY]: `<business reason, contract reason, technical pitfall, or debugging conclusion>`
+  - **Evidence**: `<user statement | existing memory | docs/schema/tests/spec | implementation contract>`
+  - **Applies When**: `<when future agents should rely on this rule>`
+```
+
 ## Phase 1: Progress Log
 
 ### Parse Input
@@ -50,8 +91,8 @@ Before reporting meaningful coding work as complete, run the Value Funnel. If th
 
 ### Value Funnel
 
-- **Block**: Pure CSS/UI pixel changes, variable renames, code movement, formatting, or behavior-preserving extraction with no state/data impact.
-- **Record**: Money calculations, state transitions, condition branches, API field mapping, API fallback/interception, rule checkboxes, durable decisions, business rules, or bug conclusions.
+- **Block**: Route to **IGNORE** for pure CSS/UI pixel changes, variable renames, code movement, formatting, or behavior-preserving extraction with no state/data impact.
+- **Record**: Route to **ACTIVE_LOG** for money calculations, state transitions, condition branches, API field mapping, API fallback/interception, rule checkboxes, durable decisions, business rules, or bug conclusions.
 
 When blocked by the funnel, do not write a log. Say that the change did not meet the memory threshold.
 
@@ -97,7 +138,7 @@ Update the pending tasks section when the task changes pending work. Common head
 
 ## Phase 2: Knowledge Distillation
 
-After the progress log, decide whether the change created durable knowledge:
+After the progress log, decide whether the change routes to **DOMAIN_TRUTH** or **PROJECT_ADR**:
 
 - Architecture decision.
 - Business truth.
@@ -109,19 +150,20 @@ If no durable knowledge exists, stop after the progress log.
 
 If durable knowledge exists:
 
-1. Extract the durable rule and include `[WHY]`: the pitfall, business reason, or technical reasoning.
-2. Read `.wingman/memory/projectBrief.md`.
-3. Read `.wingman/memory/domains/README.md` if it exists and follow its structure rules.
-4. Route the knowledge:
+1. Run the Evidence Gate. If evidence is weak and the rule would constrain future work, ask the user before writing durable memory.
+2. Extract the durable rule using the Durable Truth Template and include `[WHY]`: the pitfall, business reason, or technical reasoning.
+3. Read `.wingman/memory/projectBrief.md`.
+4. Read `.wingman/memory/domains/README.md` if it exists and follow its structure rules.
+5. Route the knowledge:
    - Global rule or ADR -> update the architecture decisions section in `projectBrief.md`.
    - Existing small domain -> update `.wingman/memory/domains/<domain>.md`.
    - Existing folder domain -> read `<domain>/index.md`, choose the relevant topic file, then update the index when adding or moving subfiles.
    - New domain -> create either `.wingman/memory/domains/<domain>.md` for small domains or `.wingman/memory/domains/<domain>/index.md` plus topic files for large domains.
-5. Do not create one domain file per small feature. Route feature knowledge into a stable business domain whenever possible.
-6. If a domain file exceeds 250 lines or contains 3+ unrelated knowledge clusters, split it into `<domain>/index.md` plus topic files and update `projectBrief.md`.
-7. In domain files, write durable rules under the current truths section. Use `## Current Truths` for English memory or `## 当前业务真理` for Chinese memory.
-8. Overwrite outdated or contradictory logic. Do not leave conflicting truths alive.
-9. Remove only active-context logs that were fully distilled into durable knowledge, or trivial logs older than 5 days.
+6. Do not create one domain file per small feature. Route feature knowledge into a stable business domain whenever possible.
+7. If a domain file exceeds 250 lines or contains 3+ unrelated knowledge clusters, split it into `<domain>/index.md` plus topic files and update `projectBrief.md`.
+8. In domain files, write durable rules under the current truths section. Use `## Current Truths` for English memory or `## 当前业务真理` for Chinese memory.
+9. Overwrite outdated or contradictory logic. Do not leave conflicting truths alive.
+10. Remove only active-context logs that were fully distilled into durable knowledge, or trivial logs older than 5 days.
 
 ## Phase 3: Active Context Maintenance
 
@@ -136,7 +178,7 @@ Run maintenance when:
 Maintenance rules:
 
 - Keep current todos and recent high-signal logs in `activeContext.md`.
-- Move complete old log blocks to `.wingman/memory/archive/YYYY-MM.md`; do not summarize them unless the user asks.
+- Route complete old log blocks to **ARCHIVE** by moving them to `.wingman/memory/archive/YYYY-MM.md`; do not summarize them unless the user asks.
 - Prefer distilling stable rules into `domains/*.md` before archiving.
 - Delete only logs proven obsolete, contradicted, or replaced by a same-task correction.
 - Never rewrite `activeContext.md` wholesale.

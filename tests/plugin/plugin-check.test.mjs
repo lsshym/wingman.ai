@@ -170,6 +170,30 @@ test("核心 skill 的触发契约必须保留在 skill 文本中", async () => 
   assert.deepEqual(issues, []);
 });
 
+test("memory-sync 必须保留结构化记忆路由语法", async () => {
+  const content = await readFile(
+    path.join(repoRoot, "skills", "memory-sync", "SKILL.md"),
+    "utf8",
+  );
+
+  assert.match(content, /## Memory Routing/);
+  assert.match(content, /### Evidence Gate/);
+  assert.match(content, /### Durable Truth Template/);
+
+  for (const destination of [
+    "IGNORE",
+    "ACTIVE_LOG",
+    "DOMAIN_TRUTH",
+    "PROJECT_ADR",
+    "ARCHIVE",
+  ]) {
+    assert.match(content, new RegExp(`\\*\\*${destination}\\*\\*`));
+  }
+
+  assert.match(content, /If evidence is weak/i);
+  assert.match(content, /ask the user/i);
+});
+
 test("skill 触发契约缺少关键触发语言时必须报错", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "wingman-trigger-"));
 
