@@ -2,8 +2,8 @@
 
 Use this workflow to initialize a lightweight memory bank for a repository.
 
-The command creates a small set of files that help an AI coding tool remember
-the project brief and the current working context.
+The command creates a small set of files that help an AI coding tool separate
+stable project knowledge from short-term working context.
 
 ## Command
 
@@ -15,20 +15,21 @@ the project brief and the current working context.
 If a name is provided, create a named memory bank. Otherwise create the default
 memory bank.
 
-## Paths
+## Memory Layout
 
-For the default memory bank:
+Use three layers:
 
 ```text
-.cursor/memory/
-.cursor/rules/memory-bank.mdc
+.cursor/brain/projectBrief.md
+.cursor/memory/activeContext.md
+.cursor/memory/domains/
 ```
 
-For a named memory bank:
+For a named memory bank, suffix the memory directory with the provided name:
 
 ```text
 .cursor/memory-<name>/
-.cursor/rules/memory-<name>.mdc
+.cursor/memory-<name>/domains/
 ```
 
 ## Files
@@ -38,7 +39,8 @@ Create these directories:
 ```text
 .cursor/rules/
 .cursor/skills/memory-manager/
-<memory-dir>/
+.cursor/brain/
+<memory-dir>/domains/
 ```
 
 Create the project brief:
@@ -46,17 +48,15 @@ Create the project brief:
 ```markdown
 # Project Brief
 
-## Stack
+## Global Rules
 
-- Frontend:
-- Language:
+- Architecture:
+- Naming:
 - Styling:
 
-## Rules
+## Domain Registry
 
-- Follow the existing project structure.
-- Keep names consistent with the codebase.
-- Avoid broad refactors unless the task requires them.
+- Add domain files here as the project grows.
 ```
 
 Create the active context:
@@ -64,7 +64,7 @@ Create the active context:
 ```markdown
 # Active Context
 
-## Current Progress
+## Current Work
 
 - Repository memory initialized.
 
@@ -74,8 +74,27 @@ Create the active context:
 - Update this file after meaningful work.
 ```
 
-Create a driver rule that tells the agent to read both files at the start of
-work and update the active context after meaningful changes.
+Create a domain template:
+
+```markdown
+# Domain Notes
+
+## Current Truths
+
+- Record stable domain rules here.
+
+## Open Questions
+
+- Track uncertain behavior here until it is resolved.
+```
+
+Create a driver rule that tells the agent to:
+
+1. read `projectBrief.md` and `activeContext.md` at the start of work;
+2. choose relevant domain notes only when needed;
+3. update active context after meaningful changes;
+4. avoid rewriting stable domain knowledge unless the new information is more
+   precise.
 
 ## Finish
 
