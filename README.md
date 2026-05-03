@@ -12,3 +12,13 @@ improved over time.
 Use `api-bind` when connecting backend response fields to an existing frontend
 component. It focuses on preserving the UI while choosing a practical data
 binding style for simple and complex API shapes.
+
+### `init-momory`
+
+Use `init-momory` to create a lightweight repository memory structure for an AI
+coding tool. It separates stable project notes from short-term working context.
+
+### `memo`
+
+Use `memo` after meaningful work to update the active project context without
+rewriting the whole memory file.
