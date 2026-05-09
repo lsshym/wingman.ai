@@ -1,0 +1,15 @@
+{
+  "name": "wingman",
+  "version": "1.0.0",
+  "type": "module",
+  "private": false,
+  "description": "Reusable AI coding workflows for project memory, API integration, refactoring, and local reuse.",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "coding",
+    "workflow",
+    "skills",
+    "agent"
+  ]
+}
