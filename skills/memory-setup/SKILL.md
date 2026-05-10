@@ -1,6 +1,6 @@
-# Init Momory
+# Memory Setup
 
-Use this workflow to initialize a lightweight memory bank for a repository.
+Use this workflow to set up a lightweight memory bank for a repository.
 
 The command creates a small set of files that help an AI coding tool separate
 stable project knowledge from short-term working context.
@@ -8,8 +8,8 @@ stable project knowledge from short-term working context.
 ## Command
 
 ```text
-/init
-/init <name>
+/memory-setup
+/memory-setup <name>
 ```
 
 If a name is provided, create a named memory bank. Otherwise create the default

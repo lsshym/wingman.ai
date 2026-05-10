@@ -22,7 +22,7 @@ lets platform-specific files act as thin metadata shells.
 ├── skills/
 │   ├── api-bind/
 │   │   └── SKILL.md
-│   ├── init/
+│   ├── memory-setup/
 │   │   └── SKILL.md
 │   └── ...
 ├── package.json

@@ -19,10 +19,11 @@ Use `api-bind` when connecting backend response fields to an existing frontend
 component. It focuses on preserving the UI while choosing a practical data
 binding style for simple and complex API shapes.
 
-### `init`
+### `memory-setup`
 
-Use `init` to create a lightweight repository memory structure for an AI coding
-tool. It separates stable project notes from short-term working context.
+Use `memory-setup` to create a lightweight repository memory structure for an
+AI coding tool. It separates stable project notes from short-term working
+context.
 
 ### `memo`
 
