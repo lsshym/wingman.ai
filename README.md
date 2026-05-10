@@ -25,6 +25,16 @@ Use `memory-setup` to create a lightweight repository memory structure for an
 AI coding tool. It separates stable project notes from short-term working
 context.
 
+### `memory-load`
+
+Use `memory-load` before non-trivial work to read existing project context
+without modifying memory files.
+
+### `memory-sync`
+
+Use `memory-sync` after meaningful work to record progress, decisions, and
+durable project knowledge.
+
 ### `memo`
 
 Use `memo` after meaningful work to update the active project context without
