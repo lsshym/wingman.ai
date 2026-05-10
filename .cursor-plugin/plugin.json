@@ -1,0 +1,7 @@
+{
+  "name": "wingman",
+  "displayName": "Wingman",
+  "description": "Reusable AI coding workflows for project memory, API integration, refactoring, and local reuse.",
+  "version": "1.0.0",
+  "skills": "../skills/"
+}
