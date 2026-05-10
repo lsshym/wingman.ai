@@ -1,0 +1,11 @@
+{
+  "name": "wingman-marketplace",
+  "plugins": [
+    {
+      "name": "wingman",
+      "version": "1.0.0",
+      "source": "../",
+      "description": "Reusable AI coding workflows for project memory, API integration, refactoring, and local reuse."
+    }
+  ]
+}
