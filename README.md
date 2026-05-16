@@ -13,11 +13,10 @@ skills/<workflow>/SKILL.md
 
 ## Workflows
 
-### `api-bind`
+### `align-contracts`
 
-Use `api-bind` when connecting backend response fields to an existing frontend
-component. It focuses on preserving the UI while choosing a practical data
-binding style for simple and complex API shapes.
+Use `align-contracts` when connecting provider and consumer shapes across API,
+schema, data model, event, config, or UI boundaries.
 
 ### `memory-setup`
 
