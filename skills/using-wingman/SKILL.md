@@ -35,8 +35,8 @@ project rules with Wingman defaults.
 
 ### Reuse
 
-- `reg`: register one reusable component, hook, utility, or workflow.
-- `find`: search registered assets before rebuilding something.
+- `reuse-catalog`: register one reusable component, hook, utility, pattern, or contract.
+- `reuse-select`: search registered assets before rebuilding something.
 
 ### Refactoring
 
@@ -63,7 +63,7 @@ Use a Wingman workflow when these thoughts appear:
 | Thought | Check |
 | --- | --- |
 | "This is just a field rename." | If it crosses API, schema, type, UI, event, or config boundaries, use `align-contracts`. |
-| "I'll create a new component or helper." | If something similar may exist, use `find` first. |
+| "I'll create a new component or helper." | If something similar may exist, use `reuse-select` first. |
 | "I should remember this decision." | Use `memory-sync` if repository memory exists. |
 | "I need project context from previous work." | Use `memory-load` if repository memory exists. |
 | "This refactor looks safe." | Use `refactor` or `refactor-types` to inspect first when risk is non-trivial. |

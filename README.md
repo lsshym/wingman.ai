@@ -39,6 +39,16 @@ without modifying memory files.
 Use `memory-sync` after meaningful work to record progress, decisions, and
 durable project knowledge.
 
+### `reuse-select`
+
+Use `reuse-select` before rebuilding something that may already exist in the
+project.
+
+### `reuse-catalog`
+
+Use `reuse-catalog` after finding or creating a reusable implementation that
+future work should consider.
+
 ### `memo`
 
 Use `memo` after meaningful work to update the active project context without
