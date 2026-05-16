@@ -24,6 +24,9 @@ Use this when connecting:
 
 Do not use this for pure formatting, styling, or copy edits.
 
+For React, JSX, TypeScript props, or backend response to component binding, read
+`references/frontend-react-typescript.md` after this core protocol.
+
 ## Core Protocol
 
 1. Identify the provider contract: what shape is actually supplied?
