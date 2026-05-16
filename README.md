@@ -13,6 +13,11 @@ skills/<workflow>/SKILL.md
 
 ## Workflows
 
+### `using-wingman`
+
+Use `using-wingman` as the entry router when deciding which Wingman workflow
+applies to a coding session.
+
 ### `align-contracts`
 
 Use `align-contracts` when connecting provider and consumer shapes across API,
