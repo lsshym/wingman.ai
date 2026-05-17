@@ -31,7 +31,6 @@ project rules with Wingman defaults.
 
 - `align-contracts`: use when API, schema, type, config, event, data model, or UI
   boundaries may drift.
-- `zod-gen`: experimental schema generation for strict API boundaries.
 
 ### Reuse
 
