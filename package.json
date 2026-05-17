@@ -3,13 +3,22 @@
   "version": "1.0.0",
   "type": "module",
   "private": false,
-  "description": "Reusable AI coding workflows for project memory, API integration, refactoring, and local reuse.",
+  "description": "Cross-platform AI coding plugin for project memory, contract checks, and reuse workflows.",
+  "author": {
+    "name": "keni"
+  },
+  "homepage": "https://github.com/lsshym/wingman.ai",
+  "repository": "https://github.com/lsshym/wingman.ai",
   "license": "MIT",
   "keywords": [
     "ai",
-    "coding",
+    "agentic",
+    "codex",
+    "cursor",
     "workflow",
     "skills",
-    "agent"
-  ]
+    "memory",
+    "reuse"
+  ],
+  "skills": "./skills/"
 }
