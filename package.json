@@ -5,7 +5,8 @@
   "private": false,
   "description": "Cross-platform AI coding plugin for project memory, contract checks, and reuse workflows.",
   "scripts": {
-    "check:release": "node scripts/check-release.mjs"
+    "check:release": "node scripts/check-release.mjs",
+    "prepare:codex-local": "bash scripts/sync-to-codex-plugin.sh --dest ."
   },
   "author": {
     "name": "keni"

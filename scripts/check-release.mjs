@@ -115,6 +115,9 @@ function checkPackage(pkg) {
   if (pkg.scripts?.["check:release"] !== "node scripts/check-release.mjs") {
     fail("package.json", 'scripts.check:release must be "node scripts/check-release.mjs"');
   }
+  if (pkg.scripts?.["prepare:codex-local"] !== "bash scripts/sync-to-codex-plugin.sh --dest .") {
+    fail("package.json", "scripts.prepare:codex-local must sync the local Codex payload");
+  }
 }
 
 function checkPluginManifests(json) {
