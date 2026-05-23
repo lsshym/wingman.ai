@@ -30,6 +30,8 @@ project rules with Wingman defaults.
 - `memory-setup`: initialize repository memory when the user asks.
 - `memory-load`: read relevant memory before non-trivial work.
 - `memory-sync`: record meaningful progress and durable knowledge after work.
+- `memory-clean`: compact, prune, or deduplicate Wingman memory only when the
+  user explicitly asks.
 - `memo`: early lightweight progress logging workflow.
 
 ### Contract Alignment

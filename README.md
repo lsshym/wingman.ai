@@ -39,6 +39,11 @@ without modifying memory files.
 Use `memory-sync` after meaningful work to record progress, decisions, and
 durable project knowledge.
 
+### `memory-clean`
+
+Use `memory-clean` only when you explicitly want Wingman memory compacted,
+pruned, deduplicated, or corrected.
+
 ### `reuse-select`
 
 Use `reuse-select` before rebuilding something that may already exist in the
