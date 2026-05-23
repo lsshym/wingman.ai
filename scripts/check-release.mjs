@@ -24,6 +24,8 @@ const requiredFiles = [
   "assets/icon.svg",
   "hooks/session-start",
   "hooks/run-hook.cmd",
+  "scripts/install-codex-wingman.sh",
+  "scripts/sync-to-codex-plugin.sh",
 ];
 
 main().catch((error) => {
