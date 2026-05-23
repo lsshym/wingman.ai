@@ -15,6 +15,7 @@ const requiredJsonFiles = [
   ".cursor-plugin/plugin.json",
   ".claude-plugin/plugin.json",
   ".claude-plugin/marketplace.json",
+  ".agents/plugins/marketplace.json",
   "hooks/hooks.json",
   "hooks/hooks-cursor.json",
 ];
@@ -44,9 +45,42 @@ async function main() {
   await checkSkills();
   checkPackage(json["package.json"]);
   checkPluginManifests(json);
+  checkCodexLocalMarketplace(json[".agents/plugins/marketplace.json"]);
   checkHookConfigs(json);
+  await checkCodexPayload();
 
   printResults();
+}
+
+function checkCodexLocalMarketplace(marketplace) {
+  if (!marketplace) return;
+  requireString(".agents/plugins/marketplace.json", marketplace, "name");
+  requireObject(".agents/plugins/marketplace.json", marketplace, "interface");
+  if (!Array.isArray(marketplace.plugins) || marketplace.plugins.length === 0) {
+    fail(".agents/plugins/marketplace.json", "plugins must be a non-empty array");
+    return;
+  }
+
+  const entry = marketplace.plugins.find((plugin) => plugin?.name === pluginName);
+  if (!entry) {
+    fail(".agents/plugins/marketplace.json", `plugins must include ${pluginName}`);
+    return;
+  }
+  if (entry.source?.source !== "local") {
+    fail(".agents/plugins/marketplace.json", "wingman source.source must be local");
+  }
+  if (entry.source?.path !== "./plugins/wingman") {
+    fail(".agents/plugins/marketplace.json", "wingman source.path must be ./plugins/wingman");
+  }
+  if (entry.policy?.installation !== "AVAILABLE") {
+    fail(".agents/plugins/marketplace.json", "wingman policy.installation must be AVAILABLE");
+  }
+  if (entry.policy?.authentication !== "ON_INSTALL") {
+    fail(".agents/plugins/marketplace.json", "wingman policy.authentication must be ON_INSTALL");
+  }
+  if (entry.category !== "Coding") {
+    fail(".agents/plugins/marketplace.json", "wingman category must be Coding");
+  }
 }
 
 async function readJson(rel) {
@@ -182,6 +216,24 @@ function checkHookConfigs(json) {
   const cursorHooks = json["hooks/hooks-cursor.json"];
   if (!cursorHooks?.hooks?.sessionStart) {
     fail("hooks/hooks-cursor.json", "sessionStart hook is required");
+  }
+}
+
+async function checkCodexPayload() {
+  const payloadRoot = path.join(repoRoot, "plugins", pluginName);
+  const requiredPayloadFiles = [
+    ".codex-plugin/plugin.json",
+    "README.md",
+    "assets/icon.svg",
+    "skills/using-wingman/SKILL.md",
+  ];
+
+  for (const rel of requiredPayloadFiles) {
+    try {
+      await access(path.join(payloadRoot, rel));
+    } catch {
+      fail(`plugins/${pluginName}/${rel}`, "Codex payload file is missing");
+    }
   }
 }
 
