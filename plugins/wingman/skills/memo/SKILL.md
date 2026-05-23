@@ -1,3 +1,8 @@
+---
+name: memo
+description: Use when recording a short note, decision, or progress update into the active Wingman memory context without running the full memory sync workflow.
+---
+
 # Memo
 
 Use this workflow to update the repository memory after meaningful work.

@@ -1,3 +1,8 @@
+---
+name: memory-sync
+description: Use when progress, decisions, business logic, API contracts, state flow, field mappings, or durable project knowledge should be recorded in Wingman memory.
+---
+
 # Memory Sync
 
 Use this workflow after meaningful work when project context should be recorded.

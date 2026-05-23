@@ -1,3 +1,8 @@
+---
+name: reuse-select
+description: Use when deciding whether to reuse, extend, wrap, or create components, modules, utilities, patterns, contracts, or prior implementations from the Wingman reuse registry.
+---
+
 # Reuse Select
 
 Use this workflow before creating a component, module, utility, pattern, or

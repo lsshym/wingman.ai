@@ -1,3 +1,8 @@
+---
+name: memory-load
+description: Use when starting non-trivial coding, debugging, planning, review, API integration, or business-logic work in a repository where Wingman memory is enabled.
+---
+
 # Memory Load
 
 Use this workflow to decide whether repository memory is needed, then load only

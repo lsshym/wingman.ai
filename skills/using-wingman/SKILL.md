@@ -1,3 +1,8 @@
+---
+name: using-wingman
+description: Use when starting a Wingman-enabled coding session, adapting Wingman across AI coding platforms, deciding which Wingman skill applies, or interpreting Wingman plugin-level instructions versus project-local instructions.
+---
+
 # Using Wingman
 
 Use this as the entry router for Wingman workflows.
@@ -39,8 +44,8 @@ project rules with Wingman defaults.
 
 ### Refactoring
 
-- `refactor`: inspect code structure before behavior-preserving cleanup.
-- `refactor-types`: inspect TypeScript types and extraction paths.
+- `react-ts-refactor`: run the explicit React + TypeScript component refactor
+  diagnostic workflow when the user requests it.
 
 ## Decision Rule
 
@@ -65,7 +70,7 @@ Use a Wingman workflow when these thoughts appear:
 | "I'll create a new component or helper." | If something similar may exist, use `reuse-select` first. |
 | "I should remember this decision." | Use `memory-sync` if repository memory exists. |
 | "I need project context from previous work." | Use `memory-load` if repository memory exists. |
-| "This refactor looks safe." | Use `refactor` or `refactor-types` to inspect first when risk is non-trivial. |
+| "The user explicitly asked for React + TypeScript refactor diagnostics." | Use `react-ts-refactor` before editing. |
 
 ## Safe Editing
 

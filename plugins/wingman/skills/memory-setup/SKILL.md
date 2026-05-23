@@ -1,3 +1,8 @@
+---
+name: memory-setup
+description: Use when the user explicitly invokes `/memory-setup` or explicitly asks to initialize Wingman memory files in the current repository. Do not use for ordinary work, memory loading, memory syncing, or setup of unrelated tools.
+---
+
 # Memory Setup
 
 Use this workflow to set up a lightweight memory bank for a repository.

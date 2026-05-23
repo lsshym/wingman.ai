@@ -1,3 +1,8 @@
+---
+name: align-contracts
+description: Use when connecting provider and consumer contracts across APIs, services, schemas, events, configs, data models, SDKs, databases, CLI inputs, or UI boundaries where field shapes or semantics may drift.
+---
+
 # Align Contracts
 
 Use this workflow when connecting provider and consumer contracts across a code

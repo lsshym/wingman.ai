@@ -134,10 +134,47 @@ async function checkSkills() {
   for (const dir of skillDirs) {
     const rel = `skills/${dir}/SKILL.md`;
     const content = await readRequiredText(rel);
-    if (!content.startsWith(`# `)) {
-      warn(rel, "skill does not start with an H1 heading yet");
+    const parsed = parseFrontmatter(content);
+    if (!parsed.frontmatter) {
+      fail(rel, "missing YAML frontmatter");
+      continue;
+    }
+    if (parsed.frontmatter.name !== dir) {
+      fail(rel, "frontmatter name must match the skill directory");
+    }
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(parsed.frontmatter.name ?? "")) {
+      fail(rel, "frontmatter name must use lowercase hyphen-case");
+    }
+    const description = parsed.frontmatter.description ?? "";
+    if (!description.startsWith("Use when")) {
+      fail(rel, 'frontmatter description must start with "Use when"');
+    }
+    if (!parsed.body.trimStart().startsWith("# ")) {
+      fail(rel, "skill body must start with an H1 heading after frontmatter");
     }
   }
+}
+
+function parseFrontmatter(content) {
+  if (!content.startsWith("---\n")) {
+    return { frontmatter: null, body: content };
+  }
+
+  const end = content.indexOf("\n---\n", 4);
+  if (end === -1) {
+    return { frontmatter: null, body: content };
+  }
+
+  const rawFrontmatter = content.slice(4, end);
+  const body = content.slice(end + 5);
+  const frontmatter = {};
+  for (const line of rawFrontmatter.split("\n")) {
+    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+    if (match) {
+      frontmatter[match[1]] = match[2].replace(/^["']|["']$/g, "");
+    }
+  }
+  return { frontmatter, body };
 }
 
 function checkPackage(pkg) {
