@@ -5,84 +5,141 @@ description: Use when starting a Wingman-enabled coding session, adapting Wingma
 
 # Using Wingman
 
-Use this as the entry router for Wingman workflows.
+## Purpose
 
-Wingman is a collection of reusable coding-agent skills. This entry skill helps
-decide which workflow applies before starting meaningful work.
+Use this as Wingman's entry router. Decide which Wingman skill, if any, applies before meaningful coding work, debugging, refactoring, review, or project explanation. This router is not a substitute for the specific skill body.
+
+Wingman covers three recurring agent risks:
+
+- project memory: load relevant context before meaningful work and sync durable outcomes afterward
+- contract alignment: protect API, schema, type, event, config, domain, and UI boundaries when meanings may drift
+- reuse decisions: select, extend, wrap, or catalog existing implementations instead of rebuilding them
+
+Small, isolated tasks can stay small. If no Wingman trigger clearly matches, continue normally.
 
 ## Instruction Priority
 
-Follow the highest applicable instruction source:
+Wingman skills provide plugin defaults, but user control comes first. Follow the highest applicable instruction source:
 
-1. Direct user instructions.
-2. Project-local instructions such as `AGENTS.md`, `CLAUDE.md`, `.cursor/rules`,
-   or equivalent files.
+1. Direct user instructions, including current-chat requests.
+2. Project-local instructions from the active coding platform, such as `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, Cursor rules, or equivalent files.
 3. Wingman skills.
 4. Default model behavior.
 
-Wingman provides plugin defaults. Do not override explicit user requests or
-project rules with Wingman defaults.
+If a project-local instruction conflicts with Wingman, follow the project-local instruction. The user is in control.
 
-## Capability Groups
+## How to Access Wingman Skills
 
-### Project Memory
+Use the current platform's skill mechanism:
 
-- `memory-setup`: initialize repository memory when the user asks.
-- `memory-load`: read relevant memory before non-trivial work.
-- `memory-sync`: record meaningful progress and durable knowledge after work.
-- `memory-clean`: compact, prune, or deduplicate Wingman memory only when the
-  user explicitly asks.
-- `memo`: early lightweight progress logging workflow.
+- **Claude Code:** use the `Skill` tool. When invoked, follow the loaded skill directly instead of reading skill files manually.
+- **Copilot CLI:** use the `skill` tool. Skills are auto-discovered from installed plugins.
+- **Gemini CLI:** use `activate_skill`. Gemini loads skill metadata at session start and activates full content on demand.
+- **Codex:** use the platform's native skill loading behavior. If a Wingman skill is already loaded in context, follow it directly.
+- **Cursor:** use Cursor's plugin skill UI or slash-command surface where available. Hooks may load `using-wingman` automatically, but manual skill invocation should not depend on hooks.
+- **Other environments:** use the platform's documented skill or instruction-loading mechanism.
 
-### Contract Alignment
+## Platform Adaptation
 
-- `align-contracts`: use when API, schema, type, config, event, data model, or UI
-  boundaries may drift.
+Wingman skill bodies are platform-neutral. If a Wingman skill or wrapper mentions platform-specific tool names, adapt them to the current platform.
 
-### Reuse
+For tool mappings, read only the relevant reference when needed:
 
-- `reuse-catalog`: register one reusable component, hook, utility, pattern, or contract.
-- `reuse-select`: search registered assets before rebuilding something.
+- Codex: `references/codex-tools.md`
+- Copilot CLI: `references/copilot-tools.md`
+- Gemini CLI: `references/gemini-tools.md`
 
-### Refactoring
+## Using Wingman Skills
 
-- `react-ts-refactor`: run the explicit React + TypeScript component refactor
-  diagnostic workflow when the user requests it.
+### Decision Rule
 
-## Decision Rule
+Check Wingman skill triggers before meaningful coding work, debugging, refactoring, review, or project explanation.
 
-Before meaningful coding, debugging, refactoring, review, or project
-explanation:
+- If the user directly asks for a Wingman skill, use that skill before other work unless it conflicts with higher-priority instructions.
+- If a situational skill clearly matches, use it before acting.
+- If only this router matches, decide the next skill and then follow that skill body.
+- If no trigger clearly matches, continue normally.
 
-1. Check whether the user explicitly requested a Wingman workflow.
-2. Check whether memory should be loaded.
-3. Check whether a contract boundary is involved.
-4. Check whether an existing implementation may be reusable.
-5. If no trigger matches, continue normally.
+### Skill Priority
 
-Small isolated tasks can stay small.
+When multiple Wingman skills apply:
 
-## Red Flags
+1. Explicit user-requested skills.
+2. `memory-load` before work that needs project context.
+3. `align-contracts` or `reuse-select` before implementation when their boundary or reuse triggers apply.
+4. `memory-sync` or `reuse-catalog` after meaningful work when durable context or reusable implementation knowledge should be recorded.
 
-Use a Wingman workflow when these thoughts appear:
+Explicit workflow skills still require direct user request unless listed by the user.
+
+## Repository Memory State
+
+Wingman memory follows a repository-scoped opt-in model:
+
+```text
+memory capability installed
+  = Wingman plugin provides memory skills
+  != repository memory enabled
+
+repository memory disabled
+  = no .wingman/memory/
+
+repository memory enabled
+  = .wingman/memory/brief.md and .wingman/memory/context.md exist
+
+repository memory partial / broken
+  = .wingman/memory/ exists but required entry files are missing
+```
+
+For ordinary tasks, only invoke `memory-load` or `memory-sync` when repository memory is enabled.
+
+If repository memory is disabled, do not announce or run `memory-load` / `memory-sync` for ordinary work. Continue normally. Mention disabled memory only when the user asks about memory, asks for history or consistency with previous work, explicitly requests memory loading or syncing, or asks to run `memory-setup`.
+
+If repository memory is partial / broken, do not treat the partial files as authoritative memory. Report the missing entry files only for explicit memory requests or tasks that require memory consistency. `memory-setup` is the explicit repair/enable path.
+
+When repository memory is enabled, current memory has priority over history. Use `memory-load` / `memory-sync` for the detailed routing, status, and conflict rules.
+
+Situational skills:
+
+- `memory-load`: use before non-trivial work where durable project context may matter and repository memory is enabled.
+- `memory-sync`: use after meaningful work that should be recorded as durable context and repository memory is enabled.
+- `align-contracts`: use when data, schema, type, API, event, config, or UI boundary meanings may drift.
+- `reuse-select`: use before rebuilding something that may already exist, or when deciding whether to reuse, extend, wrap, or create an implementation.
+- `reuse-catalog`: use after creating or identifying a reusable project implementation that should become part of the selection map.
+
+Explicit workflow skills:
+
+- `memory-setup`: initialize Wingman memory files.
+- `memory-clean`: clean, compact, prune, deduplicate, reduce memory, or resolve stale/conflicting memory rules only when the user explicitly asks.
+- `react-ts-refactor`: run the React + TypeScript component refactor diagnostic workflow.
+
+Run explicit workflow skills only when the user directly asks for them.
+
+Slash-prefixed forms such as `/reuse-catalog`, `/reuse-select`, `/memory-setup`, or `/react-ts-refactor` are conceptual invocation aliases for skills. Specific platforms may namespace or display them differently, such as `/wingman:memory-setup` in Claude Code.
+
+## Wingman Red Flags
+
+These are signs that a Wingman skill may be needed:
 
 | Thought | Check |
-| --- | --- |
+|---------|-------|
 | "This is just a field rename." | If it crosses API, schema, type, UI, event, or config boundaries, use `align-contracts`. |
-| "I'll create a new component or helper." | If something similar may exist, use `reuse-select` first. |
-| "I should remember this decision." | Use `memory-sync` if repository memory exists. |
-| "I need project context from previous work." | Use `memory-load` if repository memory exists. |
-| "The user explicitly asked for React + TypeScript refactor diagnostics." | Use `react-ts-refactor` before editing. |
+| "I'll create a new component/helper." | If a reusable implementation may already exist, use `reuse-select` first. |
+| "No need to read memory for this change." | If repository memory is enabled and the work touches business rules, state transitions, permissions, quotas, billing, field mappings, debugging, or refactoring, use `memory-load`. |
+| "The work is done; I can just report back." | If repository memory is enabled and the result creates durable context, decisions, contract knowledge, or reusable implementation knowledge, use `memory-sync` or `reuse-catalog`. |
+| "The memory folder is missing, so I'll initialize it." | Do not run `memory-setup` unless the user directly asks for it. |
+| "Memory looks too long; I'll clean it now." | Do not run `memory-clean` unless the user asks; during `memory-load`, only warn or stop by pressure severity. |
 
 ## Safe Editing
 
 - Preserve existing code during real file edits.
-- Do not write placeholder comments such as `// ... existing code ...` into
-  files.
-- Keep edits scoped to the user request.
-- Use the project's normal verification after meaningful changes.
+- Do not write placeholder comments such as `// ... existing code ...` into files to stand in for unchanged code.
+- Use abbreviated snippets only in chat explanations, examples, or change summaries.
+- Keep edits scoped to the user request and the surrounding project design.
 
 ## Language
 
-Published Wingman skill bodies are English by default. User-facing output can
-follow the user's current language.
+Wingman's published plugin instructions are English by default. Generated memory and user-facing output may adapt to the project memory language or the user's current language.
+
+## Platform Wrappers
+
+Different platforms use different names for persistent instructions and startup behavior. Keep Wingman's canonical behavior in skills; platform wrappers may add their own hooks or manifests to invoke those capabilities.

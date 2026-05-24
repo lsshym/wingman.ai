@@ -5,106 +5,135 @@ description: Use when the user explicitly invokes `/memory-setup` or explicitly 
 
 # Memory Setup
 
-Use this workflow to set up a lightweight memory bank for a repository.
+Initialize the Wingman memory workflow for the current repository. Create files on disk; do not merely print templates.
 
-The command creates a small set of files that help an AI coding tool separate
-stable project knowledge from short-term working context.
+This is an explicit workflow skill. Only proceed when the user directly asks for Wingman memory setup.
 
-## Command
+## Paths
 
-```text
-/memory-setup
-/memory-setup <name>
-```
+Use `.wingman/` as the platform-neutral data root.
 
-If a name is provided, create a named memory bank. Otherwise create the default
-memory bank.
+Create:
 
-## Memory Layout
+- `.wingman/memory/`
 
-Use three layers:
+Seed:
 
-```text
-.cursor/brain/projectBrief.md
-.cursor/memory/activeContext.md
-.cursor/memory/domains/
-```
+- `.wingman/memory/brief.md`
+- `.wingman/memory/context.md`
 
-For a named memory bank, suffix the memory directory with the provided name:
+Do not create `domains/` or `history/` during initial setup. Those areas are created on demand when durable domain truth or history events first need to be written.
 
-```text
-.cursor/memory-<name>/
-.cursor/memory-<name>/domains/
-```
+If `.wingman/memory/` already exists, treat setup as a repair operation: create missing core files, but never overwrite existing user-authored memory files.
 
-## Files
+## Brief Template
 
-Create these directories:
-
-```text
-.cursor/rules/
-.cursor/skills/memory-manager/
-.cursor/brain/
-<memory-dir>/domains/
-```
-
-Create the project brief:
+Write `.wingman/memory/brief.md`:
 
 ```markdown
-# Project Brief
+# Memory Brief
 
-## Global Rules
+## 0. Memory Settings
+- **Language**: `auto`
 
-- Architecture:
-- Naming:
-- Styling:
+## 1. Architecture Decisions (ADR - Global Rules)
+> Record global rules that affect the whole project. Each rule must include `[WHY]`.
+> ADR status values: `proposed | accepted | deprecated | superseded`.
 
-## Domain Registry
+## 2. Domain Registry
+| Domain | Read When | Current File | History | Aliases | Related Domains | Status |
+| --- | --- | --- | --- | --- | --- | --- |
 
-- Add domain files here as the project grows.
+Registry status values describe whether a domain is still used for routing: `current | deprecated | superseded`.
+`History` is a history index entry, not current truth. `Related Domains` are read only when relevant to the task.
+
+## 3. Memory Layout
+- `brief.md`: global rules, ADRs, memory settings, and the Domain Registry.
+- `context.md`: current task, pending work, and recent high-signal logs.
+- `domains/`: current durable domain truth, created on demand.
+- `history/`: indexed event history, created on demand and not read by default.
+
+## 4. Authority Order
+Current rules override old events:
+
+1. `brief.md` global rules and current ADRs.
+2. `domains/` current domain truth.
+3. `context.md` hot working context.
+4. `history/` past events and audit trail.
 ```
 
-Create the active context:
+Set `Language` to the user's preferred memory language when clear, such as `zh-CN` or `en`. Use `auto` when unclear. Future memory updates should follow this setting.
+
+## Context Template
+
+Write `.wingman/memory/context.md`:
 
 ```markdown
-# Active Context
+# Memory Context
+
+## Pending Tasks
+- [ ] To be planned
 
 ## Current Work
+- None yet.
 
-- Repository memory initialized.
-
-## Next Steps
-
-- Fill in project-specific rules.
-- Update this file after meaningful work.
+---
+## Recent Logs
+### [Init] Wingman memory enabled
+- **Goal**: Enable repository-scoped Wingman memory so agents can load current project context before work and sync important outcomes afterward.
+- **Core Files**:
+  - `.wingman/memory/brief.md`: [Memory Brief] - Stores global ADRs, memory settings, and the Domain Registry.
+  - `.wingman/memory/context.md`: [Memory Context] - Stores short-term progress, pending tasks, and recent work context.
+- **Notes**: `domains/` and `history/` are created only when durable domain truth or history events emerge.
 ```
 
-Create a domain template:
+## On-Demand Domain Shape
+
+When durable domain knowledge first appears, create either `.wingman/memory/domains/<domain>.md` for a small domain or `.wingman/memory/domains/<domain>/index.md` plus focused topic files for a large domain.
+
+Use this shape when no stronger local format exists:
 
 ```markdown
-# Domain Notes
+# <Domain> Domain
+
+## When To Read This Domain
+- <task signal>
 
 ## Current Truths
+- `<rule>` [WHY]: `<reason>`
+  - **Evidence**: `<user statement | docs/schema/tests/spec | implementation>`
+  - **Applies When**: `<future task condition>`
+  - **Status**: `current | deprecated | superseded`
+  - **Since**: `YYYY-MM-DD`
+  - **Supersedes**: `<old rule or None>`
+  - **Related Domains**: `<domain list or None>`
+  - **History**: `<history/events/YYYY/MM/YYYY-MM-DD-<event-slug>.md or None>`
 
-- Record stable domain rules here.
-
-## Open Questions
-
-- Track uncertain behavior here until it is resolved.
+## Subfiles
+- `topic.md`: when this file should be read
 ```
 
-Create a driver rule that tells the agent to:
+Only `current` truths are binding. `History` is an optional backlink; do not invent events just to fill the field.
 
-1. read `projectBrief.md` and `activeContext.md` at the start of work;
-2. choose relevant domain notes only when needed;
-3. update active context after meaningful changes;
-4. avoid rewriting stable domain knowledge unless the new information is more
-   precise.
+## On-Demand History Shape
+
+When historical event retention is needed, create:
+
+```text
+.wingman/memory/history/
+  index.md
+  domains/
+    <domain>.md
+  months/
+    YYYY-MM.md
+  events/
+    YYYY/
+      MM/
+        YYYY-MM-DD-<event-slug>.md
+```
+
+History stores past events, not current rules. Event bodies live under `events/YYYY/MM/` and are the single source of truth. `domains/` and `months/` under history are projection indexes that link to event bodies. Current implementation constraints belong in `brief.md` or `domains/`.
 
 ## Finish
 
-Reply exactly:
-
-```text
-Initialized. (Rules in Brief, Progress in Context)
-```
+Report the created or updated paths.

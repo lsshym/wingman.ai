@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-import { access, readdir, readFile } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const pluginName = "wingman";
-const issues = [];
-const warnings = [];
+const payloadRoot = path.join(repoRoot, "plugins", pluginName);
 
 const requiredJsonFiles = [
   "package.json",
@@ -16,21 +16,32 @@ const requiredJsonFiles = [
   ".claude-plugin/plugin.json",
   ".claude-plugin/marketplace.json",
   ".agents/plugins/marketplace.json",
-  "hooks/hooks.json",
-  "hooks/hooks-cursor.json",
+  "gemini-extension.json",
 ];
 
-const requiredFiles = [
+const requiredReleaseFiles = [
   "README.md",
+  "GEMINI.md",
+  "LICENSE",
   "assets/icon.svg",
-  "hooks/session-start",
-  "hooks/run-hook.cmd",
-  "scripts/install-codex-wingman.sh",
-  "scripts/sync-to-codex-plugin.sh",
+];
+
+const issues = [];
+const warnings = [];
+const checkedScopes = [
+  "package.json 的最小工具入口：name、version、type、check:release、prepare:codex-local",
+  "Codex / Cursor / Claude / Gemini 的插件 manifest 基础信息与版本一致性",
+  "Codex 本地安装入口：.agents/plugins/marketplace.json 指向 ./plugins/wingman",
+  "Claude marketplace 是否包含 wingman 插件条目",
+  "Gemini extension 是否声明 contextFileName 并指向 GEMINI.md",
+  "manifest 中声明的 skills、hooks、icon/logo 路径是否真实存在",
+  "skills/*/SKILL.md 的名称、frontmatter、Use when 描述和 H1 结构",
+  "发布必备材料：README、GEMINI.md、LICENSE、assets/icon.svg",
+  "Codex 本地安装 payload：plugins/wingman 是否与根目录关键文件同步",
 ];
 
 main().catch((error) => {
-  console.error(`Release check failed unexpectedly: ${error.stack || error.message}`);
+  console.error(`发布前检查异常：${error.stack || error.message}`);
   process.exit(1);
 });
 
@@ -42,45 +53,24 @@ async function main() {
   }
 
   await checkRequiredFiles();
-  await checkSkills();
   checkPackage(json["package.json"]);
-  checkPluginManifests(json);
+  checkPlatformManifests(json);
   checkCodexLocalMarketplace(json[".agents/plugins/marketplace.json"]);
-  checkHookConfigs(json);
-  await checkCodexPayload();
+  checkClaudeMarketplace(json[".claude-plugin/marketplace.json"], json["package.json"]);
+  checkGeminiExtension(json["gemini-extension.json"], json["package.json"]);
+  await checkSkillFiles("skills");
+  await checkManifestPaths(json);
+  await checkCodexPayloadSync();
 
   printResults();
 }
 
-function checkCodexLocalMarketplace(marketplace) {
-  if (!marketplace) return;
-  requireString(".agents/plugins/marketplace.json", marketplace, "name");
-  requireObject(".agents/plugins/marketplace.json", marketplace, "interface");
-  if (!Array.isArray(marketplace.plugins) || marketplace.plugins.length === 0) {
-    fail(".agents/plugins/marketplace.json", "plugins must be a non-empty array");
-    return;
-  }
-
-  const entry = marketplace.plugins.find((plugin) => plugin?.name === pluginName);
-  if (!entry) {
-    fail(".agents/plugins/marketplace.json", `plugins must include ${pluginName}`);
-    return;
-  }
-  if (entry.source?.source !== "local") {
-    fail(".agents/plugins/marketplace.json", "wingman source.source must be local");
-  }
-  if (entry.source?.path !== "./plugins/wingman") {
-    fail(".agents/plugins/marketplace.json", "wingman source.path must be ./plugins/wingman");
-  }
-  if (entry.policy?.installation !== "AVAILABLE") {
-    fail(".agents/plugins/marketplace.json", "wingman policy.installation must be AVAILABLE");
-  }
-  if (entry.policy?.authentication !== "ON_INSTALL") {
-    fail(".agents/plugins/marketplace.json", "wingman policy.authentication must be ON_INSTALL");
-  }
-  if (entry.category !== "Coding") {
-    fail(".agents/plugins/marketplace.json", "wingman category must be Coding");
-  }
+function checkGeminiExtension(extension, pkg) {
+  if (!extension) return;
+  requireString("gemini-extension.json", extension, "name", pluginName);
+  requireString("gemini-extension.json", extension, "version", pkg?.version);
+  requireString("gemini-extension.json", extension, "description");
+  requireString("gemini-extension.json", extension, "contextFileName", "GEMINI.md");
 }
 
 async function readJson(rel) {
@@ -103,36 +93,155 @@ async function readRequiredText(rel) {
 }
 
 async function checkRequiredFiles() {
-  for (const rel of requiredFiles) {
-    try {
-      await access(path.join(repoRoot, rel));
-    } catch {
+  for (const rel of requiredReleaseFiles) {
+    if (!(await exists(path.join(repoRoot, rel)))) {
       fail(rel, "required release file is missing");
     }
   }
 }
 
-async function checkSkills() {
-  const skillsRoot = path.join(repoRoot, "skills");
-  let entries = [];
-  try {
-    entries = await readdir(skillsRoot, { withFileTypes: true });
-  } catch {
-    fail("skills", "skills directory is required");
+function checkPackage(pkg) {
+  if (!pkg) return;
+  requireString("package.json", pkg, "name", pluginName);
+  requireString("package.json", pkg, "version");
+  requireString("package.json", pkg, "type", "module");
+
+  const scripts = pkg.scripts ?? {};
+  if (scripts["check:release"] !== "node scripts/check-release.mjs") {
+    fail("package.json", 'scripts.check:release must be "node scripts/check-release.mjs"');
+  }
+  if (scripts["prepare:codex-local"] !== "bash scripts/sync-to-codex-plugin.sh --dest .") {
+    fail("package.json", "scripts.prepare:codex-local must sync the local Codex payload");
+  }
+}
+
+function checkPlatformManifests(json) {
+  const pkg = json["package.json"];
+  for (const rel of [
+    ".codex-plugin/plugin.json",
+    ".cursor-plugin/plugin.json",
+    ".claude-plugin/plugin.json",
+  ]) {
+    const manifest = json[rel];
+    if (!manifest) continue;
+    requireString(rel, manifest, "name", pluginName);
+    requireString(rel, manifest, "version", pkg?.version);
+    requireString(rel, manifest, "description", pkg?.description);
+    requireString(rel, manifest, "homepage");
+    requireString(rel, manifest, "repository");
+    requireString(rel, manifest, "license", pkg?.license);
+    requireObject(rel, manifest, "author");
+  }
+
+  const codex = json[".codex-plugin/plugin.json"];
+  if (codex) {
+    requireString(".codex-plugin/plugin.json", codex, "skills", "./skills/");
+    const ui = codex.interface;
+    requireObject(".codex-plugin/plugin.json", codex, "interface");
+    if (ui) {
+      for (const key of [
+        "displayName",
+        "shortDescription",
+        "longDescription",
+        "developerName",
+        "category",
+        "websiteURL",
+        "privacyPolicyURL",
+        "termsOfServiceURL",
+        "brandColor",
+        "composerIcon",
+        "logo",
+      ]) {
+        requireString(".codex-plugin/plugin.json interface", ui, key);
+      }
+      if (!Array.isArray(ui.capabilities) || ui.capabilities.length === 0) {
+        fail(".codex-plugin/plugin.json interface", "capabilities must be a non-empty array");
+      }
+      if (!Array.isArray(ui.defaultPrompt) || ui.defaultPrompt.length === 0) {
+        fail(".codex-plugin/plugin.json interface", "defaultPrompt must be a non-empty array");
+      }
+    }
+  }
+
+  const cursor = json[".cursor-plugin/plugin.json"];
+  if (cursor) {
+    requireString(".cursor-plugin/plugin.json", cursor, "skills", "./skills/");
+    requireString(".cursor-plugin/plugin.json", cursor, "hooks", "./hooks/hooks-cursor.json");
+  }
+}
+
+function checkCodexLocalMarketplace(marketplace) {
+  if (!marketplace) return;
+  requireString(".agents/plugins/marketplace.json", marketplace, "name");
+  requireObject(".agents/plugins/marketplace.json", marketplace, "interface");
+  if (!Array.isArray(marketplace.plugins) || marketplace.plugins.length === 0) {
+    fail(".agents/plugins/marketplace.json", "plugins must be a non-empty array");
     return;
   }
 
-  const skillDirs = entries
+  const entry = marketplace.plugins.find((plugin) => plugin?.name === pluginName);
+  if (!entry) {
+    fail(".agents/plugins/marketplace.json", `plugins must include ${pluginName}`);
+    return;
+  }
+  if (entry.source?.source !== "local") {
+    fail(".agents/plugins/marketplace.json", "wingman source.source must be local for local install support");
+  }
+  if (entry.source?.path !== "./plugins/wingman") {
+    fail(".agents/plugins/marketplace.json", "wingman source.path must be ./plugins/wingman");
+  }
+  if (entry.policy?.installation !== "AVAILABLE") {
+    fail(".agents/plugins/marketplace.json", "wingman policy.installation must be AVAILABLE");
+  }
+  if (entry.policy?.authentication !== "ON_INSTALL") {
+    fail(".agents/plugins/marketplace.json", "wingman policy.authentication must be ON_INSTALL");
+  }
+  if (entry.category !== "Coding") {
+    fail(".agents/plugins/marketplace.json", "wingman category must be Coding");
+  }
+}
+
+function checkClaudeMarketplace(marketplace, pkg) {
+  if (!marketplace) return;
+  requireString(".claude-plugin/marketplace.json", marketplace, "name");
+  requireObject(".claude-plugin/marketplace.json", marketplace, "owner");
+  if (!marketplace.owner?.email) {
+    fail(".claude-plugin/marketplace.json", "owner.email is required");
+  }
+  if (!Array.isArray(marketplace.plugins) || marketplace.plugins.length === 0) {
+    fail(".claude-plugin/marketplace.json", "plugins must be a non-empty array");
+    return;
+  }
+  const entry = marketplace.plugins.find((plugin) => plugin?.name === pluginName);
+  if (!entry) {
+    fail(".claude-plugin/marketplace.json", `plugins must include ${pluginName}`);
+    return;
+  }
+  requireString(".claude-plugin/marketplace.json wingman", entry, "version", pkg?.version);
+  requireString(".claude-plugin/marketplace.json wingman", entry, "description", pkg?.description);
+  if (entry.source !== "./") {
+    fail(".claude-plugin/marketplace.json wingman", "source must be ./ for repository plugin root");
+  }
+}
+
+async function checkSkillFiles(rootRel) {
+  const skillsRoot = path.join(repoRoot, rootRel);
+  if (!(await exists(skillsRoot))) {
+    fail(rootRel, "skills directory is required");
+    return;
+  }
+
+  const skillDirs = (await readdir(skillsRoot, { withFileTypes: true }))
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
     .sort();
 
   if (skillDirs.length === 0) {
-    fail("skills", "at least one skill is required");
+    fail(rootRel, "at least one skill is required");
   }
 
   for (const dir of skillDirs) {
-    const rel = `skills/${dir}/SKILL.md`;
+    const rel = path.join(rootRel, dir, "SKILL.md");
     const content = await readRequiredText(rel);
     const parsed = parseFrontmatter(content);
     if (!parsed.frontmatter) {
@@ -149,169 +258,180 @@ async function checkSkills() {
     if (!description.startsWith("Use when")) {
       fail(rel, 'frontmatter description must start with "Use when"');
     }
-    if (!parsed.body.trimStart().startsWith("# ")) {
-      fail(rel, "skill body must start with an H1 heading after frontmatter");
+    if (description.length < 40) {
+      fail(rel, "frontmatter description is too short to define a reliable trigger");
     }
+    if (!parsed.body.trimStart().startsWith("# ")) {
+      fail(rel, "body must start with an H1 heading");
+    }
+  }
+}
+
+async function checkManifestPaths(json) {
+  const checks = [
+    [".codex-plugin/plugin.json", json[".codex-plugin/plugin.json"]?.skills],
+    [".codex-plugin/plugin.json", json[".codex-plugin/plugin.json"]?.interface?.composerIcon],
+    [".codex-plugin/plugin.json", json[".codex-plugin/plugin.json"]?.interface?.logo],
+    [".cursor-plugin/plugin.json", json[".cursor-plugin/plugin.json"]?.skills],
+    [".cursor-plugin/plugin.json", json[".cursor-plugin/plugin.json"]?.hooks],
+  ];
+
+  for (const [label, relPath] of checks) {
+    if (!relPath) continue;
+    if (!relPath.startsWith("./")) {
+      fail(label, `path must be relative and start with ./: ${relPath}`);
+      continue;
+    }
+    if (!(await exists(path.join(repoRoot, relPath)))) {
+      fail(label, `referenced path does not exist: ${relPath}`);
+    }
+  }
+}
+
+async function checkCodexPayloadSync() {
+  if (!(await exists(payloadRoot))) {
+    fail("plugins/wingman", "Codex local install payload is missing");
+    return;
+  }
+
+  const requiredPayloadFiles = [
+    ".codex-plugin/plugin.json",
+    "README.md",
+    "LICENSE",
+    "assets/icon.svg",
+  ];
+
+  for (const rel of requiredPayloadFiles) {
+    await requireSameFile(rel, path.join(payloadRoot, rel));
+  }
+
+  const skillDirs = (await readdir(path.join(repoRoot, "skills"), { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+
+  for (const dir of skillDirs) {
+    await requireSameFile(
+      path.join("skills", dir, "SKILL.md"),
+      path.join(payloadRoot, "skills", dir, "SKILL.md"),
+    );
+  }
+}
+
+async function requireSameFile(sourceRel, targetAbs) {
+  const sourceAbs = path.join(repoRoot, sourceRel);
+  if (!(await exists(sourceAbs))) {
+    fail(sourceRel, "source file is missing");
+    return;
+  }
+  if (!(await exists(targetAbs))) {
+    fail(relative(targetAbs), `payload copy is missing for ${sourceRel}`);
+    return;
+  }
+  const [sourceHash, targetHash] = await Promise.all([
+    hashFile(sourceAbs),
+    hashFile(targetAbs),
+  ]);
+  if (sourceHash !== targetHash) {
+    fail(relative(targetAbs), `payload copy is out of sync with ${sourceRel}; run npm run prepare:codex-local`);
   }
 }
 
 function parseFrontmatter(content) {
-  if (!content.startsWith("---\n")) {
-    return { frontmatter: null, body: content };
-  }
-
-  const end = content.indexOf("\n---\n", 4);
-  if (end === -1) {
-    return { frontmatter: null, body: content };
-  }
-
-  const rawFrontmatter = content.slice(4, end);
-  const body = content.slice(end + 5);
+  const match = content.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  if (!match) return { frontmatter: null, body: content };
   const frontmatter = {};
-  for (const line of rawFrontmatter.split("\n")) {
-    const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (match) {
-      frontmatter[match[1]] = match[2].replace(/^["']|["']$/g, "");
+  for (const rawLine of match[1].split("\n")) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+    const index = line.indexOf(":");
+    if (index === -1) continue;
+    const key = line.slice(0, index).trim();
+    let value = line.slice(index + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
     }
+    frontmatter[key] = value;
   }
-  return { frontmatter, body };
+  return { frontmatter, body: match[2] };
 }
 
-function checkPackage(pkg) {
-  if (!pkg) return;
-  requireString("package.json", pkg, "name", pluginName);
-  requireString("package.json", pkg, "version");
-  requireString("package.json", pkg, "type", "module");
-  requireString("package.json", pkg, "description");
-  requireString("package.json", pkg, "license");
-
-  if (pkg.scripts?.["check:release"] !== "node scripts/check-release.mjs") {
-    fail("package.json", 'scripts.check:release must be "node scripts/check-release.mjs"');
-  }
-  if (pkg.scripts?.["prepare:codex-local"] !== "bash scripts/sync-to-codex-plugin.sh --dest .") {
-    fail("package.json", "scripts.prepare:codex-local must sync the local Codex payload");
-  }
-}
-
-function checkPluginManifests(json) {
-  const pkg = json["package.json"];
-  for (const rel of [
-    ".codex-plugin/plugin.json",
-    ".cursor-plugin/plugin.json",
-    ".claude-plugin/plugin.json",
-  ]) {
-    const manifest = json[rel];
-    if (!manifest) continue;
-    requireString(rel, manifest, "name", pluginName);
-    requireString(rel, manifest, "version", pkg?.version);
-    requireString(rel, manifest, "description", pkg?.description);
-    requireString(rel, manifest, "homepage");
-    requireString(rel, manifest, "repository");
-    requireString(rel, manifest, "license", pkg?.license);
-  }
-
-  const codex = json[".codex-plugin/plugin.json"];
-  if (codex) {
-    requireString(".codex-plugin/plugin.json", codex, "skills", "./skills/");
-    const ui = codex.interface;
-    requireObject(".codex-plugin/plugin.json", codex, "interface");
-    if (ui) {
-      requireString(".codex-plugin/plugin.json interface", ui, "displayName");
-      requireString(".codex-plugin/plugin.json interface", ui, "shortDescription");
-      requireString(".codex-plugin/plugin.json interface", ui, "brandColor");
-      requireString(".codex-plugin/plugin.json interface", ui, "composerIcon", "./assets/icon.svg");
-      requireString(".codex-plugin/plugin.json interface", ui, "logo", "./assets/icon.svg");
-    }
-  }
-
-  const cursor = json[".cursor-plugin/plugin.json"];
-  if (cursor) {
-    requireString(".cursor-plugin/plugin.json", cursor, "skills", "./skills/");
-    requireString(".cursor-plugin/plugin.json", cursor, "hooks", "./hooks/hooks-cursor.json");
-  }
-
-  const claudeMarketplace = json[".claude-plugin/marketplace.json"];
-  if (claudeMarketplace) {
-    requireObject(".claude-plugin/marketplace.json", claudeMarketplace, "owner");
-    const entry = claudeMarketplace.plugins?.find((plugin) => plugin?.name === pluginName);
-    if (!entry) {
-      fail(".claude-plugin/marketplace.json", `plugins must include ${pluginName}`);
-    } else {
-      requireString(".claude-plugin/marketplace.json wingman", entry, "version", pkg?.version);
-      requireString(".claude-plugin/marketplace.json wingman", entry, "description", pkg?.description);
-      requireString(".claude-plugin/marketplace.json wingman", entry, "source", "./");
-    }
-  }
-}
-
-function checkHookConfigs(json) {
-  const claudeHooks = json["hooks/hooks.json"];
-  if (!claudeHooks?.hooks?.SessionStart) {
-    fail("hooks/hooks.json", "SessionStart hook is required");
-  }
-
-  const cursorHooks = json["hooks/hooks-cursor.json"];
-  if (!cursorHooks?.hooks?.sessionStart) {
-    fail("hooks/hooks-cursor.json", "sessionStart hook is required");
-  }
-}
-
-async function checkCodexPayload() {
-  const payloadRoot = path.join(repoRoot, "plugins", pluginName);
-  const requiredPayloadFiles = [
-    ".codex-plugin/plugin.json",
-    "README.md",
-    "assets/icon.svg",
-    "skills/using-wingman/SKILL.md",
-  ];
-
-  for (const rel of requiredPayloadFiles) {
-    try {
-      await access(path.join(payloadRoot, rel));
-    } catch {
-      fail(`plugins/${pluginName}/${rel}`, "Codex payload file is missing");
-    }
-  }
-}
-
-function requireString(scope, object, key, expected) {
+function requireString(label, object, key, expected) {
   const value = object?.[key];
-  if (typeof value !== "string" || value.length === 0) {
-    fail(scope, `${key} must be a non-empty string`);
+  if (typeof value !== "string" || value.trim() === "") {
+    fail(label, `${key} is required`);
     return;
   }
   if (expected !== undefined && value !== expected) {
-    fail(scope, `${key} must be ${JSON.stringify(expected)}`);
+    fail(label, `${key} must be ${JSON.stringify(expected)}, got ${JSON.stringify(value)}`);
   }
 }
 
-function requireObject(scope, object, key) {
+function requireObject(label, object, key) {
   const value = object?.[key];
   if (!value || typeof value !== "object" || Array.isArray(value)) {
-    fail(scope, `${key} must be an object`);
+    fail(label, `${key} is required`);
   }
 }
 
 function fail(scope, message) {
-  issues.push(`${scope}: ${message}`);
+  issues.push({ scope, message });
 }
 
 function warn(scope, message) {
-  warnings.push(`${scope}: ${message}`);
+  warnings.push({ scope, message });
+}
+
+async function exists(absPath) {
+  try {
+    await stat(absPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function hashFile(absPath) {
+  const content = await readFile(absPath);
+  return createHash("sha256").update(content).digest("hex");
+}
+
+function relative(absPath) {
+  return path.relative(repoRoot, absPath) || ".";
 }
 
 function printResults() {
-  for (const warning of warnings) {
-    console.warn(`WARN ${warning}`);
+  console.log("Wingman 发布前规范检查");
+  console.log("");
+  console.log("检查范围：");
+  for (const scope of checkedScopes) {
+    console.log(`- ${scope}`);
   }
+  console.log("");
 
-  if (issues.length > 0) {
-    console.error("Release check found issues:");
-    for (const issue of issues) {
-      console.error(`- ${issue}`);
+  if (issues.length === 0) {
+    console.log("结果：通过");
+    if (warnings.length > 0) {
+      console.log("\n警告：");
+      for (const item of warnings) {
+        console.log(`- ${item.scope}: ${item.message}`);
+      }
     }
-    process.exit(1);
+    return;
   }
 
-  console.log("Release check passed.");
+  console.error(`结果：失败，共 ${issues.length} 个问题：`);
+  for (const item of issues) {
+    console.error(`- ${item.scope}: ${item.message}`);
+  }
+  if (warnings.length > 0) {
+    console.error("\n警告：");
+    for (const item of warnings) {
+      console.error(`- ${item.scope}: ${item.message}`);
+    }
+  }
+  process.exit(1);
 }

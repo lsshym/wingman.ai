@@ -3,67 +3,122 @@ name: memory-sync
 description: Use when progress, decisions, business logic, API contracts, state flow, field mappings, or durable project knowledge should be recorded in Wingman memory.
 ---
 
-# Memory Sync
+# Wingman Memory Sync
 
-Use this workflow after meaningful work when project context should be recorded.
+## Core Rule
 
-`memory-sync` updates short-term progress and, when needed, durable project
-knowledge.
+`memory-sync` writes the smallest useful memory update after meaningful work. It is a routing workflow, not a changelog generator.
 
-## Memory Root
+- Current truth that future agents must obey belongs in `brief.md` or `domains/`.
+- `history/` is trace context only; it is not current truth.
+- Small isolated changes may write nothing.
 
-Use:
+## Gate
 
-```text
-.wingman/memory/
-```
+Apply these gates before reading or writing memory:
 
-Expected files:
+1. If the user says "skip update", "不更新", "跳过记录", "这个不用记忆", "局部改动不记录", or equivalent, stop without reading or writing memory.
+2. If `.wingman/memory/` is missing, ordinary completion must not invoke `memory-sync`. If sync was explicitly requested, report that repository memory is disabled and `memory-setup` is the explicit enable path.
+3. If `.wingman/memory/` exists but `.wingman/memory/brief.md` or `.wingman/memory/context.md` is missing, stop before writing, report the missing core entry files, and suggest `memory-setup` repair. Do not repair from `memory-sync`.
+4. Continue only when both `brief.md` and `context.md` exist.
 
-```text
-.wingman/memory/projectBrief.md
-.wingman/memory/activeContext.md
-.wingman/memory/domains/
-```
+Before reporting meaningful coding, documentation, configuration, product, or operational work as complete in a repository where memory is enabled, run this skill's thresholds. If the work passes a write threshold and memory has not been synced, sync memory before saying done, fixed, completed, or 已完成, unless the user explicitly opted out.
 
-If the memory root does not exist, ask the user to run `memory-setup` first.
+## Routing
 
-## User Override
+Route each fact to the destination matching its job:
 
-If the user says "skip update", "不更新", "跳过记录", or equivalent, do not
-sync memory.
+| Route | Destination | Use When |
+| --- | --- | --- |
+| **IGNORE** | none | Too small or too local to remember. |
+| **CONTEXT_LOG** | `context.md` | Recent progress, changed files, debugging state, partial work, unresolved follow-ups, or near-term context. |
+| **DOMAIN_TRUTH** | `domains/` | Stable one-domain business rules, API contract, canonical field, state flow, permission rule, money rule, routing rule, or recurring debugging conclusion. |
+| **PROJECT_ADR** | `brief.md` | Global or cross-domain architecture decision, repository convention, project-wide agent behavior, or policy. |
+| **HISTORY_EVENT** | `history/` | Past event with lasting trace value beyond hot context. |
 
-## What To Record
+A task may route to more than one destination, but each destination must have a concrete reason. Do not write memory just because this skill was invoked.
 
-Record changes that affect:
+## Thresholds
 
-- project decisions;
-- API contracts;
-- state flow;
-- field mappings;
-- business rules;
-- debugging conclusions;
-- important next steps.
+**IGNORE** for typo-only edits, rename-only cleanup, formatting, small copy edits, isolated visual or style tweaks with no behavior/state/data/contract/business impact, behavior-preserving movement or extraction, and one-off failed attempts with no reusable lesson.
 
-Skip purely cosmetic edits, formatting-only changes, and trivial renames.
+**CONTEXT_LOG** when the work may matter in the next few sessions: meaningful progress, changed files and what each one now does, partial work, pending follow-ups, debugging state, recent conclusions, or non-trivial implementation details that are not durable rules.
 
-## Progress Log
+**DOMAIN_TRUTH** or **PROJECT_ADR** when future agents must obey the result: stable field meaning, API contract, schema, event, config, data model, state flow, permission, routing, money, quota, lifecycle, business rule, recurring debugging conclusion with a clear trigger, repository-wide convention, or architecture decision.
 
-Update `activeContext.md` with:
+**HISTORY_EVENT** defaults to no. Write history only for lasting trace value: important bug or regression fix, incident, migration, state-flow correction, contract or field decision that may need source tracing, complex debugging conclusion, project or architecture decision with event context, explicit user request, or an event that explains a current rule written to `brief.md` or `domains/`.
 
-```markdown
-### [YYYY-MM-DD] 简短功能标题
-- **目标**: 一句话描述本次工作的目标。
-- **核心文件明细**:
-  - `path/to/file`: 精确说明文件承担的行为、数据或规则变化。
-- **遗留问题/备注**: 未处理边界或无。
-```
+## Workflow
 
-Prepend new logs above older logs. Do not rewrite unrelated history.
+1. Apply the Gate.
+2. Route facts using the Thresholds.
+3. If every fact is **IGNORE**, write nothing and say which threshold blocked the update.
+4. Write **CONTEXT_LOG** first when needed.
+5. For **DOMAIN_TRUTH** or **PROJECT_ADR**, pass the Evidence Gate before writing current truth.
+6. Decide **HISTORY_EVENT** after current truth routing. Write history only when the History threshold passes.
+7. Report changed memory files, or report that nothing was written.
 
-## Durable Knowledge
+Current truth comes before history. If a future agent must follow a rule, write it to `brief.md` or `domains/` before writing any history event about it. Do not write history just because `context.md` was updated. Do not create a history event just to fill a `History` backlink. Do not promote guessed thresholds, temporary constants, local workarounds, or one-off implementation details into current rules.
 
-If the work creates a rule that future tasks must follow, write it into the
-appropriate domain file or project brief.
+## Write Rules
 
-Durable notes should include why the rule exists, not only what the rule says.
+### Context Log
+
+Open `.wingman/memory/context.md`. Find the recent log section, commonly `## Recent Logs`, `## Current Sprint Logs`, or `## 短期活跃日志 (CURRENT SPRINT LOGS)`.
+
+- Prepend the new log directly below the section heading.
+- Update pending tasks only when the task changes pending work.
+- If this update corrects a same-day, same-feature, or same-bug log that is now wrong, remove only that obsolete log and keep the corrected truth.
+- Do not merge, rewrite, reorder, or delete unrelated history.
+- Before using the default context log shape, read `references/templates.md`.
+
+Before writing a log, internally verify that the implementation used canonical memory fields, did not substitute proxy or heuristic fields for semantic fields, and did not conflict with any current rule. If this proof fails, report the conflict and propose a correction instead of claiming completion.
+
+### Current Truth
+
+Before writing **DOMAIN_TRUTH** or **PROJECT_ADR**, verify at least one evidence source:
+
+- The user explicitly stated the rule or decision.
+- Existing Wingman memory already implies the rule.
+- Product docs, API docs, schema, tests, or accepted specs confirm it.
+- The implementation intentionally changed a stable contract or business behavior, not just an incidental implementation detail.
+
+If evidence is weak and the proposed durable rule would constrain future work, ask the user before writing durable memory.
+
+Write current truth with these rules:
+
+- Read `.wingman/memory/brief.md` and use the Domain Registry to route the rule.
+- Route one-domain rules to `.wingman/memory/domains/<domain>.md` or that domain folder's focused topic file.
+- Route global or cross-domain rules to the architecture decisions section in `brief.md`.
+- Create new domain files only for stable business, technical, product, or operational domains. Do not create one domain file per small feature.
+- Write new durable truth to the best existing location. If the target already mixes unrelated knowledge clusters, prefer the most specific existing domain or topic file instead of adding another broad entry.
+- Write durable rules under `## Current Truths` for English memory or `## 当前业务真理` for Chinese memory.
+- Update the Domain Registry when creating, renaming, deprecating, or superseding a domain route.
+- When replacing a rule, decision, or domain route, mark the old current entry as `superseded` or `deprecated` and point to the replacement. Do not leave conflicting current truths alive.
+
+Before using the default durable truth shape, read `references/templates.md` when the existing memory file has no stronger local format. `History` is optional; write `None` when there is no specific history event. Do not invent a history event just to fill the field. For **PROJECT_ADR**, use ADR lifecycle status values: `proposed | accepted | deprecated | superseded`.
+
+### History Event
+
+Run this section only when **HISTORY_EVENT** passes the threshold.
+
+- Read `references/history-events.md` before writing history.
+- Write one event body under `.wingman/memory/history/events/YYYY/MM/YYYY-MM-DD-<event-slug>.md`.
+- Update `.wingman/memory/history/index.md`, `.wingman/memory/history/domains/<domain>.md`, and `.wingman/memory/history/months/YYYY-MM.md`.
+- Include `Promoted Truths` links when `brief.md` or `domains/` was updated. Use `None` when no current truth was promoted.
+- Do not copy full event bodies into projection indexes.
+- Do not treat projection indexes as current rules.
+- Projection indexes can be rebuilt from events; do not rewrite event bodies just because an index changes.
+
+## Language And Completion
+
+Write memory content in the configured memory language:
+
+1. Use `## 0. Memory Settings` -> `Language` in `.wingman/memory/brief.md` when present and not `auto`.
+2. If the setting is `auto` or missing, use the existing memory files' dominant language.
+3. If memory files are empty or mixed, use the user's current language.
+4. If still unclear, use English.
+
+Keep field names, code symbols, paths, API names, and config names unchanged.
+
+After updating memory, report which files changed. If nothing was written, say which threshold blocked the update. Do not use celebratory fixed phrases that hide what was actually updated.

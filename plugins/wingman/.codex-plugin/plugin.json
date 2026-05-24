@@ -30,6 +30,11 @@
       "Read",
       "Write"
     ],
+    "defaultPrompt": [
+      "Use Wingman to load project context before this change.",
+      "Use /react-ts-refactor to diagnose this React + TypeScript component before editing.",
+      "Use Wingman to decide whether an existing implementation should be reused."
+    ],
     "websiteURL": "https://github.com/lsshym/wingman.ai",
     "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
     "termsOfServiceURL": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",

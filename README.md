@@ -1,60 +1,125 @@
 # Wingman
 
-Wingman is a personal experiment for collecting AI coding workflows.
+[English](README.md) | [中文](README.zh-CN.md)
 
-The goal is to turn repeated coding practices into reusable notes that can be
-improved over time.
+Wingman is a coding-agent plugin with project memory, contract checks, reuse helpers, and focused refactor workflows.
 
-Each workflow now lives in its own skill folder:
+## Install
 
-```text
-skills/<workflow>/SKILL.md
+For Codex:
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/lsshym/wingman.ai/main/scripts/install-codex-wingman.sh
+bash install-codex-wingman.sh --self-delete
 ```
 
-## Workflows
+Restart Codex after installation.
 
-### `using-wingman`
+For Cursor or Claude Code, use the plugin metadata in this repository. Skill names may appear with a platform namespace, such as `/wingman:memory-setup`.
 
-Use `using-wingman` as the entry router when deciding which Wingman workflow
-applies to a coding session.
+## Memory Skills
 
-### `align-contracts`
-
-Use `align-contracts` when connecting provider and consumer shapes across API,
-schema, data model, event, config, or UI boundaries.
+Use these as a simple memory workflow for each repository.
 
 ### `memory-setup`
 
-Use `memory-setup` to create a lightweight repository memory structure for an
-AI coding tool. It separates stable project notes from short-term working
-context.
+Use once when you want Wingman memory in a repository.
+
+```text
+/memory-setup
+```
 
 ### `memory-load`
 
-Use `memory-load` before non-trivial work to read existing project context
-without modifying memory files.
+Use before meaningful work, especially bug fixes, refactors, business logic, API work, or existing feature changes.
+
+```text
+Use `memory-load` before this bug fix.
+```
+
+```text
+Load Wingman memory before changing the upload flow.
+```
 
 ### `memory-sync`
 
-Use `memory-sync` after meaningful work to record progress, decisions, and
-durable project knowledge.
+Use after meaningful work when the agent should record useful project knowledge.
+
+```text
+Use `memory-sync` to record the API contract decision from this change.
+```
+
+```text
+Sync memory for this bug fix, but do not write unrelated history events.
+```
 
 ### `memory-clean`
 
-Use `memory-clean` only when you explicitly want Wingman memory compacted,
-pruned, deduplicated, or corrected.
+Use only when you explicitly want memory compacted, pruned, deduplicated, or corrected.
+
+```text
+Use `memory-clean` to compact the current memory context.
+```
+
+## Independent Skills
+
+These skills are separate from the memory workflow. Use them when they fit the task.
+
+### `align-contracts`
+
+Use when connecting APIs, schemas, types, events, configs, data models, CLI inputs, or UI props.
+
+```text
+Use `align-contracts` to bind this API response into the existing React component.
+```
 
 ### `reuse-select`
 
-Use `reuse-select` before rebuilding something that may already exist in the
-project.
+Use before building something new when an existing component, utility, module, contract, or pattern may already exist.
+
+```text
+Use `reuse-select` before creating a new upload progress component.
+```
 
 ### `reuse-catalog`
 
-Use `reuse-catalog` after finding or creating a reusable implementation that
-future work should consider.
+Use after creating or finding one reusable implementation that future agents should consider.
 
-### `memo`
+```text
+Use `reuse-catalog` for src/components/UploadProgress.tsx.
+```
 
-Use `memo` after meaningful work to update the active project context without
-rewriting the whole memory file.
+### `react-ts-refactor`
+
+Use only when you explicitly want the React + TypeScript refactor diagnostic workflow.
+
+```text
+/react-ts-refactor
+```
+
+### `using-wingman`
+
+This is Wingman's entry skill for platforms that load plugin-level instructions. You usually do not need to call it directly.
+
+```text
+Use `using-wingman` to load the Wingman skill guide.
+```
+
+## Slash Aliases
+
+```text
+/memory-setup
+/reuse-select
+/reuse-catalog
+/react-ts-refactor
+```
+
+## Notes
+
+- User instructions and project-local instructions still come first.
+- Wingman memory files live inside the current repository under `.wingman/`.
+- `memory-setup`, `memory-clean`, and `react-ts-refactor` run only when you directly ask for them.
+
+## License
+
+MIT
