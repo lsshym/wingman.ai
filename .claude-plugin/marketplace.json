@@ -1,0 +1,15 @@
+{
+  "name": "wingman-marketplace",
+  "owner": {
+    "name": "keni",
+    "email": "lsshym9@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "wingman",
+      "version": "1.0.0",
+      "source": "./",
+      "description": "Cross-platform AI coding plugin for project memory, contract checks, and reuse workflows."
+    }
+  ]
+}
