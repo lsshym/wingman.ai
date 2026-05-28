@@ -2,14 +2,14 @@
 
 ## Runner Format Contract
 
-The memory runner depends on these heading names and case shapes. Do not rename them unless `tests/runner/memory/eval-memory.mjs` is updated in the same change:
+The unified runner depends on these heading names and case shapes. Do not rename them unless `tests/runner/run-skill-eval.mjs` is updated in the same change:
 
 - `## MEMSYNC-001: ...`
 - `### Initial Workspace`
 - file fixtures as `` `path/to/file` `` followed by a fenced code block
 - `### Task Prompt`
 
-Mini comparison variants such as `## MEMSYNC-009A` and `## MEMSYNC-009B` are intentionally skipped by `node tests/runner/memory/eval-memory.mjs all memory-sync`.
+Mini comparison variants such as `## MEMSYNC-009A` and `## MEMSYNC-009B` are intentionally skipped by `node tests/runner/run-skill-eval.mjs memory-sync`.
 
 ## Case Index
 

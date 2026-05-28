@@ -2,7 +2,7 @@
 
 ## Runner Format Contract
 
-The memory runner depends on these heading names and case shapes. Do not rename them unless `tests/runner/memory/eval-memory.mjs` is updated in the same change:
+The unified runner depends on these heading names and case shapes. Do not rename them unless `tests/runner/run-skill-eval.mjs` is updated in the same change:
 
 - `## MEMSETUP-001: ...`
 - `### Initial Workspace`

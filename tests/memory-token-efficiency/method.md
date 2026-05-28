@@ -17,14 +17,9 @@ Both variants use the same fixture workspace and task target.
 
 ## Runner Support
 
-No runner support yet. Run these cases manually until a dedicated token-efficiency runner exists.
+No automated runner support yet. Run these cases manually until `tests/runner/run-skill-eval.mjs` is extended for token-efficiency A/B cases.
 
-The existing runners do not support this suite:
-
-- `tests/runner/skill/eval-skill.mjs` supports paired skill cases with `## Pair ...` headings.
-- `tests/runner/memory/eval-memory.mjs` supports ordinary memory cases with `## MEM...-001` headings.
-
-Future support should live in a dedicated runner, such as `tests/runner/token/`, because this suite needs token measurement and cache visibility handling.
+This suite needs token measurement and cache visibility handling, so do not treat the ordinary memory case support as sufficient.
 
 ## Execution Protocol
 

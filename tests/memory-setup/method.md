@@ -16,14 +16,14 @@ For each case:
 
 ## Runner Support
 
-Ordinary memory setup cases can be prepared by the memory runner:
+Ordinary memory setup cases can be run by the unified skill eval runner:
 
 ```bash
-node tests/runner/memory/eval-memory.mjs prepare memory-setup MEMSETUP-001
-node tests/runner/memory/eval-memory.mjs all memory-setup
+node tests/runner/run-skill-eval.mjs memory-setup --case MEMSETUP-001 --agent claude
+node tests/runner/run-skill-eval.mjs memory-setup --agent claude
 ```
 
-The runner creates `.eval-runs/memory-setup/<run-id>/<case-id>/` directories with isolated `workspace/`, `prompt.md`, and `evidence-template.json` files.
+Use `--dry-run` to only create `.eval-runs/memory-setup/<run-id>/<case-id>/` directories with isolated `workspace/`, `prompt.md`, and `evidence-template.json` files. Real runs ask the tested agent to write `evidence.json` and then generate `summary.json` and `summary.md`.
 
 ## Required JSON Output
 

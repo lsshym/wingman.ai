@@ -19,16 +19,16 @@ For mini comparison cases, run A and B in separate workspaces. A uses a generic 
 
 ## Runner Support
 
-Ordinary memory-sync cases can be prepared by the memory runner:
+Ordinary memory-sync cases can be run by the unified skill eval runner:
 
 ```bash
-node tests/runner/memory/eval-memory.mjs prepare memory-sync MEMSYNC-005
-node tests/runner/memory/eval-memory.mjs all memory-sync
+node tests/runner/run-skill-eval.mjs memory-sync --case MEMSYNC-005 --agent claude
+node tests/runner/run-skill-eval.mjs memory-sync --agent claude
 ```
 
-The runner creates `.eval-runs/memory-sync/<run-id>/<case-id>/` directories with isolated `workspace/`, `prompt.md`, and `evidence-template.json` files.
+Use `--dry-run` to only create `.eval-runs/memory-sync/<run-id>/<case-id>/` directories with isolated `workspace/`, `prompt.md`, and `evidence-template.json` files. Real runs ask the tested agent to write `evidence.json` and then generate `summary.json` and `summary.md`.
 
-Mini comparison cases such as `MEMSYNC-009A/B` are not supported by this runner yet and must be run manually until a comparison runner exists.
+Mini comparison cases such as `MEMSYNC-009A/B` are skipped by the ordinary runner until comparison support is added.
 
 ## Required JSON Output
 

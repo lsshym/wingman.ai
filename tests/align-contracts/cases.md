@@ -2,7 +2,7 @@
 
 ## Runner Format Contract
 
-The paired runner depends on these heading names and case shapes. Do not rename them unless `tests/runner/skill/eval-skill.mjs` is updated in the same change:
+The unified runner depends on these heading names and case shapes. Do not rename them unless `tests/runner/run-skill-eval.mjs` is updated in the same change:
 
 - `## Pair ALIGN-001: ...`
 - `### Shared Initial Workspace`

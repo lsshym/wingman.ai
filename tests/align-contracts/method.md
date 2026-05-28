@@ -22,14 +22,14 @@ Run A and B in separate conversations when possible. If separate conversations a
 
 ## Runner Support
 
-Paired A/B cases can be prepared by the skill runner:
+Paired A/B cases can be run by the unified skill eval runner:
 
 ```bash
-node tests/runner/skill/eval-skill.mjs prepare align-contracts ALIGN-002
-node tests/runner/skill/eval-skill.mjs all align-contracts
+node tests/runner/run-skill-eval.mjs align-contracts --case ALIGN-002 --agent claude
+node tests/runner/run-skill-eval.mjs align-contracts --agent claude
 ```
 
-The runner creates `.eval-runs/align-contracts/<run-id>/<case-id>/` directories with isolated `workspace/`, `prompt.md`, and `evidence-template.json` files.
+Use `--dry-run` to only create `.eval-runs/align-contracts/<run-id>/<case-id>/` directories with isolated `workspace/`, `prompt.md`, and `evidence-template.json` files. Real runs ask the tested agent to write `evidence.json` and then generate `summary.json` and `summary.md`.
 
 ## Required JSON Output
 

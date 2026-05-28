@@ -1,106 +1,125 @@
-# Wingman Evaluation Runner
+# Wingman Skill Evaluation Runner
 
-这个目录放 Wingman skill 评测 runner。当前 runner 是**通用准备工具**，不是某个 skill 专用工具。
+这个目录现在只保留一条主路径：用本地 runner 准备隔离 case、启动独立 agent 子进程、收集 evidence、生成汇总报告。
 
-它现在只做一件事：根据 `tests/<skill>/cases.md` 生成隔离运行目录、prompt 和 evidence 模板。它还不会直接启动 Codex、Claude、Gemini 或其他 agent。
+## 文件
 
-## 文件说明
+- `run-skill-eval.mjs`：唯一 runner。支持 prepare、执行 Claude/Codex、收集 `evidence.json`、生成 `summary.json` 和 `summary.md`。
+- `run-skill-eval.test.mjs`：runner 的 Node 内置测试。
+- `USAGE.md`：日常使用说明，包括 Claude 里怎么测试、结果怎么看、`.venv` 是什么。
+- `HANDOFF.md`：给后续 agent 的交接说明。
 
-- `skill/eval-skill.mjs`：A/B paired case prepare runner。当前主要用于 `align-contracts` 这类对照实验。
-- `skill/eval-skill.test.mjs`：`skill/eval-skill.mjs` 的 Node 内置测试。
-- `memory/eval-memory.mjs`：memory single case prepare runner。当前用于 `memory-setup`、`memory-load`、`memory-sync`、`memory-clean` 的普通 case。
-- `memory/eval-memory.test.mjs`：`memory/eval-memory.mjs` 的 Node 内置测试。
-- `inspect/`：可选 Inspect AI bridge。读取 `.eval-runs/` 里的 prepared prompt，生成 Inspect task/log。
-- `phoenix/`：可选 Phoenix bridge。读取 `.eval-runs/`，导出 Phoenix 友好的 JSONL。
+旧的 `skill/`、`memory/`、`inspect/`、`phoenix/` runner 已删除，避免维护多套入口。
 
-## 让 AI 启动 Runner
+## 推荐用法
 
-把下面 prompt 发给当前 AI 即可：
+在 Claude 交互界面里可以直接说：
 
 ```text
-请准备 Wingman evaluation 运行目录：
-
-- 如果是 align-contracts A/B 对照 case，运行：
-  node tests/runner/skill/eval-skill.mjs prepare align-contracts ALIGN-002
-
-- 如果是 align-contracts 全部 A/B 对照 case，运行：
-  node tests/runner/skill/eval-skill.mjs all align-contracts
-
-- 如果是 memory 普通 case，运行：
-  node tests/runner/memory/eval-memory.mjs prepare memory-load MEMLOAD-004
-
-- 如果是某个 memory skill 的全部普通 case，运行：
-  node tests/runner/memory/eval-memory.mjs all memory-load
-
-运行后告诉我生成的 .eval-runs 路径，以及下一步应该把哪个 prompt.md 交给独立 agent 会话执行。
+帮我测试 memory-load 这个 skill，用 Claude 跑全部测试用例，最后统计结果。
 ```
 
-## 准备 align-contracts A/B Prompt
+总控 agent 应运行：
 
 ```bash
-node tests/runner/skill/eval-skill.mjs prepare align-contracts ALIGN-002
+node tests/runner/run-skill-eval.mjs memory-load --agent claude
 ```
 
-这会生成：
+测试单个 case：
+
+```bash
+node tests/runner/run-skill-eval.mjs memory-load --case MEMLOAD-004 --agent claude
+```
+
+用 Codex 作为被测 agent：
+
+```bash
+node tests/runner/run-skill-eval.mjs memory-load --case MEMLOAD-004 --agent codex
+```
+
+为 TypeScript case 准备共享 `tsc`：
+
+```bash
+node tests/runner/run-skill-eval.mjs align-contracts \
+  --agent claude \
+  --setup-toolchain typescript
+```
+
+TypeScript 只会安装到 `.eval-runs/.toolchains/typescript/`，不会污染根项目，也不会给每个 case workspace 都装一份 `node_modules`。
+
+只准备目录、不启动 agent：
+
+```bash
+node tests/runner/run-skill-eval.mjs align-contracts --case ALIGN-002 --dry-run
+```
+
+## Claude 和 Codex 的角色
+
+当前 Claude TUI 是总控 agent：它负责运行 runner、读取汇总、向用户解释结果。
+
+runner 启动的子进程才是被测 agent：
+
+- Claude 默认命令：`claude -p`
+- Codex 默认命令：`codex exec --cd <workspace> --sandbox workspace-write --ask-for-approval never -`
+
+每个 case 都在独立 workspace 里执行，避免同一个会话先读 skill 后污染 baseline。
+
+如果你的本机需要魔改命令，可以覆盖：
+
+```bash
+WINGMAN_EVAL_AGENT_CMD="claude-ds -p" \
+node tests/runner/run-skill-eval.mjs memory-load --agent claude
+```
+
+也可以直接传参：
+
+```bash
+node tests/runner/run-skill-eval.mjs memory-load \
+  --agent claude \
+  --agent-cmd "claude-ds -p"
+```
+
+## 产物
+
+runner 会写入：
 
 ```text
-.eval-runs/align-contracts/<run-id>/ALIGN-002A/
-  workspace/
-  prompt.md
-  evidence-template.json
-
-.eval-runs/align-contracts/<run-id>/ALIGN-002B/
-  workspace/
-  prompt.md
-  evidence-template.json
-```
-
-然后分别开启两个全新的 agent 会话：
-
-1. 在第一个会话里运行 `ALIGN-002A/prompt.md`，并让 agent 只操作 `ALIGN-002A/workspace/`。
-2. 在第二个会话里运行 `ALIGN-002B/prompt.md`，并让 agent 只操作 `ALIGN-002B/workspace/`。
-3. 两边都把结果填到对应的 `evidence-template.json` 结构里。
-
-这样可以避免同一个会话先读了 skill 后污染 baseline。
-
-准备 `align-contracts` 的全部 A/B case：
-
-```bash
-node tests/runner/skill/eval-skill.mjs all align-contracts
-```
-
-## 准备 memory 单 case Prompt
-
-```bash
-node tests/runner/memory/eval-memory.mjs prepare memory-load MEMLOAD-004
-```
-
-这会生成：
-
-```text
-.eval-runs/memory-load/<run-id>/MEMLOAD-004/
-  workspace/
-  prompt.md
-  evidence-template.json
+.eval-runs/<skill>/<run-id>/
   run.json
+  summary.json
+  summary.md
+  <case-id>/
+    workspace/
+    prompt.md
+    evidence-template.json
+    evidence.json
+    analysis.json
+    analysis.md
+    agent-output.txt
+    agent-error.txt
+    agent-run.json
 ```
 
-开启一个全新的 agent 会话，把 `prompt.md` 发给它，并让它只操作对应的 `workspace/`。
+`.eval-runs/` 是运行产物目录，不要提交。
 
-准备某个 memory skill 的全部普通 case：
+共享 toolchain 产物在：
 
-```bash
-node tests/runner/memory/eval-memory.mjs all memory-load
+```text
+.eval-runs/.toolchains/typescript/
+  setup.json
+  setup-output.txt
+  setup-error.txt
+  node_modules/.bin/tsc
 ```
 
-`all` 会跳过 `MEMLOAD-008A/B` 这类 mini comparison variant，只准备普通 case。mini comparison 和 token-efficiency A/B 后续需要专门 runner。
+## 支持的 case 格式
 
-## 当前支持范围
+### Paired A/B
 
-`skill/eval-skill.mjs` 支持 `cases.md` 里的 paired A/B case，格式如下：
+任意 skill 都可以用 paired case。runner 看到 `## Pair ...` 就按 A/B 解析，不依赖 skill 名称：
 
 ````markdown
-## Pair ALIGN-002: ...
+## Pair CASE-002: ...
 
 ### Shared Initial Workspace
 
@@ -110,7 +129,7 @@ node tests/runner/memory/eval-memory.mjs all memory-load
 file content
 ```
 
-### ALIGN-002A baseline_without_skill
+### CASE-002A baseline_without_skill
 
 #### Task Prompt
 
@@ -118,7 +137,7 @@ file content
 baseline prompt
 ```
 
-### ALIGN-002B with_align_contracts
+### CASE-002B with_skill
 
 #### Task Prompt
 
@@ -127,10 +146,12 @@ skill prompt
 ```
 ````
 
-`memory/eval-memory.mjs` 支持 memory 普通 case，格式如下：
+### Ordinary
+
+任意 skill 都可以用 ordinary case。runner 会解析不带字母后缀的二级标题，跳过 `CASE-008A` 这类 comparison variant：
 
 ````markdown
-## MEMLOAD-004: ...
+## TASK-004: ...
 
 ### Initial Workspace
 
@@ -147,12 +168,89 @@ memory task prompt
 ```
 ````
 
-memory mini comparison 和 token-efficiency A/B 目前还没有专门 prepare runner。可以先手动运行，后续再扩展。
+`TASK-008A` 这类带字母后缀的 mini comparison case 会被普通 case runner 跳过。后续如果要测 token efficiency 或 mini comparison，再扩展同一个 runner，而不是恢复多套 runner。
 
-## 后续可扩展方向
+## Evidence 模板
 
-- 增加 Codex、Claude、Gemini agent adapter，直接启动独立 agent 会话。
-- 收集 worker agent 输出，生成 `raw-output.json` 和 `evidence.json`。
-- 合并 A/B 结果，生成最终 report。
-- 继续完善 Inspect AI bridge，或接入 Braintrust 等实验平台。
-- 继续完善 Phoenix bridge，加入 trace/eval SDK 写入。
+runner 会始终生成通用字段：
+
+```json
+{
+  "id": "TASK-004",
+  "skill": "some-skill",
+  "status": "not_run",
+  "files_read": [],
+  "files_changed": [],
+  "commands_run": [],
+  "final_answer": "",
+  "observed_output": "",
+  "expected_behavior": "",
+  "failure_reasons": []
+}
+```
+
+如果 `tests/<skill>/method.md` 里有 `Required JSON Output` 的 `json` 示例，runner 会从示例里的 case 对象自动推断扩展字段，例如：
+
+```json
+{
+  "cases": [
+    {
+      "id": "TASK-004",
+      "status": "pass",
+      "risk_level": "",
+      "findings": []
+    }
+  ]
+}
+```
+
+会让 `evidence-template.json` 自动带上：
+
+```json
+{
+  "risk_level": "",
+  "findings": []
+}
+```
+
+因此新增 skill 时不要改 runner；优先在 `method.md` 写清楚 evidence JSON 结构，在 `cases.md` 保持 paired 或 ordinary 格式即可。
+
+## 结果判定
+
+runner 不做 numeric scoring。每个 case 有三层状态：
+
+- `workerStatus`：被测 agent 在 `evidence.json` 里自报的状态。
+- `analysisStatus`：runner 分析层产出的状态，写在 `analysis.json`。
+- `status`：最终统计状态，当前等于 `analysisStatus`。
+
+默认分析层会检查 evidence 是否存在、是否合法，然后镜像 worker 状态，并把调试材料写入 `analysis.md`：
+
+- agent stdout/stderr
+- 修改后的 workspace 文件列表
+- analysis reasons/notes
+
+如果运行时传入 `--judge-agent claude` 或 `--judge-cmd "claude-ds -p"`，runner 会在 worker 完成后启动独立 judge agent。judge 读取 evidence、agent stdout/stderr 和修改后的 workspace，返回 `pass | fail | not_run`，并写入 `analysis.json/md`。summary 的最终统计使用 `analysis.json` 里的 `final_status`。
+
+因此失败 case 的调试入口是：
+
+- `<case-id>/analysis.md`
+- `<case-id>/evidence.json`
+- `<case-id>/agent-output.txt`
+- `<case-id>/agent-error.txt`
+- `<case-id>/workspace/`
+
+summary 统计：
+
+- `pass | fail | not_run`
+- missing evidence
+- invalid evidence
+
+paired case 还会汇总 A/B pair effect：
+
+- `improved`
+- `regressed`
+- `unchanged_pass`
+- `unchanged_fail`
+- `inconclusive`
+
+真正的 pass/fail 依据仍然是各 skill 的 `method.md` 和 `cases.md`。
