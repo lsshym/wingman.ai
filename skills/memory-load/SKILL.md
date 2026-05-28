@@ -88,12 +88,14 @@ If uncertain and repository memory is enabled, load memory. If repository state 
 13. Read matched history event bodies only after checking the relevant projection. Do not read every history event by default, and do not read history before current truth.
 14. Treat history as past context, not current truth. Follow the Read Authority And Routing priority when memory files disagree.
 15. Before editing code, build an internal Memory Context Checklist:
-   - Active task.
-   - Relevant memory files read.
-   - Which memory rule or domain truth applies.
-   - Which exact fields, symbols, contracts, or files are binding.
-   - Whether reusable implementation lookup may be needed.
-   - Whether the requested change would conflict with memory.
+
+- Active task.
+- Relevant memory files read.
+- Which memory rule or domain truth applies.
+- Which exact fields, symbols, contracts, or files are binding.
+- Whether reusable implementation lookup may be needed.
+- Whether the requested change would conflict with memory.
+
 16. Do not show the checklist by default. Surface it only when there is a conflict, missing context, or the user asks.
 17. If required context is missing or contradictory, stop and ask the user instead of inventing substitutes.
 
@@ -113,5 +115,5 @@ Do not treat large `history/` as memory pressure unless the user asked to inspec
 
 - **No silent semantic fallback**: Never use `??`, `||`, or chained ternaries to substitute one business field for a semantically different field. Missing data should render an empty state or explicit absence.
 - **No rule substitution**: If memory specifies a canonical field or contract, do not replace it with a proxy field for convenience.
-- **Micro-logic comments**: For tiny code changes with large business impact, add a localized invariant comment in the target code, such as `// @business-rule: [WHY]` for English memory or `// @业务铁律: [WHY]` for Chinese memory.
+- **Existing invariant comments**: Treat `// @invariant:` as local binding context when present. `memory-load` is read-only; deciding whether to add a new code comment belongs to `memory-sync`.
 - **Reuse lookup boundary**: Reusable implementation lookup belongs to `reuse-select`. Do not read registry files during `memory-load` unless the user explicitly asks for registry context. If the task may require choosing an existing implementation, mention that `reuse-select` is the appropriate next capability.

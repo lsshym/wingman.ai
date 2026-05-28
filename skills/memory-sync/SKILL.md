@@ -28,13 +28,13 @@ Before reporting meaningful coding, documentation, configuration, product, or op
 
 Route each fact to the destination matching its job:
 
-| Route | Destination | Use When |
-| --- | --- | --- |
-| **IGNORE** | none | Too small or too local to remember. |
-| **CONTEXT_LOG** | `context.md` | Recent progress, changed files, debugging state, partial work, unresolved follow-ups, or near-term context. |
-| **DOMAIN_TRUTH** | `domains/` | Stable one-domain business rules, API contract, canonical field, state flow, permission rule, money rule, routing rule, or recurring debugging conclusion. |
-| **PROJECT_ADR** | `brief.md` | Global or cross-domain architecture decision, repository convention, project-wide agent behavior, or policy. |
-| **HISTORY_EVENT** | `history/` | Past event with lasting trace value beyond hot context. |
+| Route             | Destination  | Use When                                                                                                                                                   |
+| ----------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **IGNORE**        | none         | Too small or too local to remember.                                                                                                                        |
+| **CONTEXT_LOG**   | `context.md` | Recent progress, changed files, debugging state, partial work, unresolved follow-ups, or near-term context.                                                |
+| **DOMAIN_TRUTH**  | `domains/`   | Stable one-domain business rules, API contract, canonical field, state flow, permission rule, money rule, routing rule, or recurring debugging conclusion. |
+| **PROJECT_ADR**   | `brief.md`   | Global or cross-domain architecture decision, repository convention, project-wide agent behavior, or policy.                                               |
+| **HISTORY_EVENT** | `history/`   | Past event with lasting trace value beyond hot context.                                                                                                    |
 
 A task may route to more than one destination, but each destination must have a concrete reason. Do not write memory just because this skill was invoked.
 
@@ -47,6 +47,16 @@ A task may route to more than one destination, but each destination must have a 
 **DOMAIN_TRUTH** or **PROJECT_ADR** when future agents must obey the result: stable field meaning, API contract, schema, event, config, data model, state flow, permission, routing, money, quota, lifecycle, business rule, recurring debugging conclusion with a clear trigger, repository-wide convention, or architecture decision.
 
 **HISTORY_EVENT** defaults to no. Write history only for lasting trace value: important bug or regression fix, incident, migration, state-flow correction, contract or field decision that may need source tracing, complex debugging conclusion, project or architecture decision with event context, explicit user request, or an event that explains a current rule written to `brief.md` or `domains/`.
+
+## Value Funnel
+
+Before writing memory, classify the change by future value:
+
+- **Record** when it changes behavior, contracts, data meaning, workflow, architecture, shared implementation, or a durable debugging conclusion.
+- **Skip** when it is local, obvious from the diff, purely mechanical, or has no reusable lesson.
+- **Promote** to `domains/` or `brief.md` when it becomes a rule future work must follow.
+
+Every recorded entry must explain why the change was needed and what future mistake it prevents.
 
 ## Workflow
 
@@ -72,7 +82,26 @@ Open `.wingman/memory/context.md`. Find the recent log section, commonly `## Rec
 - Do not merge, rewrite, reorder, or delete unrelated history.
 - Before using the default context log shape, read `references/templates.md`.
 
-Before writing a log, internally verify that the implementation used canonical memory fields, did not substitute proxy or heuristic fields for semantic fields, and did not conflict with any current rule. If this proof fails, report the conflict and propose a correction instead of claiming completion.
+Before writing a log, internally verify that:
+
+- The implementation used canonical memory fields and did not substitute proxy or heuristic fields for semantic fields.
+- The implementation reused an existing component/helper/pattern when the repository already had one.
+- Any tiny but high-impact local behavior has an inline invariant comment when code alone would invite accidental cleanup.
+- The context log includes the reason for the change and the mistake it prevents.
+
+If this proof fails, report the conflict or missing invariant instead of claiming completion.
+
+Inline invariant comments are for local constraints, not full change history. Use them only when a tiny or odd-looking line would be easy to "simplify" but changing it would alter behavior, data meaning, contract, security, money, routing, permissions, or state flow:
+
+`// @invariant: <constraint>; <why changing it breaks semantics>.`
+
+### Reason Gate
+
+Do not write a context log that only says what changed. Include the reason in one sentence:
+
+`Changed X because Y; prevents Z.`
+
+If the reason is trivial, meaningless, or obvious from the diff, prefer `IGNORE` unless the task is hot context for the next session.
 
 ### Current Truth
 
@@ -112,13 +141,6 @@ Run this section only when **HISTORY_EVENT** passes the threshold.
 
 ## Language And Completion
 
-Write memory content in the configured memory language:
+Memory language: `brief.md` setting when not `auto`; otherwise existing memory language, then user's language, then English. Keep code symbols, paths, API names, config names, and field names unchanged.
 
-1. Use `## 0. Memory Settings` -> `Language` in `.wingman/memory/brief.md` when present and not `auto`.
-2. If the setting is `auto` or missing, use the existing memory files' dominant language.
-3. If memory files are empty or mixed, use the user's current language.
-4. If still unclear, use English.
-
-Keep field names, code symbols, paths, API names, and config names unchanged.
-
-After updating memory, report which files changed. If nothing was written, say which threshold blocked the update. Do not use celebratory fixed phrases that hide what was actually updated.
+Finish by reporting changed memory files. If nothing was written, name the blocking gate or threshold.
