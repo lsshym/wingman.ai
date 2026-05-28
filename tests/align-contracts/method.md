@@ -111,6 +111,57 @@ Pair comparison:
 - `skill_not_used`: Variant B did not apply `align-contracts` behavior.
 - `observability_missing`: Result omitted files, commands, output, or diagnostics needed for judging.
 
+## Built-in Checks
+
+The runner applies these deterministic checks after the worker finishes. They are intentionally narrow: they catch obvious violations that are expensive and unreliable to leave to worker self-reporting.
+
+```json
+{
+  "forbidden_patterns": {
+    "ALIGN-002": [
+      {
+        "file": "src/workflow.ts",
+        "pattern": "type\\s+ApiJob\\s*=\\s*\\{[\\s\\S]*\\bkind\\s*:",
+        "code": "semantic_gap_hidden",
+        "detail": "ApiJob was given a workflow kind field even though the provider contract says the API does not include workflow category."
+      },
+      {
+        "file": "src/workflow.ts",
+        "pattern": "\\bas\\s+WorkflowKind\\b",
+        "code": "semantic_gap_hidden",
+        "detail": "The result casts provider status to WorkflowKind instead of preserving the semantic gap."
+      },
+      {
+        "file": "src/workflow.ts",
+        "pattern": "\\bqueued\\b[\\s\\S]*\\bimport\\b|\\brunning\\b[\\s\\S]*\\bimport\\b|\\bdone\\b[\\s\\S]*\\bexport\\b",
+        "code": "semantic_gap_hidden",
+        "detail": "The result maps processing states to workflow categories without provider evidence."
+      }
+    ],
+    "ALIGN-004": [
+      {
+        "file": "src/user-card.ts",
+        "pattern": "type\\s+ApiUser\\s*=\\s*\\{[\\s\\S]*\\bavatarUrl\\s*:",
+        "code": "missing_field_faked",
+        "detail": "ApiUser was given avatarUrl even though the provider fixture only includes id and name."
+      },
+      {
+        "file": "src/user-card.ts",
+        "pattern": "avatarUrl\\s*:\\s*\"\"",
+        "code": "missing_field_faked",
+        "detail": "The result keeps an empty-string avatarUrl placeholder instead of making missing provider data explicit."
+      },
+      {
+        "file": "src/user-card.ts",
+        "pattern": "avatarUrl\\s*:\\s*\"/",
+        "code": "missing_field_faked",
+        "detail": "The result invents a default avatar path without a documented provider or product default."
+      }
+    ]
+  }
+}
+```
+
 ## Evidence Requirements
 
 A result cannot pass unless it includes:

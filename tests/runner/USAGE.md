@@ -171,7 +171,14 @@ toolchain 安装日志在：
 
 ## 让 AI 分析测试结果
 
-默认 runner 会生成 `analysis.md/json`，但默认分析层比较保守：检查 evidence 是否有效，然后镜像 worker status。这样至少能保留调试材料，但不能替代独立判断。
+默认 runner 会生成 `analysis.md/json`。分析层会先检查 evidence 是否有效；如果 `method.md` 里声明了 `## Built-in Checks`，还会对修改后的 workspace 跑轻量规则，命中 forbidden pattern 就直接判 fail。没有这些规则时，它才会镜像 worker status。
+
+`align-contracts` 已经内置了少量规则来抓明显违规：
+
+- `ALIGN-002`：给 `ApiJob` 发明 workflow kind、`as WorkflowKind`、把 queued/running/done 硬映射成 import/export。
+- `ALIGN-004`：给 `ApiUser` 发明 `avatarUrl`、保留 `avatarUrl: ""`、发明默认头像路径。
+
+这能防止“worker 自报 pass 但代码明显违反 Forbidden Behavior”的情况。更复杂的判断仍然建议加 judge。
 
 如果你希望另一个 AI 来判断“这个 case 到底有没有通过”，可以加 judge：
 
@@ -184,6 +191,7 @@ node tests/runner/run-skill-eval.mjs memory-load \
 
 这会在 worker agent 跑完后，再启动一个独立 judge agent。judge 会读取：
 
+- `cases.md` 里的原始 case spec，包括 Expected Behavior、Forbidden Behavior、Pass Assertions
 - `evidence.json`
 - `agent-output.txt`
 - `agent-error.txt`
@@ -299,7 +307,7 @@ summary 现在区分三列：
 - `Analysis`：runner 分析层给出的状态。
 - `Final`：最终用于统计的状态。当前等于 `Analysis`。
 
-默认分析层比较保守：它会检查 evidence 是否存在、是否合法，然后镜像 worker 状态，同时把 stdout/stderr 和 workspace 文件列表写入 `analysis.md`，方便人工或总控 Claude 继续分析。后续可以把规则 checker 或独立 judge 接到 `analysis.json` 这层。
+默认分析层会检查 evidence 是否存在、是否合法，并运行 `method.md` 里可选的 `Built-in Checks`。如果没有内置规则命中，它会镜像 worker 状态，同时把 stdout/stderr、case spec 和 workspace 文件列表写入 `analysis.md`，方便人工或总控 Claude 继续分析。独立 judge 也接在 `analysis.json` 这层。
 
 - `pass`：最终状态是通过。
 - `fail`：最终状态是失败。

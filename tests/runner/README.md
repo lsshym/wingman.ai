@@ -223,11 +223,30 @@ runner 不做 numeric scoring。每个 case 有三层状态：
 - `analysisStatus`：runner 分析层产出的状态，写在 `analysis.json`。
 - `status`：最终统计状态，当前等于 `analysisStatus`。
 
-默认分析层会检查 evidence 是否存在、是否合法，然后镜像 worker 状态，并把调试材料写入 `analysis.md`：
+默认分析层会检查 evidence 是否存在、是否合法。没有额外规则时，它会镜像 worker 状态，并把调试材料写入 `analysis.md`：
 
 - agent stdout/stderr
 - 修改后的 workspace 文件列表
 - analysis reasons/notes
+
+如果 `method.md` 里有 `## Built-in Checks` JSON，runner 会在 worker 完成后对修改后的 workspace 跑这些轻量规则。规则命中会让 `analysisStatus/final status` 变成 `fail`，即使 worker 自报 `pass`。当前支持的规则是 `forbidden_patterns`：
+
+```json
+{
+  "forbidden_patterns": {
+    "CASE-001": [
+      {
+        "file": "src/example.ts",
+        "pattern": "forbiddenRegex",
+        "code": "failure_code",
+        "detail": "Human-readable reason."
+      }
+    ]
+  }
+}
+```
+
+`align-contracts` 现在用这层检查 `ALIGN-002` 的语义漂移和 `ALIGN-004` 的伪造缺失字段。新增 skill 不需要写 checker；只有那些“明显不能出现”的代码形态值得加这种规则。
 
 如果运行时传入 `--judge-agent claude` 或 `--judge-cmd "claude-ds -p"`，runner 会在 worker 完成后启动独立 judge agent。judge 读取 evidence、agent stdout/stderr 和修改后的 workspace，返回 `pass | fail | not_run`，并写入 `analysis.json/md`。summary 的最终统计使用 `analysis.json` 里的 `final_status`。
 

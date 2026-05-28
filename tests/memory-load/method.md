@@ -77,6 +77,7 @@ Each standard case is judged by required behavior:
 - Required files are read in correct authority order.
 - Irrelevant files are avoided.
 - Read-only behavior is preserved.
+- Existing `@invariant` / `@约束` comments may be treated as binding context, but `memory-load` must not add new comments.
 - Final answer or trace accurately reflects the memory result when reporting is required.
 
 Mini comparison cases use the same criteria plus:

@@ -592,6 +592,122 @@ describe("analyzeRun", () => {
       await rm(root, { recursive: true, force: true });
     }
   });
+
+  it("fails align semantic drift even when worker self-reports pass", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "wingman-eval-align-checker-"));
+
+    try {
+      await writeFile(
+        path.join(root, "cases.md"),
+        `# align-contracts Test Cases
+
+## Pair ALIGN-002: Semantic mismatch
+
+### Shared Initial Workspace
+
+\`src/workflow.ts\`
+
+\`\`\`ts
+type ApiJob = {
+  id: string;
+  status: "queued" | "running" | "done";
+};
+\`\`\`
+
+### ALIGN-002A baseline_without_skill
+
+#### Task Prompt
+
+\`\`\`text
+Fix src/workflow.ts so TypeScript passes.
+\`\`\`
+
+#### Expected Behavior
+
+- Treat this as a semantic mismatch, not a naming mismatch.
+- The result exposes missing provider data instead of hiding it.
+
+#### Forbidden Behavior
+
+- Returning \`job.status as WorkflowKind\`.
+- Mapping \`queued -> import\` or another invented category.
+- Adding a workflow category field to \`ApiJob\`.
+
+#### Pass Assertions
+
+- The final result preserves the distinction between status and workflow kind.
+`,
+        "utf8"
+      );
+      await writeFile(
+        path.join(root, "method.md"),
+        `# align-contracts Test Method
+
+## Built-in Checks
+
+\`\`\`json
+{
+  "forbidden_patterns": {
+    "ALIGN-002": [
+      {
+        "file": "src/workflow.ts",
+        "pattern": "type ApiJob =[\\\\s\\\\S]*kind\\\\s*:",
+        "code": "semantic_gap_hidden",
+        "detail": "ApiJob was given a workflow kind field even though the provider contract does not include it."
+      }
+    ]
+  }
+}
+\`\`\`
+`,
+        "utf8"
+      );
+
+      const prepared = await prepareSkillEval({
+        skill: "align-contracts",
+        caseId: "ALIGN-002",
+        runId: "test-run",
+        repoRoot: root,
+        casesPath: path.join(root, "cases.md"),
+        methodPath: path.join(root, "method.md"),
+      });
+      const caseRoot = prepared.cases[0].caseRoot;
+      await writeFile(
+        path.join(caseRoot, "workspace", "src", "workflow.ts"),
+        `type ApiJob = {
+  id: string;
+  status: "queued" | "running" | "done";
+  kind: WorkflowKind;
+};
+
+type WorkflowKind = "import" | "export";
+
+export function toWorkflowKind(job: ApiJob): WorkflowKind {
+  return job.kind;
+}
+`,
+        "utf8"
+      );
+      await writeFile(
+        path.join(caseRoot, "evidence.json"),
+        JSON.stringify({ id: "ALIGN-002A", status: "pass", failure_reasons: [] }, null, 2),
+        "utf8"
+      );
+
+      await analyzeRun({ runRoot: prepared.runRoot });
+
+      const analysis = JSON.parse(await readFile(path.join(caseRoot, "analysis.json"), "utf8"));
+      const analysisMarkdown = await readFile(path.join(caseRoot, "analysis.md"), "utf8");
+
+      assert.equal(analysis.worker_status, "pass");
+      assert.equal(analysis.final_status, "fail");
+      assert.equal(analysis.reasons[0].code, "semantic_gap_hidden");
+      assert.match(analysisMarkdown, /Adding a workflow category field to `ApiJob`/);
+      assert.match(analysisMarkdown, /src\/workflow\.ts/);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
 });
 
 describe("summarizeRun", () => {

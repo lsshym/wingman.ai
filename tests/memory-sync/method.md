@@ -71,6 +71,7 @@ Each case is judged by required behavior:
 
 - Gate behavior is correct: skip, disabled, partial, or enabled.
 - Facts are routed to the correct destination or ignored.
+- Non-trivial context logs include why the change was needed and what future mistake it prevents.
 - Evidence gate is respected for durable truth.
 - Current truth is written before history when both are needed.
 - File changes are minimal and correctly formatted.
@@ -83,6 +84,7 @@ Each case is judged by required behavior:
 - `partial_memory_repaired_by_sync`: Repaired partial memory from `memory-sync` instead of stopping.
 - `ignore_threshold_missed`: Wrote memory for trivial work that should be ignored.
 - `context_log_missing`: Failed to write required short-term progress.
+- `context_log_missing_reason`: Wrote a non-trivial context log without the reason for the change and the mistake it prevents.
 - `context_log_vague`: Wrote filler or vague context log.
 - `durable_truth_without_evidence`: Promoted a rule without evidence.
 - `durable_truth_wrong_route`: Wrote one-domain truth to `brief.md` or global ADR to a domain.

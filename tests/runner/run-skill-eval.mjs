@@ -48,6 +48,8 @@ export async function prepareSkillEval({
       pairId: testCase.pairId,
       title: testCase.title,
       variant: testCase.variant,
+      caseMarkdown: testCase.caseMarkdown,
+      checkRules: testCase.checkRules || [],
       caseRoot,
       workspaceRoot,
       promptPath: path.join(caseRoot, "prompt.md"),
@@ -61,6 +63,7 @@ export async function prepareSkillEval({
     runId,
     kind,
     toolchains,
+    methodMarkdown,
     cases: preparedCases,
   };
   await writeJson(path.join(runRoot, "run.json"), runManifest);
@@ -220,13 +223,17 @@ export async function analyzeRun({ runRoot, analyzer = defaultAnalyzer } = {}) {
     const agentOutput = await readOptionalText(path.join(caseRoot, "agent-output.txt"));
     const agentError = await readOptionalText(path.join(caseRoot, "agent-error.txt"));
     const workspaceFiles = await readWorkspaceFiles(path.join(caseRoot, "workspace"));
-    const analyzerResult = await analyzer({
+    const baseAnalyzerResult = await analyzer({
       testCase,
       evidence: evidenceResult.evidence,
       evidenceError: evidenceResult.error,
       workspaceFiles,
       agentOutput,
       agentError,
+    });
+    const analyzerResult = mergeAnalysisWithBuiltInChecks({
+      analyzerResult: baseAnalyzerResult,
+      checkReasons: runBuiltInChecks({ testCase, workspaceFiles }),
     });
 
     const analysis = normalizeAnalysis({
@@ -249,20 +256,21 @@ export async function analyzeRun({ runRoot, analyzer = defaultAnalyzer } = {}) {
 }
 
 function parseCases({ markdown, methodMarkdown = "", caseId }) {
+  const evidenceDefaults = inferEvidenceDefaults(`${methodMarkdown}\n${markdown}`);
+  const builtInChecks = parseBuiltInChecks(methodMarkdown);
+
   if (hasPairedCases(markdown)) {
-    return parsePairedCases(markdown, caseId);
+    return parsePairedCases(markdown, caseId, { evidenceDefaults, builtInChecks });
   }
 
-  return parseOrdinaryCases(markdown, caseId, {
-    evidenceDefaults: inferEvidenceDefaults(`${methodMarkdown}\n${markdown}`),
-  });
+  return parseOrdinaryCases(markdown, caseId, { evidenceDefaults, builtInChecks });
 }
 
 function hasPairedCases(markdown) {
   return /^## Pair [A-Z]+-\d{3}\b/m.test(markdown);
 }
 
-function parsePairedCases(markdown, requestedCaseId) {
+function parsePairedCases(markdown, requestedCaseId, { evidenceDefaults, builtInChecks }) {
   const pairIds = listMatches(markdown, /^## Pair ([A-Z]+-\d{3})\b.*$/gm);
   const targetPairIds = requestedCaseId
     ? [requestedCaseId.replace(/[AB]$/, "")]
@@ -284,7 +292,9 @@ function parsePairedCases(markdown, requestedCaseId) {
         pairId,
         title,
         fixtures,
-        evidenceFields: [],
+        caseMarkdown: block,
+        checkRules: checksForCase(builtInChecks, variant.caseId, pairId),
+        evidenceDefaults,
       });
     }
   }
@@ -296,7 +306,7 @@ function parsePairedCases(markdown, requestedCaseId) {
   return cases;
 }
 
-function parseOrdinaryCases(markdown, requestedCaseId, { evidenceDefaults }) {
+function parseOrdinaryCases(markdown, requestedCaseId, { evidenceDefaults, builtInChecks }) {
   const ordinaryIds = listMatches(markdown, /^## ([A-Z]+-\d{3})(?![A-Z])\b.*$/gm);
   const targetIds = requestedCaseId ? [requestedCaseId] : ordinaryIds;
   const sharedFixtures = parseSharedEnabledMemoryFixture(markdown);
@@ -322,6 +332,8 @@ function parseOrdinaryCases(markdown, requestedCaseId, { evidenceDefaults }) {
       title,
       prompt: taskPrompt,
       fixtures,
+      caseMarkdown: block,
+      checkRules: checksForCase(builtInChecks, id, id),
       evidenceDefaults,
     });
   }
@@ -355,6 +367,56 @@ function parsePairedVariants(block, pairId) {
   }
 
   return variants;
+}
+
+function parseBuiltInChecks(markdown) {
+  const block = extractOptionalSection(markdown, "Built-in Checks");
+  if (!block) {
+    return {};
+  }
+
+  const jsonMatch = block.match(/```json\s*\n([\s\S]*?)```/);
+  if (!jsonMatch) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(jsonMatch[1]);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (error) {
+    throw new Error(`Could not parse Built-in Checks JSON: ${error.message}`);
+  }
+}
+
+function checksForCase(checks, caseId, baseCaseId) {
+  const forbidden = checks?.forbidden_patterns || {};
+  return [
+    ...normalizeForbiddenPatternRules(forbidden[baseCaseId]),
+    ...normalizeForbiddenPatternRules(forbidden[caseId]),
+  ];
+}
+
+function normalizeForbiddenPatternRules(value) {
+  const entries = Array.isArray(value) ? value : value ? [value] : [];
+  return entries.map((entry) => {
+    if (typeof entry === "string") {
+      return {
+        type: "forbidden_pattern",
+        file: "**/*",
+        pattern: entry,
+        code: "forbidden_pattern",
+        detail: `Matched forbidden pattern: ${entry}`,
+      };
+    }
+
+    return {
+      type: "forbidden_pattern",
+      file: entry.file || "**/*",
+      pattern: entry.pattern,
+      code: entry.code || "forbidden_pattern",
+      detail: entry.detail || `Matched forbidden pattern: ${entry.pattern}`,
+    };
+  }).filter((entry) => entry.pattern);
 }
 
 function parseWorkspace(block, heading, endPattern) {
@@ -836,6 +898,56 @@ async function defaultAnalyzer({ evidence, evidenceError }) {
   };
 }
 
+function runBuiltInChecks({ testCase, workspaceFiles }) {
+  const reasons = [];
+  for (const rule of testCase.checkRules || []) {
+    if (rule.type !== "forbidden_pattern") {
+      continue;
+    }
+
+    let pattern;
+    try {
+      pattern = new RegExp(rule.pattern, "m");
+    } catch (error) {
+      reasons.push({
+        code: "checker_invalid_rule",
+        detail: `Invalid forbidden pattern for ${testCase.caseId}: ${error.message}`,
+      });
+      continue;
+    }
+
+    for (const [file, content] of Object.entries(workspaceFiles)) {
+      if (!matchesFilePattern(file, rule.file)) {
+        continue;
+      }
+      if (pattern.test(content)) {
+        reasons.push({ code: rule.code, detail: rule.detail });
+        break;
+      }
+    }
+  }
+
+  return reasons;
+}
+
+function mergeAnalysisWithBuiltInChecks({ analyzerResult, checkReasons }) {
+  if (checkReasons.length === 0) {
+    return analyzerResult;
+  }
+
+  return {
+    ...analyzerResult,
+    status: "fail",
+    reasons: [
+      ...(Array.isArray(analyzerResult?.reasons) ? analyzerResult.reasons : []),
+      ...checkReasons,
+    ],
+    notes: [analyzerResult?.notes, "Built-in checks found forbidden output in the modified workspace."]
+      .filter(Boolean)
+      .join("\n"),
+  };
+}
+
 function buildJudgeAnalyzer({ judgeAgent, judgeCmd, timeoutMs }) {
   if (!judgeAgent && !judgeCmd) {
     return defaultAnalyzer;
@@ -882,6 +994,7 @@ function buildJudgePrompt({ testCase, evidence, evidenceError, workspaceFiles, a
   return `You are judging a Wingman skill evaluation case.
 
 Decide whether the tested agent's result satisfies the case requirements.
+Do not trust the worker's self-reported status. If the final workspace violates Forbidden Behavior or fails Pass Assertions, return fail.
 
 Return only JSON with this shape:
 
@@ -898,6 +1011,10 @@ ${JSON.stringify({
     variant: testCase.variant,
     title: testCase.title,
   }, null, 2)}
+
+## Case Spec
+
+${testCase.caseMarkdown || "Not available"}
 
 ## Evidence Error
 
@@ -978,6 +1095,10 @@ ${analysis.reasons.length > 0 ? analysis.reasons.map((reason) => `- ${reason.cod
 ## Notes
 
 ${analysis.notes || "None"}
+
+## Case Spec
+
+${testCase.caseMarkdown || "Not available"}
 
 ## Agent Output
 
@@ -1190,6 +1311,21 @@ function extractBlock(markdown, startPattern, nextPattern, label) {
   return rest.slice(0, startMatch[0].length + nextMatch.index);
 }
 
+function extractOptionalSection(markdown, heading) {
+  const startMatch = markdown.match(new RegExp(`^## ${escapeRegExp(heading)}\\b.*$`, "m"));
+  if (!startMatch || startMatch.index === undefined) {
+    return "";
+  }
+
+  const rest = markdown.slice(startMatch.index);
+  const nextMatch = rest.slice(startMatch[0].length).match(/\n## /);
+  if (!nextMatch || nextMatch.index === undefined) {
+    return rest;
+  }
+
+  return rest.slice(0, startMatch[0].length + nextMatch.index);
+}
+
 function firstHeadingTitle(block) {
   return block.split("\n", 1)[0].replace(/^##\s+/, "").trim();
 }
@@ -1206,6 +1342,19 @@ function listMatches(markdown, pattern) {
 function splitCommand(command) {
   const matches = command.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g) || [];
   return matches.map((part) => part.replace(/^(['"])(.*)\1$/, "$2"));
+}
+
+function matchesFilePattern(file, pattern) {
+  if (!pattern || pattern === "**/*") {
+    return true;
+  }
+  if (pattern.endsWith("/**/*")) {
+    return file.startsWith(pattern.slice(0, -4));
+  }
+  if (pattern.startsWith("**/")) {
+    return file.endsWith(pattern.slice(3));
+  }
+  return file === pattern;
 }
 
 function ensureTrailingNewline(value) {

@@ -50,7 +50,7 @@ No `.wingman/` directory exists.
 
 - `brief.md` contains Memory Settings, Architecture Decisions, Domain Registry, Memory Layout, and Authority Order sections.
 - `context.md` contains Pending Tasks, Current Work, and Recent Logs sections.
-- The initial log says Wingman memory is enabled.
+- The initial log says Wingman memory is enabled and includes a reason for creating the memory root.
 
 ## MEMSETUP-002: Preserve existing memory files
 

@@ -62,9 +62,10 @@ Use this fixture unless a case overrides it.
 ## Recent Logs
 ### [Init] Wingman memory enabled
 - **Goal**: Enable repository-scoped Wingman memory.
+- **Reason**: Establish a default-read memory root; prevents future sessions from relying only on chat history.
 - **Core Files**:
   - `.wingman/memory/brief.md`: [Memory Brief] - Stores global ADRs, memory settings, and the Domain Registry.
-- **Notes**: None.
+- **Verification / Notes**: None.
 ```
 
 `.wingman/memory/domains/upload.md`
@@ -233,6 +234,7 @@ Use memory-sync after this upload telemetry work.
 ### Pass Assertions
 
 - New log is prepended under `## Recent Logs`.
+- Log includes a `Reason` field that explains why the change was needed and what future mistake it prevents.
 - Log describes `src/upload/retry.ts` and at least two of interaction, data/state, output, rule, contract, or operational change.
 - No domain or history file changed.
 

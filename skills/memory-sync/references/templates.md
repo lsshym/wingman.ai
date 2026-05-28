@@ -8,19 +8,21 @@ For English memory:
 
 ```markdown
 ### [YYYY-MM-DD] Short feature title
-- **Goal**: One sentence describing the core goal.
-- **Core Files**:
-  - `path/to/file`: [Function/Component/Module/Doc/Config Name] - Precise description of interaction, data/state, output, rule, contract, or operational change.
-- **Notes**: Hardcoded data, untreated boundaries, unresolved follow-ups, or none.
-```
 
-For Chinese memory, use `目标`, `核心文件明细`, and `遗留问题/备注` for the same fields.
+- **Goal**: One sentence describing the goal.
+- **Reason**: Changed X because Y; prevents Z.
+- **Core Files**:
+  - `path/to/file`: [Name] - What changed and what behavior/data/contract/output it affects.
+- **Verification / Notes**: Verification run, unresolved follow-ups, hardcoded data, or none.
+```
 
 ### Context Log Quality Rules
 
+- Every non-trivial context log must include `Reason`.
+- File bullets should state the affected behavior, data, contract, output, or operational flow; avoid repeating the global reason unless the file-specific reason differs.
 - For code, config, docs, or workflow files, describe at least two of: interaction, data/state, output, rule, contract, or operational change.
 - For presentation-only or layout-only files, describe the exact surface and issue solved.
-- Do not write filler such as "basic component", "contains logic", "for display", "基础组件", "包含逻辑", or "用于展示".
+- Do not write filler such as "basic component", "contains logic", "for display".
 - Do not batch unrelated core files into one vague bullet. Split them by file and describe the specific change.
 
 ## Durable Truth Template

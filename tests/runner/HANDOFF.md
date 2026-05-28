@@ -96,6 +96,7 @@ tests/runner/run-skill-eval.test.mjs
 - 保留被测 agent 修改后的 `workspace/`
 - 保留 `agent-output.txt` 和 `agent-error.txt`
 - 生成 `analysis.json` 和 `analysis.md`
+- 运行 `method.md` 中可选的 `Built-in Checks`，用轻量 forbidden pattern 捕获明显违规
 - 生成 `summary.json` 和 `summary.md`
 
 命令：
@@ -175,7 +176,7 @@ WINGMAN_EVAL_JUDGE_CMD="claude-ds -p" \
 node tests/runner/run-skill-eval.mjs memory-load --case MEMLOAD-004 --agent claude
 ```
 
-judge 会读取 evidence、agent output/error、修改后的 workspace，并把独立判断写入 `analysis.json/md`。summary 的 `Final` 使用 judge/analysis 的 `final_status`。
+judge 会读取原始 case spec、evidence、agent output/error、修改后的 workspace，并把独立判断写入 `analysis.json/md`。summary 的 `Final` 使用 judge/analysis 的 `final_status`。
 
 ## 为什么 A/B 必须隔离
 
@@ -189,9 +190,11 @@ paired case 的对照实验需要：
 ## 当前限制
 
 1. Runner 现在有分析层，但默认不是 LLM judge。
-   - 默认分析层检查 evidence 是否存在、是否合法，然后镜像 worker status。
-   - 它会生成 `analysis.json` 和 `analysis.md`，把调试材料集中起来。
-   - 后续规则 checker 或独立 judge 应接到 analysis 层，让 summary 使用 `final_status`。
+   - 默认分析层检查 evidence 是否存在、是否合法。
+   - 如果 `method.md` 有 `## Built-in Checks` JSON，会对修改后的 workspace 跑轻量 forbidden pattern，命中则判 fail。
+   - 没有规则命中时，它会镜像 worker status。
+   - 它会生成 `analysis.json` 和 `analysis.md`，把 case spec、stdout/stderr、workspace 文件列表等调试材料集中起来。
+   - 独立 judge 仍然可选，用 `--judge-agent` 或 `--judge-cmd` 接入。
 
 2. Runner 不做 numeric score。
    - 用户明确不需要 worker agent 自评分。
