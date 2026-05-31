@@ -52,6 +52,7 @@ Registry status values describe whether a domain is still used for routing: `cur
 - `context.md`: current task, pending work, and recent high-signal logs.
 - `domains/`: current durable domain truth, created on demand.
 - `history/`: indexed event history, created on demand and not read by default.
+- Context logs should preserve the reason for non-trivial changes; durable rules with binding force belong in `domains/`.
 
 ## 4. Authority Order
 Current rules override old events:
@@ -81,10 +82,11 @@ Write `.wingman/memory/context.md`:
 ## Recent Logs
 ### [Init] Wingman memory enabled
 - **Goal**: Enable repository-scoped Wingman memory so agents can load current project context before work and sync important outcomes afterward.
+- **Reason**: Establish a lightweight default-read memory root; prevents future sessions from relying only on chat history.
 - **Core Files**:
   - `.wingman/memory/brief.md`: [Memory Brief] - Stores global ADRs, memory settings, and the Domain Registry.
   - `.wingman/memory/context.md`: [Memory Context] - Stores short-term progress, pending tasks, and recent work context.
-- **Notes**: `domains/` and `history/` are created only when durable domain truth or history events emerge.
+- **Verification / Notes**: `domains/` and `history/` are created only when durable domain truth or history events emerge.
 ```
 
 ## On-Demand Domain Shape

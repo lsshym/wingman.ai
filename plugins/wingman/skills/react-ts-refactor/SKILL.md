@@ -17,7 +17,7 @@ This skill runs one diagnostic pass across React component structure, props, loc
 - Do not use for backend-only code, scripts, non-React TypeScript, pure CSS, copy edits, formatting, or generic cleanup.
 - Do not use for ordinary "fix this TypeScript error" requests unless the user explicitly asks for this workflow.
 - Do not edit code in Phase 1.
-- If API, schema, domain model, backend response, persisted data, or parent/child props may have different business meanings, report the risk and route that decision to `align-contracts`. Do not resolve semantic drift inside this workflow.
+- If API, schema, domain model, backend response, persisted data, or parent/child props may have different business meanings, report the risk and route that decision to `data-contracts`. Do not resolve semantic drift inside this workflow.
 - Preserve runtime behavior. This workflow reorganizes component and type structure; it does not change product behavior.
 
 ## Phase 1: Diagnostic & Plan (Read-Only)
@@ -52,7 +52,7 @@ Evaluate React components, hooks, props, and TypeScript types against these cate
 
 2. **CONTRACT_RISK** (Component Contract Risk)
    - **Condition**: Parent and child props, display models, or local component names imply different meanings from the source data.
-   - **Action**: Flag the possible semantic drift and recommend `align-contracts`. Do not rename, merge, delete, or remap the contract as part of this diagnostic.
+   - **Action**: Flag the possible semantic drift and recommend `data-contracts`. Do not rename, merge, delete, or remap the contract as part of this diagnostic.
 
 3. **INLINE_TYPE** (Inline Definition)
    - **Condition**: Inline object shapes appear in props, `useState`, callbacks, form state, or local helpers.
@@ -103,7 +103,7 @@ Do not execute these until the user explicitly approves with language such as "G
 2. **React Scope**: Touch only React + TypeScript component structure, props, local types, imports, and helpers needed by approved findings.
 3. **Interface Updates**: When changing props, update parent usage, child props type, and call sites together.
 4. **Type Safety**: Before deleting aliases or local types, confirm strict compatibility. Never merge semantically different types.
-5. **Contract Escalation**: If implementation reveals API/schema/domain/provider-consumer drift, pause. This workflow may identify the risk, but `align-contracts` owns the semantic decision.
+5. **Contract Escalation**: If implementation reveals API/schema/domain/provider-consumer drift, pause. This workflow may identify the risk, but `data-contracts` owns the semantic decision.
 6. **No Unrelated Cleanup**: Do not fold formatting, styling, visual layout, dependency upgrades, or unrelated component redesign into this workflow.
 7. **Verification**: Run the project's normal proof after approved edits: typecheck, tests, lint, or focused compile.
 
