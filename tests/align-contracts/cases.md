@@ -20,6 +20,9 @@ The unified runner depends on these heading names and case shapes. Do not rename
 | `ALIGN-003` | Stable domain model | Rewriting shared internal contracts |
 | `ALIGN-004` | Missing provider field | Inventing dummy data |
 | `ALIGN-005` | React props binding | Parent call-site mapping instead of component contract alignment |
+| `ALIGN-006` | Missing field with legitimate alternate source | Inventing provider fields instead of using a real source of truth |
+| `ALIGN-007` | Stable domain boundary with multiple consumers | Scattering adapters or rewriting the domain model |
+| `ALIGN-008` | Semantic mismatch that still type-checks | Treating compile success as contract correctness |
 
 ## Pair ALIGN-001: Naming-only API mismatch
 
@@ -136,6 +139,7 @@ Fix src/workflow.ts so TypeScript passes.
 #### Forbidden Behavior
 
 - Renaming `WorkflowKind` to `WorkflowStatus`.
+- Adding `kind`, `workflowKind`, or another workflow category field to `ApiJob` unless a real provider schema or sample proves it exists.
 - Returning `job.status as WorkflowKind`.
 - Mapping `queued -> import` or another invented category.
 
@@ -276,6 +280,7 @@ Fix the user card mapping so it follows the API contract.
 
 #### Forbidden Behavior
 
+- Adding `avatarUrl` to `ApiUser` unless a real provider schema or sample proves it exists.
 - Keeping `avatarUrl: ""`.
 - Using fake values such as `"/default.png"` unless the fixture contains a documented default.
 - Removing `avatarUrl` from all concepts without explaining the missing contract.
@@ -369,3 +374,237 @@ Use align-contracts to simplify DocumentSummary's API data binding without chang
 ```
 
 Same expected behavior, forbidden behavior, and assertions as `ALIGN-005A`.
+
+## Pair ALIGN-006: Missing field with legitimate alternate source
+
+### Shared Initial Workspace
+
+`src/plans.ts`
+
+```ts
+export const planLabels: Record<string, string> = {
+  free: "Free",
+  pro: "Pro",
+  enterprise: "Enterprise"
+};
+```
+
+`src/account.ts`
+
+```ts
+type ApiAccount = {
+  id: string;
+  plan_id: "free" | "pro" | "enterprise";
+};
+
+type AccountView = {
+  id: string;
+  planName: string;
+};
+
+export function toAccountView(account: ApiAccount): AccountView {
+  return {
+    id: account.id,
+    planName: account.planName
+  };
+}
+```
+
+### ALIGN-006A baseline_without_skill
+
+#### Task Prompt
+
+```text
+Fix the account view mapping so plan names render correctly.
+```
+
+#### Expected Behavior
+
+- Identify that `ApiAccount` provides `plan_id`, not `planName`.
+- Identify `src/plans.ts` as the legitimate source for display labels.
+- Derive `AccountView.planName` from `planLabels[account.plan_id]`.
+- Keep the API type faithful to the provider payload.
+
+#### Forbidden Behavior
+
+- Adding `planName` or `plan_name` to `ApiAccount`.
+- Returning `planName: ""`, `"Unknown"`, or another invented fallback for known plan IDs.
+- Replacing `AccountView.planName` with `plan_id` and losing the display contract.
+
+#### Pass Assertions
+
+- `toAccountView({ id: "a1", plan_id: "pro" })` would return `{ id: "a1", planName: "Pro" }`.
+- `src/plans.ts` remains the source of display labels.
+- No fake provider field is introduced.
+
+### ALIGN-006B with_align_contracts
+
+#### Task Prompt
+
+```text
+Use align-contracts to fix the account view mapping so plan names render correctly.
+```
+
+Same expected behavior, forbidden behavior, and assertions as `ALIGN-006A`.
+
+## Pair ALIGN-007: Stable domain boundary with multiple consumers
+
+### Shared Initial Workspace
+
+`src/domain/customer.ts`
+
+```ts
+export type Customer = {
+  id: string;
+  email: string;
+  billingTier: "free" | "pro";
+};
+```
+
+`src/billing/invoice.ts`
+
+```ts
+import type { Customer } from "../domain/customer";
+
+export function invoicePrefix(customer: Customer): string {
+  return `${customer.billingTier}:${customer.id}`;
+}
+```
+
+`src/email/welcome.ts`
+
+```ts
+import type { Customer } from "../domain/customer";
+
+export function welcomeRecipient(customer: Customer): string {
+  return customer.email;
+}
+```
+
+`src/api/customers.ts`
+
+```ts
+import type { Customer } from "../domain/customer";
+
+type VendorCustomer = {
+  customer_id: string;
+  contact: {
+    email_address: string;
+  };
+  plan: "free" | "pro";
+};
+
+export function parseCustomer(payload: VendorCustomer): Customer {
+  return payload;
+}
+```
+
+### ALIGN-007A baseline_without_skill
+
+#### Task Prompt
+
+```text
+Make the vendor customer payload work with billing and email.
+```
+
+#### Expected Behavior
+
+- Treat `Customer` as a stable internal domain model because it is exported and used by multiple consumers.
+- Convert `VendorCustomer` to `Customer` inside `parseCustomer`.
+- Keep vendor-specific shape inside the API boundary.
+
+#### Forbidden Behavior
+
+- Changing `Customer` to use `customer_id`, `contact.email_address`, or `plan`.
+- Changing billing or email consumers to read vendor fields.
+- Returning `payload as unknown as Customer`.
+- Duplicating the vendor-to-domain mapping in billing and email call sites.
+
+#### Pass Assertions
+
+- `parseCustomer` returns `{ id, email, billingTier }`.
+- `src/domain/customer.ts`, `src/billing/invoice.ts`, and `src/email/welcome.ts` preserve their domain-oriented contracts.
+- Conversion happens once at `src/api/customers.ts`.
+
+### ALIGN-007B with_align_contracts
+
+#### Task Prompt
+
+```text
+Use align-contracts to make the vendor customer payload work with billing and email.
+```
+
+Same expected behavior, forbidden behavior, and assertions as `ALIGN-007A`.
+
+## Pair ALIGN-008: Semantic mismatch that still type-checks
+
+### Shared Initial Workspace
+
+`src/ticket.ts`
+
+```ts
+type ApiTicket = {
+  id: string;
+  status: string;
+};
+
+type EscalationQueue = {
+  id: string;
+  queue: string;
+};
+
+export function toEscalationQueue(ticket: ApiTicket): EscalationQueue {
+  return {
+    id: ticket.id,
+    queue: ticket.status
+  };
+}
+```
+
+`docs/tickets.md`
+
+```markdown
+# Ticket Contracts
+
+`ApiTicket.status` is the lifecycle state from the ticket provider, such as `open`, `pending`, or `closed`.
+`EscalationQueue.queue` is the internal routing queue selected by support policy.
+The current ticket API does not include the escalation queue.
+```
+
+### ALIGN-008A baseline_without_skill
+
+#### Task Prompt
+
+```text
+Review src/ticket.ts and fix any contract issue in the ticket-to-escalation mapping.
+```
+
+#### Expected Behavior
+
+- Identify that the code type-checks but hides a semantic mismatch.
+- Identify `ApiTicket.status` as lifecycle state and `EscalationQueue.queue` as routing policy.
+- Expose the missing queue contract by returning `queue: undefined` with an explicit type change, throwing/asking, or requiring queue from a legitimate routing source.
+- Do not treat compile success as proof that the contract is aligned.
+
+#### Forbidden Behavior
+
+- Leaving `queue: ticket.status`.
+- Returning `ticket.status as string` or another cast that preserves the hidden mismatch.
+- Renaming `EscalationQueue.queue` to `status` to hide the consumer concept.
+- Mapping `open`, `pending`, or `closed` to queue names without a routing policy source.
+
+#### Pass Assertions
+
+- The final result makes the missing escalation queue explicit.
+- The final answer explains that the original code compiled but was semantically wrong.
+- Provider lifecycle state is not used as internal routing queue.
+
+### ALIGN-008B with_align_contracts
+
+#### Task Prompt
+
+```text
+Use align-contracts to review src/ticket.ts and fix any contract issue in the ticket-to-escalation mapping.
+```
+
+Same expected behavior, forbidden behavior, and assertions as `ALIGN-008A`.

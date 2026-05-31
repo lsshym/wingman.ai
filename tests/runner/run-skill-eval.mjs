@@ -390,30 +390,33 @@ function parseBuiltInChecks(markdown) {
 
 function checksForCase(checks, caseId, baseCaseId) {
   const forbidden = checks?.forbidden_patterns || {};
+  const required = checks?.required_patterns || {};
   return [
-    ...normalizeForbiddenPatternRules(forbidden[baseCaseId]),
-    ...normalizeForbiddenPatternRules(forbidden[caseId]),
+    ...normalizePatternRules(forbidden[baseCaseId], "forbidden_pattern"),
+    ...normalizePatternRules(forbidden[caseId], "forbidden_pattern"),
+    ...normalizePatternRules(required[baseCaseId], "required_pattern"),
+    ...normalizePatternRules(required[caseId], "required_pattern"),
   ];
 }
 
-function normalizeForbiddenPatternRules(value) {
+function normalizePatternRules(value, type) {
   const entries = Array.isArray(value) ? value : value ? [value] : [];
   return entries.map((entry) => {
     if (typeof entry === "string") {
       return {
-        type: "forbidden_pattern",
+        type,
         file: "**/*",
         pattern: entry,
-        code: "forbidden_pattern",
+        code: type,
         detail: `Matched forbidden pattern: ${entry}`,
       };
     }
 
     return {
-      type: "forbidden_pattern",
+      type,
       file: entry.file || "**/*",
       pattern: entry.pattern,
-      code: entry.code || "forbidden_pattern",
+      code: entry.code || type,
       detail: entry.detail || `Matched forbidden pattern: ${entry.pattern}`,
     };
   }).filter((entry) => entry.pattern);
@@ -901,7 +904,7 @@ async function defaultAnalyzer({ evidence, evidenceError }) {
 function runBuiltInChecks({ testCase, workspaceFiles }) {
   const reasons = [];
   for (const rule of testCase.checkRules || []) {
-    if (rule.type !== "forbidden_pattern") {
+    if (rule.type !== "forbidden_pattern" && rule.type !== "required_pattern") {
       continue;
     }
 
@@ -916,14 +919,22 @@ function runBuiltInChecks({ testCase, workspaceFiles }) {
       continue;
     }
 
+    let matched = false;
     for (const [file, content] of Object.entries(workspaceFiles)) {
       if (!matchesFilePattern(file, rule.file)) {
         continue;
       }
       if (pattern.test(content)) {
-        reasons.push({ code: rule.code, detail: rule.detail });
+        matched = true;
         break;
       }
+    }
+
+    if (rule.type === "forbidden_pattern" && matched) {
+      reasons.push({ code: rule.code, detail: rule.detail });
+    }
+    if (rule.type === "required_pattern" && !matched) {
+      reasons.push({ code: rule.code, detail: rule.detail });
     }
   }
 

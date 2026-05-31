@@ -359,6 +359,121 @@ Use custom-review to inspect the implementation.
       await rm(root, { recursive: true, force: true });
     }
   });
+
+  it("attaches base and case-specific built-in checks to paired cases", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "wingman-eval-check-rules-"));
+
+    try {
+      await writeFile(
+        path.join(root, "cases.md"),
+        `# contract-skill Test Cases
+
+## Pair CASE-001: Rule coverage
+
+### Shared Initial Workspace
+
+\`src/example.ts\`
+
+\`\`\`ts
+export const value = 1;
+\`\`\`
+
+### CASE-001A baseline_without_skill
+
+#### Task Prompt
+
+\`\`\`text
+Fix example.
+\`\`\`
+
+### CASE-001B with_contract_skill
+
+#### Task Prompt
+
+\`\`\`text
+Use contract-skill to fix example.
+\`\`\`
+`,
+        "utf8"
+      );
+      await writeFile(
+        path.join(root, "method.md"),
+        `# contract-skill Test Method
+
+## Built-in Checks
+
+\`\`\`json
+{
+  "forbidden_patterns": {
+    "CASE-001": [
+      {
+        "file": "src/example.ts",
+        "pattern": "forbiddenBase",
+        "code": "base_forbidden",
+        "detail": "Base forbidden rule."
+      }
+    ],
+    "CASE-001B": [
+      {
+        "file": "src/example.ts",
+        "pattern": "forbiddenCase",
+        "code": "case_forbidden",
+        "detail": "Case forbidden rule."
+      }
+    ]
+  },
+  "required_patterns": {
+    "CASE-001": [
+      {
+        "file": "src/example.ts",
+        "pattern": "requiredBase",
+        "code": "base_required",
+        "detail": "Base required rule."
+      }
+    ],
+    "CASE-001B": [
+      {
+        "file": "src/example.ts",
+        "pattern": "requiredCase",
+        "code": "case_required",
+        "detail": "Case required rule."
+      }
+    ]
+  }
+}
+\`\`\`
+`,
+        "utf8"
+      );
+
+      const prepared = await prepareSkillEval({
+        skill: "contract-skill",
+        runId: "test-run",
+        repoRoot: root,
+        casesPath: path.join(root, "cases.md"),
+        methodPath: path.join(root, "method.md"),
+      });
+
+      const caseA = prepared.cases.find((entry) => entry.caseId === "CASE-001A");
+      const caseB = prepared.cases.find((entry) => entry.caseId === "CASE-001B");
+
+      assert.deepEqual(
+        caseA.checkRules.map((rule) => `${rule.type}:${rule.code}`),
+        ["forbidden_pattern:base_forbidden", "required_pattern:base_required"]
+      );
+      assert.deepEqual(
+        caseB.checkRules.map((rule) => `${rule.type}:${rule.code}`),
+        [
+          "forbidden_pattern:base_forbidden",
+          "forbidden_pattern:case_forbidden",
+          "required_pattern:base_required",
+          "required_pattern:case_required",
+        ]
+      );
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
 });
 
 describe("runSkillEval", () => {
@@ -704,6 +819,62 @@ export function toWorkflowKind(job: ApiJob): WorkflowKind {
       assert.equal(analysis.reasons[0].code, "semantic_gap_hidden");
       assert.match(analysisMarkdown, /Adding a workflow category field to `ApiJob`/);
       assert.match(analysisMarkdown, /src\/workflow\.ts/);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("fails when required built-in evidence is missing from the workspace", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "wingman-eval-required-checker-"));
+
+    try {
+      const runRoot = path.join(root, ".eval-runs", "contract-skill", "test-run");
+      const caseRoot = path.join(runRoot, "CASE-001");
+      await mkdir(path.join(caseRoot, "workspace", "src"), { recursive: true });
+      await writeFile(path.join(caseRoot, "workspace", "src", "example.ts"), "export const value = 1;\n", "utf8");
+      await writeFile(
+        path.join(caseRoot, "evidence.json"),
+        JSON.stringify({ id: "CASE-001", status: "pass", failure_reasons: [] }, null, 2),
+        "utf8"
+      );
+      await writeFile(
+        path.join(runRoot, "run.json"),
+        JSON.stringify(
+          {
+            skill: "contract-skill",
+            runId: "test-run",
+            kind: "ordinary",
+            cases: [
+              {
+                caseId: "CASE-001",
+                variant: "single",
+                caseRoot,
+                workspaceRoot: path.join(caseRoot, "workspace"),
+                checkRules: [
+                  {
+                    type: "required_pattern",
+                    file: "src/example.ts",
+                    pattern: "mustExist",
+                    code: "required_missing",
+                    detail: "Expected output marker is missing.",
+                  },
+                ],
+              },
+            ],
+          },
+          null,
+          2
+        ),
+        "utf8"
+      );
+
+      await analyzeRun({ runRoot });
+
+      const analysis = JSON.parse(await readFile(path.join(caseRoot, "analysis.json"), "utf8"));
+
+      assert.equal(analysis.worker_status, "pass");
+      assert.equal(analysis.final_status, "fail");
+      assert.deepEqual(analysis.reasons, [{ code: "required_missing", detail: "Expected output marker is missing." }]);
     } finally {
       await rm(root, { recursive: true, force: true });
     }
