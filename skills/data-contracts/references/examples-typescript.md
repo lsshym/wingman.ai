@@ -2,6 +2,11 @@
 
 These examples show executable boundary handling style. Use the shape, not the domain names.
 
+## Contents
+
+- [API Payload To Domain Model With Explicit Missing Data](#api-payload-to-domain-model-with-explicit-missing-data)
+- [SDK Status To Internal Enum With Unknown Handling](#sdk-status-to-internal-enum-with-unknown-handling)
+
 ## API Payload To Domain Model With Explicit Missing Data
 
 `order-contract.ts`:

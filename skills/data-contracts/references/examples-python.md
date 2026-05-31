@@ -2,6 +2,11 @@
 
 These examples show executable boundary handling style. Use the shape, not the domain names.
 
+## Contents
+
+- [API Payload To Domain Model With Explicit Missing Data](#api-payload-to-domain-model-with-explicit-missing-data)
+- [Database Row To Domain Entity With Boundary Validation](#database-row-to-domain-entity-with-boundary-validation)
+
 ## API Payload To Domain Model With Explicit Missing Data
 
 `order_contract.py`:
