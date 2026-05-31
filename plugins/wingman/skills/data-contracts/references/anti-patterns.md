@@ -2,6 +2,18 @@
 
 Use these anti-patterns to catch real contract failures before patching type errors or mapping fields.
 
+## Contents
+
+- [Casting Away Drift](#casting-away-drift)
+- [Adding Provider Fields That Do Not Exist](#adding-provider-fields-that-do-not-exist)
+- [Fake Defaults To Satisfy Types](#fake-defaults-to-satisfy-types)
+- [Semantic Mismatch Treated As Rename](#semantic-mismatch-treated-as-rename)
+- [Vendor Shape Leaks Into Domain Model](#vendor-shape-leaks-into-domain-model)
+- [Mapper Scattered Across Call Sites](#mapper-scattered-across-call-sites)
+- [Overbuilt Adapter For Local Naming Only](#overbuilt-adapter-for-local-naming-only)
+- [Optionality Drift Ignored](#optionality-drift-ignored)
+- [Enum Or Status Collapse](#enum-or-status-collapse)
+
 ## Casting Away Drift
 
 Bad:

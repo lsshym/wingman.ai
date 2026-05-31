@@ -1,6 +1,6 @@
 ---
 name: data-contracts
-description: Use when aligning provider and consumer contracts across API payloads, webhooks, events, database rows, SDK responses, schemas, DTOs, generated clients, domain models, form payloads, config/env/CLI inputs, UI props, or AI structured outputs. Trigger for API integration, real response wiring, mock replacement, field alignment, schema/type mismatch, DTO/request/response mapping, enum/status drift, missing fields, optional fields, pagination, nested payloads, 接口对接, 字段对齐, or 类型对不上. Do not use for pure styling, copy edits, import cleanup, local renames, or refactors with no data boundary.
+description: Use when aligning provider/consumer data contracts: APIs, webhooks, events, database rows, SDK responses, schemas, DTOs, generated clients, domain models, forms, config/env/CLI, UI props, or AI outputs. Trigger for real response wiring, mock replacement, field/schema/type mismatch, DTO mapping, enum/status drift, missing/optional fields, pagination, nested payloads, 接口对接, 字段对齐, 类型对不上. Do not use for styling, copy edits, imports, or no-boundary renames/refactors.
 ---
 
 # Data Contracts
