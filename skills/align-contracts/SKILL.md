@@ -1,11 +1,11 @@
 ---
 name: align-contracts
-description: Use when connecting provider and consumer contracts across APIs, services, schemas, events, configs, data models, SDKs, databases, CLI inputs, or UI boundaries where field shapes or semantics may drift.
+description: Use when aligning provider and consumer contracts across API payloads, webhooks, events, database rows, SDK responses, schemas, DTOs, generated clients, domain models, form payloads, config/env/CLI inputs, UI props, or AI structured outputs. Trigger for API integration, real response wiring, mock replacement, field alignment, schema/type mismatch, DTO/request/response mapping, enum/status drift, missing fields, optional fields, pagination, nested payloads, 接口对接, 字段对齐, or 类型对不上. Do not use for pure styling, copy edits, import cleanup, local renames, or refactors with no data boundary.
 ---
 
 # Align Contracts
 
-Align provider and consumer contracts without hiding semantic drift. A contract can be an API payload, database row, event, config object, SDK response, CLI input, schema, domain model, or component interface.
+Align provider and consumer contracts without hiding semantic drift. A contract can be an API payload, database row, event, webhook, config object, SDK response, CLI input, schema, DTO, generated client type, domain model, form payload, AI structured output, or component interface.
 
 Core principle: do not preserve a shape just because it already exists. First decide whether the consumer contract is local/temporary or stable/shared, then preserve the contract that owns the meaning. Semantic mismatch beats scope shortcuts: even local consumer contracts must not be renamed or deleted when they express a different business concept from the provider.
 
@@ -21,12 +21,22 @@ Use this when connecting one boundary to another:
 - Legacy type -> new type.
 - Form state -> request DTO.
 - AI structured output -> tool or schema input.
+- Generated schema/client -> hand-written code.
 
 Do not use this for pure formatting, styling, copy edits, or refactors with no boundary contract.
 
-## Specializations
+## Required Contract Checkpoint
 
-If the task involves React, JSX, TypeScript props, frontend components, backend response -> UI component binding, or parent/child component contract mismatch, read `references/frontend-react-typescript.md` after this core protocol.
+Before changing code for a non-trivial contract boundary, identify:
+
+- **Provider**: actual supplied shape from schema, sample, fixture, migration, source code, docs, or runtime payload.
+- **Consumer**: receiving code shape, type, schema, DTO, handler, model, form, or interface.
+- **Source of truth**: which side owns the business meaning, and why.
+- **Gap**: naming-only, semantic mismatch, missing field, structural mismatch, enum/value mismatch, optionality mismatch, or source conflict.
+- **Binding location**: parser/schema, adapter/mapper, repository boundary, domain model, request builder, event handler, component interface, or direct source use.
+- **Verification**: focused test, typecheck, schema parse, sample payload, fixture, integration check, compile step, or render path.
+
+Keep the checkpoint concise. Do not expose private chain-of-thought; report only concrete contract facts and decisions when useful.
 
 ## Core Protocol
 
@@ -63,21 +73,25 @@ Perform this analysis internally. Do not ask the user at each step. Ask only whe
 8. **Preserve behavior**: Change only what is required to align the boundary. Do not fold unrelated refactors into contract work.
 9. **Verify**: Use the project's normal proof: tests, typecheck, schema parse, sample payload, fixture, integration check, or compile step.
 
+## Example Use Rule
+
+If implementation examples are needed, read `references/examples.md`, then one matching language example.
+
+Examples demonstrate executable boundary handling style: imports, validation, errors, tests, main functions, and run commands.
+
+Do not copy example domains, field names, enum values, architecture, or language into the project unless they match the existing code. Always follow the project's actual language, libraries, and patterns.
+
+Do not write pseudocode into project files.
+
 ## Ask The User When
 
 - Both sides use different terms that may represent different business concepts.
 - The change would alter a public API, stable domain model, persisted schema, or existing behavior.
 - No memory, docs, schema, or code ownership pattern identifies the source of truth.
 - You cannot tell whether a consumer type is local/temporary or shared/stable.
+- A provider lacks data for a distinct consumer concept.
 - Adding an adapter layer would be an architectural decision and the project has no precedent.
 
 ## Common Mistakes
 
-- Treating semantic differences as naming differences.
-- Renaming or deleting the consumer contract to hide semantic uncertainty, such as changing `toWorkflowKind` into `toWorkflowStatus`.
-- Letting external vendor fields leak through the domain model by accident.
-- Rewriting a stable internal model just to match one payload.
-- Treating a local temporary type as a stable domain model and adding unnecessary architecture around it.
-- Adding an adapter only to rename one local display field.
-- Adding `field: ''`, `id: 0`, or fake defaults to pass a compiler.
-- Creating the same mapper in several call sites instead of one boundary.
+Read `references/anti-patterns.md` when fixing type errors, replacing mock data, mapping API fields, handling missing data, or resolving enum/status/price/permission fields.

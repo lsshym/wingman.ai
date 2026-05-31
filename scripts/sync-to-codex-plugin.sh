@@ -5,6 +5,7 @@ FORK="${WINGMAN_CODEX_PLUGINS_FORK:-}"
 REMOTE_URL="${WINGMAN_CODEX_PLUGINS_REMOTE:-}"
 WORKTREE_DIR="${WINGMAN_CODEX_PLUGINS_DIR:-../openai-codex-plugins}"
 DEST_REL="plugins/wingman"
+MARKETPLACE_REL=".agents/plugins/marketplace.json"
 BOOTSTRAP=0
 DRY_RUN=0
 
@@ -62,6 +63,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 WORKTREE_DIR="$(cd "$(dirname "${WORKTREE_DIR}")" && pwd)/$(basename "${WORKTREE_DIR}")"
 DEST_DIR="${WORKTREE_DIR}/${DEST_REL}"
+MARKETPLACE_FILE="${WORKTREE_DIR}/${MARKETPLACE_REL}"
 
 if [[ ! -f "${SOURCE_ROOT}/.codex-plugin/plugin.json" ]]; then
   echo "Missing ${SOURCE_ROOT}/.codex-plugin/plugin.json; run from the Wingman repository." >&2
@@ -111,6 +113,8 @@ RSYNC_ARGS=(
   --exclude "package-lock.json"
   --exclude "plugins/"
   --exclude "scripts/"
+  --exclude "test.md"
+  --exclude "tests/"
 )
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -120,6 +124,31 @@ fi
 rsync "${RSYNC_ARGS[@]}" "${SOURCE_ROOT}/" "${DEST_DIR}/"
 
 if [[ "${DRY_RUN}" -eq 0 ]]; then
+  mkdir -p "$(dirname "${MARKETPLACE_FILE}")"
+  cat > "${MARKETPLACE_FILE}" <<'JSON'
+{
+  "name": "wingman-marketplace",
+  "interface": {
+    "displayName": "Wingman Marketplace"
+  },
+  "plugins": [
+    {
+      "name": "wingman",
+      "source": {
+        "source": "local",
+        "path": "./plugins/wingman"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Coding"
+    }
+  ]
+}
+JSON
   echo "Synced Wingman Codex plugin to ${DEST_DIR}"
+  echo "Generated Codex marketplace file at ${MARKETPLACE_FILE}"
   echo "Next: cd ${WORKTREE_DIR} && git diff -- ${DEST_REL}"
+  echo "      cd ${WORKTREE_DIR} && git diff -- ${MARKETPLACE_REL}"
 fi
