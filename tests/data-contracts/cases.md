@@ -1,4 +1,4 @@
-# align-contracts Test Cases
+# data-contracts Test Cases
 
 ## Runner Format Contract
 
@@ -86,7 +86,7 @@ Fix the TypeScript error in src/profile.ts so the API user renders correctly.
 #### Task Prompt
 
 ```text
-Use align-contracts to fix the TypeScript error in src/profile.ts so the API user renders correctly.
+Use data-contracts to fix the TypeScript error in src/profile.ts so the API user renders correctly.
 ```
 
 Same expected behavior, forbidden behavior, and assertions as `ALIGN-001A`.
@@ -154,7 +154,7 @@ Fix src/workflow.ts so TypeScript passes.
 #### Task Prompt
 
 ```text
-Use align-contracts to fix src/workflow.ts so TypeScript passes without hiding contract drift.
+Use data-contracts to fix src/workflow.ts so TypeScript passes without hiding contract drift.
 ```
 
 Same expected behavior, forbidden behavior, and assertions as `ALIGN-002A`.
@@ -232,7 +232,7 @@ Make the vendor order payload work with the existing checkout code.
 #### Task Prompt
 
 ```text
-Use align-contracts to make the vendor order payload work with the existing checkout code.
+Use data-contracts to make the vendor order payload work with the existing checkout code.
 ```
 
 Same expected behavior, forbidden behavior, and assertions as `ALIGN-003A`.
@@ -295,7 +295,7 @@ Fix the user card mapping so it follows the API contract.
 #### Task Prompt
 
 ```text
-Use align-contracts to fix the user card mapping so it follows the API contract.
+Use data-contracts to fix the user card mapping so it follows the API contract.
 ```
 
 Same expected behavior, forbidden behavior, and assertions as `ALIGN-004A`.
@@ -370,7 +370,7 @@ Simplify DocumentSummary's API data binding without changing the UI.
 #### Task Prompt
 
 ```text
-Use align-contracts to simplify DocumentSummary's API data binding without changing the UI.
+Use data-contracts to simplify DocumentSummary's API data binding without changing the UI.
 ```
 
 Same expected behavior, forbidden behavior, and assertions as `ALIGN-005A`.
@@ -442,7 +442,7 @@ Fix the account view mapping so plan names render correctly.
 #### Task Prompt
 
 ```text
-Use align-contracts to fix the account view mapping so plan names render correctly.
+Use data-contracts to fix the account view mapping so plan names render correctly.
 ```
 
 Same expected behavior, forbidden behavior, and assertions as `ALIGN-006A`.
@@ -531,7 +531,7 @@ Make the vendor customer payload work with billing and email.
 #### Task Prompt
 
 ```text
-Use align-contracts to make the vendor customer payload work with billing and email.
+Use data-contracts to make the vendor customer payload work with billing and email.
 ```
 
 Same expected behavior, forbidden behavior, and assertions as `ALIGN-007A`.
@@ -604,7 +604,7 @@ Review src/ticket.ts and fix any contract issue in the ticket-to-escalation mapp
 #### Task Prompt
 
 ```text
-Use align-contracts to review src/ticket.ts and fix any contract issue in the ticket-to-escalation mapping.
+Use data-contracts to review src/ticket.ts and fix any contract issue in the ticket-to-escalation mapping.
 ```
 
 Same expected behavior, forbidden behavior, and assertions as `ALIGN-008A`.

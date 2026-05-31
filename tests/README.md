@@ -6,7 +6,7 @@
 
 | 主题 | 测试方法 | 测试用例 | 是否有对照组 |
 | --- | --- | --- | --- |
-| `align-contracts` | `align-contracts/method.md` | `align-contracts/cases.md` | Yes |
+| `data-contracts` | `data-contracts/method.md` | `data-contracts/cases.md` | Yes |
 | `memory-setup` | `memory-setup/method.md` | `memory-setup/cases.md` | No |
 | `memory-load` | `memory-load/method.md` | `memory-load/cases.md` | Limited |
 | `memory-sync` | `memory-sync/method.md` | `memory-sync/cases.md` | Limited |
@@ -22,8 +22,8 @@
 ```text
 请在当前仓库运行 Wingman skill evaluation：
 
-1. 先阅读 tests/align-contracts/method.md
-2. 再阅读 tests/align-contracts/cases.md
+1. 先阅读 tests/data-contracts/method.md
+2. 再阅读 tests/data-contracts/cases.md
 3. 按 method.md 的执行协议运行所有 case
 4. 每个 case 使用隔离临时 workspace
 5. 严格只输出 method.md 要求的 JSON
@@ -35,8 +35,8 @@
 ```text
 请运行 Wingman evaluation 的单个测试：
 
-- Method: tests/align-contracts/method.md
-- Cases: tests/align-contracts/cases.md
+- Method: tests/data-contracts/method.md
+- Cases: tests/data-contracts/cases.md
 - 只运行 ALIGN-002A 和 ALIGN-002B 这一组对照测试
 
 要求：

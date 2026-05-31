@@ -714,7 +714,7 @@ describe("analyzeRun", () => {
     try {
       await writeFile(
         path.join(root, "cases.md"),
-        `# align-contracts Test Cases
+        `# data-contracts Test Cases
 
 ## Pair ALIGN-002: Semantic mismatch
 
@@ -756,7 +756,7 @@ Fix src/workflow.ts so TypeScript passes.
       );
       await writeFile(
         path.join(root, "method.md"),
-        `# align-contracts Test Method
+        `# data-contracts Test Method
 
 ## Built-in Checks
 
@@ -779,7 +779,7 @@ Fix src/workflow.ts so TypeScript passes.
       );
 
       const prepared = await prepareSkillEval({
-        skill: "align-contracts",
+        skill: "data-contracts",
         caseId: "ALIGN-002",
         runId: "test-run",
         repoRoot: root,

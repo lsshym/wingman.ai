@@ -1,9 +1,9 @@
 ---
-name: align-contracts
+name: data-contracts
 description: Use when aligning provider and consumer contracts across API payloads, webhooks, events, database rows, SDK responses, schemas, DTOs, generated clients, domain models, form payloads, config/env/CLI inputs, UI props, or AI structured outputs. Trigger for API integration, real response wiring, mock replacement, field alignment, schema/type mismatch, DTO/request/response mapping, enum/status drift, missing fields, optional fields, pagination, nested payloads, 接口对接, 字段对齐, or 类型对不上. Do not use for pure styling, copy edits, import cleanup, local renames, or refactors with no data boundary.
 ---
 
-# Align Contracts
+# Data Contracts
 
 Align provider and consumer contracts without hiding semantic drift. A contract can be an API payload, database row, event, webhook, config object, SDK response, CLI input, schema, DTO, generated client type, domain model, form payload, AI structured output, or component interface.
 

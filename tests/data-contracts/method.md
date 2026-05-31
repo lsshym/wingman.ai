@@ -1,8 +1,8 @@
-# align-contracts Test Method
+# data-contracts Test Method
 
 ## Purpose
 
-Evaluate whether an agent using `align-contracts` handles provider and consumer contract boundaries better than a baseline agent that receives the same task without the skill.
+Evaluate whether an agent using `data-contracts` handles provider and consumer contract boundaries better than a baseline agent that receives the same task without the skill.
 
 ## Execution Protocol
 
@@ -10,11 +10,11 @@ For every paired case:
 
 1. Create a fresh temporary workspace for variant A.
 2. Write the fixture files exactly as listed in the case.
-3. Run the A task prompt exactly as written. Do not mention `align-contracts`.
+3. Run the A task prompt exactly as written. Do not mention `data-contracts`.
 4. Record all files read, files changed, commands run, final answer, and any explicit uncertainty.
 5. Create a second fresh temporary workspace for variant B.
 6. Write the same fixture files.
-7. Run the B task prompt exactly as written. The B prompt explicitly requires `align-contracts`.
+7. Run the B task prompt exactly as written. The B prompt explicitly requires `data-contracts`.
 8. Record the same evidence.
 9. Judge A and B independently by pass criteria, then compare the pair.
 
@@ -25,11 +25,11 @@ Run A and B in separate conversations when possible. If separate conversations a
 Paired A/B cases can be run by the unified skill eval runner:
 
 ```bash
-node tests/runner/run-skill-eval.mjs align-contracts --case ALIGN-002 --agent claude
-node tests/runner/run-skill-eval.mjs align-contracts --agent claude
+node tests/runner/run-skill-eval.mjs data-contracts --case ALIGN-002 --agent claude
+node tests/runner/run-skill-eval.mjs data-contracts --agent claude
 ```
 
-Use `--dry-run` to only create `.eval-runs/align-contracts/<run-id>/<case-id>/` directories with isolated `workspace/`, `prompt.md`, and `evidence-template.json` files. Real runs ask the tested agent to write `evidence.json` and then generate `summary.json` and `summary.md`.
+Use `--dry-run` to only create `.eval-runs/data-contracts/<run-id>/<case-id>/` directories with isolated `workspace/`, `prompt.md`, and `evidence-template.json` files. Real runs ask the tested agent to write `evidence.json` and then generate `summary.json` and `summary.md`.
 
 ## Required JSON Output
 
@@ -37,8 +37,8 @@ Return only JSON:
 
 ```json
 {
-  "suite_id": "wingman.align-contracts",
-  "skill": "align-contracts",
+  "suite_id": "wingman.data-contracts",
+  "skill": "data-contracts",
   "summary": {
     "pair_count": 0,
     "case_count": 0,
@@ -108,7 +108,7 @@ Pair comparison:
 - `unnecessary_adapter`: Added a mapper when direct local usage or simple aliasing was enough.
 - `visual_or_unrelated_refactor`: Changed styling, layout, or unrelated behavior.
 - `verification_missing`: Did not run or explain verification.
-- `skill_not_used`: Variant B did not apply `align-contracts` behavior.
+- `skill_not_used`: Variant B did not apply `data-contracts` behavior.
 - `observability_missing`: Result omitted files, commands, output, or diagnostics needed for judging.
 
 ## Built-in Checks

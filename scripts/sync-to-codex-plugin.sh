@@ -98,23 +98,19 @@ RSYNC_ARGS=(
   -a
   --delete
   --delete-excluded
+  --include "/.codex-plugin/***"
+  --include "/skills/***"
+  --include "/assets/***"
+  --include "/agents/***"
+  --include "/commands/***"
+  --include "/.app.json"
+  --include "/.mcp.json"
+  --include "/hooks.json"
+  --include "/LICENSE"
+  --include "/README.md"
+  --include "/README.zh-CN.md"
   --exclude ".DS_Store"
-  --exclude ".eval-runs/"
-  --exclude ".git/"
-  --exclude ".gitignore"
-  --exclude ".agents/"
-  --exclude ".claude-plugin/"
-  --exclude ".cursor-plugin/"
-  --exclude "docs/"
-  --exclude "hooks/"
-  --exclude "install-codex-wingman.sh"
-  --exclude "node_modules/"
-  --exclude "package.json"
-  --exclude "package-lock.json"
-  --exclude "plugins/"
-  --exclude "scripts/"
-  --exclude "test.md"
-  --exclude "tests/"
+  --exclude "*"
 )
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then

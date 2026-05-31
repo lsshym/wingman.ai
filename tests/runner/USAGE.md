@@ -66,16 +66,16 @@ node tests/runner/run-skill-eval.mjs memory-load --agent claude
 node tests/runner/run-skill-eval.mjs memory-load --case MEMLOAD-004 --agent claude
 ```
 
-测试 `align-contracts` 全部 A/B case：
+测试 `data-contracts` 全部 A/B case：
 
 ```bash
-node tests/runner/run-skill-eval.mjs align-contracts --agent claude
+node tests/runner/run-skill-eval.mjs data-contracts --agent claude
 ```
 
-如果要让 `align-contracts` 的 TypeScript case 能完整运行 `tsc` 验证，使用共享 TypeScript toolchain：
+如果要让 `data-contracts` 的 TypeScript case 能完整运行 `tsc` 验证，使用共享 TypeScript toolchain：
 
 ```bash
-node tests/runner/run-skill-eval.mjs align-contracts \
+node tests/runner/run-skill-eval.mjs data-contracts \
   --agent claude \
   --setup-toolchain typescript
 ```
@@ -88,10 +88,10 @@ node tests/runner/run-skill-eval.mjs align-contracts \
 
 不会安装到项目根目录，也不会给每个 case workspace 都创建 `node_modules/`。
 
-测试 `align-contracts` 单个 pair：
+测试 `data-contracts` 单个 pair：
 
 ```bash
-node tests/runner/run-skill-eval.mjs align-contracts --case ALIGN-002 --agent claude
+node tests/runner/run-skill-eval.mjs data-contracts --case ALIGN-002 --agent claude
 ```
 
 用 Codex 跑单个 case：
@@ -142,7 +142,7 @@ claude -p
 需要 TypeScript 验证时，使用：
 
 ```bash
-node tests/runner/run-skill-eval.mjs align-contracts \
+node tests/runner/run-skill-eval.mjs data-contracts \
   --agent claude \
   --setup-toolchain typescript
 ```
@@ -173,7 +173,7 @@ toolchain 安装日志在：
 
 默认 runner 会生成 `analysis.md/json`。分析层会先检查 evidence 是否有效；如果 `method.md` 里声明了 `## Built-in Checks`，还会对修改后的 workspace 跑轻量规则，命中 forbidden pattern 就直接判 fail。没有这些规则时，它才会镜像 worker status。
 
-`align-contracts` 已经内置了少量规则来抓明显违规：
+`data-contracts` 已经内置了少量规则来抓明显违规：
 
 - `ALIGN-002`：给 `ApiJob` 发明 workflow kind、`as WorkflowKind`、把 queued/running/done 硬映射成 import/export。
 - `ALIGN-004`：给 `ApiUser` 发明 `avatarUrl`、保留 `avatarUrl: ""`、发明默认头像路径。
@@ -340,7 +340,7 @@ node tests/runner/run-skill-eval.mjs memory-setup --agent claude
 node tests/runner/run-skill-eval.mjs memory-load --agent claude
 node tests/runner/run-skill-eval.mjs memory-sync --agent claude
 node tests/runner/run-skill-eval.mjs memory-clean --agent claude
-node tests/runner/run-skill-eval.mjs align-contracts --agent claude
+node tests/runner/run-skill-eval.mjs data-contracts --agent claude
 ```
 
 暂时不要把 `memory-token-efficiency` 当成完整自动化结果看。它需要 token 计量和 cache 可见性处理，runner 目前还没有做专门支持。

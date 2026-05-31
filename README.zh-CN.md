@@ -65,12 +65,12 @@ Use `memory-clean` to compact the current memory context.
 
 这些技能独立于记忆工作流。请在它们适合当前任务时使用。
 
-### `align-contracts`
+### `data-contracts`
 
 当需要连接 API、schema、类型、事件、配置、数据模型、CLI 输入或 UI props 时使用。
 
 ```text
-Use `align-contracts` to bind this API response into the existing React component.
+Use `data-contracts` to bind this API response into the existing React component.
 ```
 
 ### `reuse-select`
