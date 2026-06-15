@@ -22,7 +22,7 @@ Repository memory states:
 
 ## Read Authority And Routing
 
-Read current memory before historical memory:
+Use this authority order when memory files disagree. The Load Protocol below defines the file read sequence:
 
 - `brief.md`: current global rules, accepted ADRs, memory settings, and the Domain Registry.
 - `domains/`: current durable domain truth, contracts, state flow, canonical fields, and domain-specific procedures.
@@ -41,7 +41,8 @@ Use the Domain Registry in `brief.md` as a routing table, not as the rule body:
 - `Domain`: canonical domain name.
 - `Read When`: task signals that make the domain relevant.
 - `Current File`: current domain truth file or folder index.
-- `History`: history index entry for historical lookup only.
+- `History Domain Index`: domain-level history projection for historical lookup only.
+- `History Topics`: topic projection ids for feature, workflow, or recurring problem lookup.
 - `Aliases`: old names, synonyms, or user-facing terms that should map to this domain.
 - `Related Domains`: domains that may also matter for cross-domain tasks.
 - `Status`: whether this domain route is active: `current | deprecated | superseded`.
@@ -49,13 +50,14 @@ Use the Domain Registry in `brief.md` as a routing table, not as the rule body:
 - Read domains with `Status: current` when the task matches `Domain`, `Read When`, or `Aliases`.
 - If a matching domain is `deprecated` or `superseded`, do not treat it as authoritative. Prefer the replacement when named; otherwise mention the routing ambiguity if the task depends on it.
 - `Related Domains` are hints, not automatic expansion. Read a related domain only when the task also touches that related area or the current domain file points to a specific related rule.
-- `History` in the registry points to historical background. It does not make history current truth and does not justify reading all history events by default.
+- `History Domain Index` and `History Topics` in the registry point to historical background. They do not make history current truth and do not justify reading all history events by default.
 - If history conflicts with `brief.md` or current domain truth, follow current memory unless the user explicitly asks to reopen the decision.
 
 History uses event bodies plus projection indexes:
 
 - `history/index.md`: top-level entry point.
 - `history/domains/<domain>.md`: domain history projection.
+- `history/topics/<topic>.md`: topic history projection.
 - `history/months/YYYY-MM.md`: month history projection.
 - `history/events/YYYY/MM/*.md`: event bodies, single source of truth for historical events.
 
@@ -83,33 +85,44 @@ If uncertain and repository memory is enabled, load memory. If repository state 
 8. Use the Domain Registry in `brief.md`, including `Read When`, `Aliases`, `Related Domains`, and `Status`, to choose relevant domain files.
 9. For a file domain, read only the relevant `.wingman/memory/domains/<domain>.md`.
 10. For a folder domain, read `.wingman/memory/domains/<domain>/index.md` first, then use its `Subfiles` section to choose relevant topic files. Do not read every subfile by default.
-11. Read `.wingman/memory/history/index.md` only when the user asks about history, previous work, "之前", "上次", "为什么以前", or when current memory points to a specific history event.
-12. From `history/index.md`, choose the relevant projection: `history/domains/<domain>.md` for domain questions, `history/months/YYYY-MM.md` for date questions, or a directly linked event when current memory cites one.
-13. Read matched history event bodies only after checking the relevant projection. Do not read every history event by default, and do not read history before current truth.
-14. Treat history as past context, not current truth. Follow the Read Authority And Routing priority when memory files disagree.
-15. Before editing code, build an internal Memory Context Checklist:
+11. Use `History Domain Index` and `History Topics` from matched registry rows to choose relevant history projections.
+12. Read history projections when any of these are true:
+    - the user asks about history, previous work, "之前", "上次", "为什么以前", or source reasoning;
+    - the current non-trivial task matches a domain with a `History Domain Index`;
+    - the current non-trivial task matches a topic listed in `History Topics`;
+    - current domain truth links directly to a specific `history/events/` event body;
+    - `context.md` mentions a related historical event.
+13. Prefer history sources in this order: direct event links from current truth, `history/topics/<topic>.md`, `history/domains/<domain>.md`, `history/months/YYYY-MM.md` for date questions only, then `history/index.md` only when projection routing is unclear or the user asks broadly.
+14. Read matched history event bodies only after checking the relevant projection. Choose only the strongest 0-3 event bodies for the current task. Do not scan `history/events/` directly, do not read every history event by default, and do not read history before current truth.
+15. Treat history as past context, not current truth. Follow the Read Authority And Routing priority when memory files disagree.
+16. Before editing code, build an internal Memory Context Checklist:
 
-- Active task.
-- Relevant memory files read.
-- Which memory rule or domain truth applies.
-- Which exact fields, symbols, contracts, or files are binding.
-- Whether reusable implementation lookup may be needed.
-- Whether the requested change would conflict with memory.
+    - Active task.
+    - Relevant memory files read.
+    - Relevant history projections read, if any.
+    - Relevant history event bodies read, if any.
+    - Which memory rule or domain truth applies.
+    - Which exact fields, symbols, contracts, or files are binding.
+    - Whether reusable implementation lookup may be needed.
+    - Whether the requested change would conflict with memory.
+    - Whether context logs appear to need promotion or cleanup.
 
-16. Do not show the checklist by default. Surface it only when there is a conflict, missing context, or the user asks.
-17. If required context is missing or contradictory, stop and ask the user instead of inventing substitutes.
+17. Do not show the checklist by default. Surface it only when there is a conflict, missing context, or the user asks.
+18. If required context is missing or contradictory, stop and ask the user instead of inventing substitutes.
 
 ## Memory Pressure Signals
 
-`memory-load` is read-only. It may notice memory pressure, but must not compact, summarize, delete, or invoke cleanup.
+`memory-load` is read-only. It may notice memory pressure, but must not compact, summarize, promote, delete, or invoke cleanup.
 
-Use these signals while loading:
+Do not suggest cleanup only because a file exceeds a fixed line count. Line count may be diagnostic, but cleanup suggestions must name concrete candidates:
 
-- **Soft pressure**: `brief.md` or `context.md` is long, repetitive, or noisy but readable. Continue and briefly suggest explicit `memory-clean` later.
-- **Hard pressure**: default-read memory is too large to load reliably. Stop and suggest the user explicitly run `memory-clean`.
-- **Current-rule conflict**: two current rules or ADRs appear to conflict. If it affects the task, stop and ask which rule is valid; otherwise continue and suggest `memory-clean` later.
+- **Promotion candidate**: `context.md` contains durable rules, contracts, field meanings, state flow, permissions, money rules, routing rules, or recurring debugging conclusions that are not in `domains/` or `brief.md`.
+- **Pointer candidate**: `context.md` repeats details already carried by `domains/` or `history/events/`.
+- **Current-rule conflict**: two current rules or ADRs conflict, or an old rule still appears current after replacement.
+- **History index gap**: relevant event history exists but no topic projection helps feature-time lookup.
+- **Default-read noise**: completed, low-reuse process logs obscure the active task or pending work.
 
-Do not treat large `history/` as memory pressure unless the user asked to inspect history. History is cold storage and is not read by default.
+If a concrete candidate affects the task, mention it and suggest explicit `memory-clean` later. If it blocks correct work, stop and ask which rule is valid. Do not treat large `history/` as pressure unless the user asked to inspect history.
 
 ## Binding Rules
 

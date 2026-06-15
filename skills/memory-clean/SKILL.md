@@ -7,11 +7,12 @@ description: "Use when the user explicitly asks to clean, compact, prune, trim, 
 
 ## Core Rule
 
-Clean Wingman memory only when the user explicitly asks. Optimize for future token cost and current-rule accuracy:
+Clean Wingman memory only when the user explicitly asks. Optimize for future token cost, current-rule accuracy, and safe promotion of long-lived knowledge out of hot context:
 
-- Keep default-read memory short: `brief.md`, `context.md`.
+- Keep default-read memory focused: `brief.md`, `context.md`.
 - Keep current rules non-conflicting: `brief.md`, relevant `domains/`.
-- Leave cold history alone unless the user explicitly asks about history cleanup.
+- Promote durable knowledge from `context.md` into `domains/`, `brief.md`, or `history/` before compacting old logs.
+- Leave cold history event bodies alone unless the user explicitly asks about history cleanup.
 - Delete logs only after a separate manual confirmation.
 
 Do not clean memory just because it exists, is old, or history is large. This is not routine sync, full-memory rewriting, or automatic deletion.
@@ -21,7 +22,7 @@ Do not clean memory just because it exists, is old, or history is large. This is
 1. Check whether `.wingman/memory/` exists.
 2. Check whether `.wingman/memory/brief.md` and `.wingman/memory/context.md` both exist.
 3. If missing, stop and report the repository memory state.
-4. When possible, check file size or line count before reading large files.
+4. When helpful, inspect file size or line count only as diagnostics before reading large files. Size alone is not a cleanup trigger.
 5. Read `brief.md` and `context.md` first.
 6. Read domain or history files only when the requested cleanup scope points to them.
 
@@ -29,7 +30,7 @@ Never scan all memory files by default.
 
 ## Optional Resources
 
-- Run `scripts/memory-stats.sh` when default-read memory size, heading layout, or pressure is unclear. The script is read-only and does not replace semantic judgment.
+- Run `scripts/memory-stats.sh` when heading layout, file size, or candidate discovery is unclear. The script is read-only and does not replace semantic judgment.
 - Read `examples/lossless-compaction.md` only when compacting current rules, ADRs, domain truths, or evidence-bearing logs.
 - Read `examples/deletion-proposals.md` only when preparing a deletion proposal.
 
@@ -41,26 +42,30 @@ Use the smallest scope that matches the user's request:
 
 | Scope | Read | Use When |
 | --- | --- | --- |
-| `context` | `context.md` | Recent logs are too long, duplicated, stale, or noisy. |
-| `brief` | `brief.md` | ADRs, registry, memory settings, or global rules are bloated or stale. |
+| `context` | `context.md` | Recent logs are duplicated, stale, noisy, pointer candidates, or no longer hot. |
+| `promotion` | `context.md`, `brief.md`, relevant domains/history projections | Context contains long-lived knowledge that should become current truth or history. |
+| `brief` | `brief.md` | ADRs, registry, memory settings, or global rules are bloated, stale, or conflicting. |
 | `domain` | One relevant domain file | A current rule changed, conflicts, or was duplicated. |
+| `domain-split` | `brief.md`, one broad domain file | A domain file mixes unrelated subdomains and should become a folder domain. |
 | `history-index` | Relevant history projection only | History indexes are bloated or copy event bodies. |
+| `history-topic-index` | Relevant history projections and event metadata | History exists but feature lookup needs topic projections. |
 | `delete-proposal` | Target files only | The user asks to delete logs or remove noise. |
 
 If unclear, choose `context` unless the user mentioned rules, domains, ADRs, or history.
 
-## Pressure Check
+## Cleanup Candidate Check
 
-Clean only when at least one is true:
+Clean only when at least one concrete candidate exists:
 
-- `context.md` is large enough to waste default-read tokens, such as clearly exceeding 200-300 lines or a user-stated threshold.
-- `brief.md` repeats explanations or contains stale routing.
-- A domain has conflicting `current` truths.
-- A rule changed from A to B and A is still marked current.
-- Logs are duplicates, corrected by later logs, sensitive, or low-value.
+- **Promotion candidate**: `context.md` contains durable rules, API contracts, field meanings, state flow, permissions, money rules, routing rules, product or business invariants, or recurring debugging conclusions that should become current truth or history.
+- **Pointer candidate**: content in `context.md` is already represented by `brief.md`, `domains/`, or `history/events/` and can be compacted to a precise pointer.
+- **Duplicate or correction candidate**: logs repeat the same task, or an older log was corrected by a later log.
+- **Default-read noise candidate**: completed, low-reuse process logs obscure current work, pending work, or high-signal context.
+- **Current-rule conflict**: two rules are marked current, or a replaced rule is not marked `superseded` or `deprecated`.
+- **History-topic candidate**: history events exist but feature-time lookup needs `history/topics/<topic>.md`.
 - The user explicitly identifies content to clean.
 
-If none apply, write nothing and explain why cleanup is not worth the token or risk cost.
+Do not clean solely because `context.md`, `brief.md`, or any other memory file exceeds a fixed line count. File size and line count are diagnostics only. If a file is long but has no safe promotion, compaction, pointer, deletion, conflict, or topic-index candidate, write nothing and explain that no worthwhile cleanup candidate was found.
 
 ## Retention Review
 
@@ -83,8 +88,11 @@ Classify before changing anything:
 
 | Label | Meaning | Action |
 | --- | --- | --- |
-| `KEEP` | Still needed, authoritative, pending, or evidence-bearing. | Preserve. |
-| `COMPACT` | Useful but verbose. | Shorten or replace with a pointer. |
+| `KEEP_HOT` | Still needed as active task, pending work, unresolved issue, or recent high-signal context. | Preserve in context. |
+| `PROMOTE_DOMAIN` | Long-lived current truth belongs in a domain file or project ADR. | Write current truth with evidence, then compact context to a pointer when safe. |
+| `PROMOTE_HISTORY` | Event has trace value but is not current truth. | Write history event and projections, then compact context to a pointer when safe. |
+| `PROMOTE_BOTH` | Current truth and historical source event are both needed. | Write current truth first, write history event/projections, then compact context to a pointer. |
+| `COMPACT_TO_POINTER` | Useful details are already preserved in current truth or history. | Replace verbose context with a precise pointer. |
 | `SUPERSEDE` | Old current rule replaced by a newer rule. | Mark `superseded` or `deprecated`; do not delete. |
 | `DELETE_CANDIDATE` | Duplicate, corrected, noisy, sensitive, or safely represented elsewhere. | Propose deletion; wait for confirmation. |
 | `NO_ACTION` | Cleanup cost or ambiguity exceeds benefit. | Leave unchanged. |
@@ -125,6 +133,8 @@ Valid confirmation must name exact current proposal IDs. Vague delegation, silen
 - `brief.md`: preserve Memory Settings, current ADR meaning, and Domain Registry routing. Remove repeated explanations only when behavior remains clear.
 - Domain files: keep current truths explicit, mark replaced rules `superseded` or `deprecated`, and do not merge semantically different rules.
 - History indexes: keep projections as links. Remove copied event bodies only if the body remains linked. Do not rewrite event bodies unless explicitly requested.
+- Promotion cleanup: when evidence is clear, write durable rules to `domains/` or ADRs to `brief.md`; write historical events under `history/events/YYYY/MM/` and update `history/domains/`, `history/topics/`, `history/months/`, and `history/index.md`; then compact context to a pointer.
+- Topic indexes: when history exists but feature lookup is weak, create or update `history/topics/<topic>.md` using stable, generic topic names.
 
 Compaction must be lossless for decision-critical meaning. A compacted entry must still preserve, when present:
 
@@ -142,14 +152,14 @@ Do not replace a specific rule with a vague summary. Read `examples/lossless-com
 
 1. Apply Repository Gate.
 2. Select the smallest cleanup scope and read only files needed for it.
-3. Run Pressure Check.
+3. Run Cleanup Candidate Check.
 4. Run Retention Review for each candidate.
 5. Classify candidates.
-6. Apply safe, lossless `COMPACT` and `SUPERSEDE` changes when evidence is clear.
+6. Apply safe, evidence-backed `PROMOTE_DOMAIN`, `PROMOTE_HISTORY`, `PROMOTE_BOTH`, `COMPACT_TO_POINTER`, and `SUPERSEDE` changes when meaning is preserved.
 7. For `DELETE_CANDIDATE`, present a deletion proposal and wait.
 8. Delete only explicitly confirmed IDs.
-9. Report files read, files changed, compactions, superseded rules, proposed deletions, and confirmed deletions.
-10. If nothing changed, report the blocking reason.
+9. Report files read, files changed, promotions, pointer compactions, superseded rules, topic indexes, proposed deletions, and confirmed deletions.
+10. If nothing changed, report the blocking reason or that no worthwhile cleanup candidate was found.
 
 ## Completion Rule
 
