@@ -110,11 +110,10 @@ Explicit workflow skills:
 
 - `memory-setup`: initialize Wingman memory files.
 - `memory-clean`: clean, compact, prune, deduplicate, reduce memory, or resolve stale/conflicting memory rules only when the user explicitly asks.
-- `react-ts-refactor`: run the React + TypeScript component refactor diagnostic workflow.
 
 Run explicit workflow skills only when the user directly asks for them.
 
-Slash-prefixed forms such as `/reuse-catalog`, `/reuse-select`, `/memory-setup`, or `/react-ts-refactor` are conceptual invocation aliases for skills. Specific platforms may namespace or display them differently, such as `/wingman:memory-setup` in Claude Code.
+Slash-prefixed forms such as `/reuse-catalog`, `/reuse-select`, or `/memory-setup` are conceptual invocation aliases for skills. Specific platforms may namespace or display them differently, such as `/wingman:memory-setup` in Claude Code.
 
 ## Wingman Red Flags
 
