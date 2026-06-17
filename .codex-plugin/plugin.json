@@ -32,7 +32,7 @@
     ],
     "defaultPrompt": [
       "Use Wingman to load project context before this change.",
-      "Use /react-ts-refactor to diagnose this React + TypeScript component before editing.",
+      "Use data-contracts to align this API response with the existing UI types before editing.",
       "Use Wingman to decide whether an existing implementation should be reused."
     ],
     "websiteURL": "https://github.com/lsshym/wingman.ai",

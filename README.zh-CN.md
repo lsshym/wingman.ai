@@ -89,14 +89,6 @@ Use `reuse-select` before creating a new upload progress component.
 Use `reuse-catalog` for src/components/UploadProgress.tsx.
 ```
 
-### `react-ts-refactor`
-
-仅当你明确需要 React + TypeScript 重构诊断工作流时使用。
-
-```text
-/react-ts-refactor
-```
-
 ### `using-wingman`
 
 这是 Wingman 面向会加载插件级指令的平台的入口技能。通常不需要直接调用它。
@@ -111,14 +103,13 @@ Use `using-wingman` to load the Wingman skill guide.
 /memory-setup
 /reuse-select
 /reuse-catalog
-/react-ts-refactor
 ```
 
 ## 说明
 
 - 用户指令和项目本地指令仍然优先。
 - Wingman 记忆文件位于当前仓库的 `.wingman/` 目录下。
-- `memory-setup`、`memory-clean` 和 `react-ts-refactor` 只会在你直接要求时运行。
+- `memory-setup` 和 `memory-clean` 只会在你直接要求时运行。
 
 ## 许可证
 
