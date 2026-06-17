@@ -83,7 +83,7 @@ else
 fi
 
 info "Wingman installed for Codex."
-info "Restart Codex, then test: Use /react-ts-refactor to analyze this React + TypeScript component."
+info "Restart Codex, then test: Use data-contracts to align this API response with the existing UI types."
 
 if [[ "${SELF_DELETE}" -eq 1 && -f "${BASH_SOURCE[0]}" ]]; then
   rm -f -- "${BASH_SOURCE[0]}"

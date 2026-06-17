@@ -65,12 +65,12 @@ Use `memory-clean` to compact the current memory context.
 
 These skills are separate from the memory workflow. Use them when they fit the task.
 
-### `align-contracts`
+### `data-contracts`
 
 Use when connecting APIs, schemas, types, events, configs, data models, CLI inputs, or UI props.
 
 ```text
-Use `align-contracts` to bind this API response into the existing React component.
+Use `data-contracts` to bind this API response into the existing React component.
 ```
 
 ### `reuse-select`
@@ -89,14 +89,6 @@ Use after creating or finding one reusable implementation that future agents sho
 Use `reuse-catalog` for src/components/UploadProgress.tsx.
 ```
 
-### `react-ts-refactor`
-
-Use only when you explicitly want the React + TypeScript refactor diagnostic workflow.
-
-```text
-/react-ts-refactor
-```
-
 ### `using-wingman`
 
 This is Wingman's entry skill for platforms that load plugin-level instructions. You usually do not need to call it directly.
@@ -111,14 +103,13 @@ Use `using-wingman` to load the Wingman skill guide.
 /memory-setup
 /reuse-select
 /reuse-catalog
-/react-ts-refactor
 ```
 
 ## Notes
 
 - User instructions and project-local instructions still come first.
 - Wingman memory files live inside the current repository under `.wingman/`.
-- `memory-setup`, `memory-clean`, and `react-ts-refactor` run only when you directly ask for them.
+- `memory-setup` and `memory-clean` run only when you directly ask for them.
 
 ## License
 

@@ -41,17 +41,21 @@ Write `.wingman/memory/brief.md`:
 > ADR status values: `proposed | accepted | deprecated | superseded`.
 
 ## 2. Domain Registry
-| Domain | Read When | Current File | History | Aliases | Related Domains | Status |
-| --- | --- | --- | --- | --- | --- | --- |
+| Domain | Read When | Current File | History Domain Index | History Topics | Aliases | Related Domains | Status |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 
 Registry status values describe whether a domain is still used for routing: `current | deprecated | superseded`.
-`History` is a history index entry, not current truth. `Related Domains` are read only when relevant to the task.
+`Current File` is the authoritative current-truth file or folder index. `History Domain Index` and `History Topics` are lookup indexes for historical context, not current truth. `Related Domains` are read only when relevant to the task.
 
 ## 3. Memory Layout
 - `brief.md`: global rules, ADRs, memory settings, and the Domain Registry.
-- `context.md`: current task, pending work, and recent high-signal logs.
+- `context.md`: hot task context, pending work, and recent high-signal logs. It is not a long-term knowledge base.
 - `domains/`: current durable domain truth, created on demand.
-- `history/`: indexed event history, created on demand and not read by default.
+- `history/events/`: event bodies, created on demand.
+- `history/domains/`: domain projection indexes for feature-time lookup.
+- `history/topics/`: topic projection indexes for feature and problem-cluster lookup.
+- `history/months/`: date projection indexes for date-based lookup.
+- Context logs should preserve the reason for non-trivial short-term changes. Durable rules with binding force belong in `domains/` or `brief.md`; historical explanation belongs in `history/`.
 
 ## 4. Authority Order
 Current rules override old events:
@@ -81,15 +85,23 @@ Write `.wingman/memory/context.md`:
 ## Recent Logs
 ### [Init] Wingman memory enabled
 - **Goal**: Enable repository-scoped Wingman memory so agents can load current project context before work and sync important outcomes afterward.
+- **Reason**: Establish a lightweight default-read memory root; prevents future sessions from relying only on chat history.
 - **Core Files**:
   - `.wingman/memory/brief.md`: [Memory Brief] - Stores global ADRs, memory settings, and the Domain Registry.
   - `.wingman/memory/context.md`: [Memory Context] - Stores short-term progress, pending tasks, and recent work context.
-- **Notes**: `domains/` and `history/` are created only when durable domain truth or history events emerge.
+- **Verification / Notes**: `domains/` and `history/` are created only when durable domain truth or history events emerge.
 ```
 
 ## On-Demand Domain Shape
 
-When durable domain knowledge first appears, create either `.wingman/memory/domains/<domain>.md` for a small domain or `.wingman/memory/domains/<domain>/index.md` plus focused topic files for a large domain.
+When durable domain knowledge first appears, create either `.wingman/memory/domains/<domain>.md` for a small domain or a folder domain for a large domain:
+
+```text
+domains/<domain>/index.md
+domains/<domain>/<topic>.md
+```
+
+Use `.wingman/memory/domains/<domain>/index.md` as the authoritative current-truth index for a folder domain and keep focused topic files beside it.
 
 Use this shape when no stronger local format exists:
 
@@ -124,6 +136,8 @@ When historical event retention is needed, create:
   index.md
   domains/
     <domain>.md
+  topics/
+    <topic>.md
   months/
     YYYY-MM.md
   events/
@@ -132,7 +146,7 @@ When historical event retention is needed, create:
         YYYY-MM-DD-<event-slug>.md
 ```
 
-History stores past events, not current rules. Event bodies live under `events/YYYY/MM/` and are the single source of truth. `domains/` and `months/` under history are projection indexes that link to event bodies. Current implementation constraints belong in `brief.md` or `domains/`.
+History stores past events, not current rules. Event bodies stay under `events/YYYY/MM/` and are the single source of truth for historical events. `domains/`, `topics/`, and `months/` under history are projection indexes containing links and short summaries only. Current implementation constraints belong in `brief.md` or `domains/`.
 
 ## Finish
 

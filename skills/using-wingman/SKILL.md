@@ -66,7 +66,7 @@ When multiple Wingman skills apply:
 
 1. Explicit user-requested skills.
 2. `memory-load` before work that needs project context.
-3. `align-contracts` or `reuse-select` before implementation when their boundary or reuse triggers apply.
+3. `data-contracts` or `reuse-select` before implementation when their boundary or reuse triggers apply.
 4. `memory-sync` or `reuse-catalog` after meaningful work when durable context or reusable implementation knowledge should be recorded.
 
 Explicit workflow skills still require direct user request unless listed by the user.
@@ -102,7 +102,7 @@ Situational skills:
 
 - `memory-load`: use before non-trivial work where durable project context may matter and repository memory is enabled.
 - `memory-sync`: use after meaningful work that should be recorded as durable context and repository memory is enabled.
-- `align-contracts`: use when data, schema, type, API, event, config, or UI boundary meanings may drift.
+- `data-contracts`: use when data, schema, type, API, event, config, or UI boundary meanings may drift.
 - `reuse-select`: use before rebuilding something that may already exist, or when deciding whether to reuse, extend, wrap, or create an implementation.
 - `reuse-catalog`: use after creating or identifying a reusable project implementation that should become part of the selection map.
 
@@ -110,11 +110,10 @@ Explicit workflow skills:
 
 - `memory-setup`: initialize Wingman memory files.
 - `memory-clean`: clean, compact, prune, deduplicate, reduce memory, or resolve stale/conflicting memory rules only when the user explicitly asks.
-- `react-ts-refactor`: run the React + TypeScript component refactor diagnostic workflow.
 
 Run explicit workflow skills only when the user directly asks for them.
 
-Slash-prefixed forms such as `/reuse-catalog`, `/reuse-select`, `/memory-setup`, or `/react-ts-refactor` are conceptual invocation aliases for skills. Specific platforms may namespace or display them differently, such as `/wingman:memory-setup` in Claude Code.
+Slash-prefixed forms such as `/reuse-catalog`, `/reuse-select`, or `/memory-setup` are conceptual invocation aliases for skills. Specific platforms may namespace or display them differently, such as `/wingman:memory-setup` in Claude Code.
 
 ## Wingman Red Flags
 
@@ -122,7 +121,7 @@ These are signs that a Wingman skill may be needed:
 
 | Thought | Check |
 |---------|-------|
-| "This is just a field rename." | If it crosses API, schema, type, UI, event, or config boundaries, use `align-contracts`. |
+| "This is just a field rename." | If it crosses API, schema, type, UI, event, or config boundaries, use `data-contracts`. |
 | "I'll create a new component/helper." | If a reusable implementation may already exist, use `reuse-select` first. |
 | "No need to read memory for this change." | If repository memory is enabled and the work touches business rules, state transitions, permissions, quotas, billing, field mappings, debugging, or refactoring, use `memory-load`. |
 | "The work is done; I can just report back." | If repository memory is enabled and the result creates durable context, decisions, contract knowledge, or reusable implementation knowledge, use `memory-sync` or `reuse-catalog`. |
