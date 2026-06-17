@@ -7,8 +7,9 @@
     {
       "name": "wingman",
       "source": {
-        "source": "local",
-        "path": "./plugins/wingman"
+        "source": "url",
+        "url": "https://github.com/lsshym/wingman.ai.git",
+        "ref": "main"
       },
       "policy": {
         "installation": "AVAILABLE",

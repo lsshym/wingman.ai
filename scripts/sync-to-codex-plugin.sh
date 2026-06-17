@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Legacy helper. Wingman's default Codex distribution now uses a Git-backed
+# marketplace entry that points at this repository root. Keep this only for
+# rollback or for a future separate payload marketplace repository.
+
 FORK="${WINGMAN_CODEX_PLUGINS_FORK:-}"
 REMOTE_URL="${WINGMAN_CODEX_PLUGINS_REMOTE:-}"
 WORKTREE_DIR="${WINGMAN_CODEX_PLUGINS_DIR:-../openai-codex-plugins}"

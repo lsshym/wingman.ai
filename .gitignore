@@ -2,4 +2,4 @@
 .DS_Store
 .eval-runs/
 docs/superpowers
-docs/update-plans
+docs/update-plans/*

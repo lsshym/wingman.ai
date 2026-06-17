@@ -9,11 +9,18 @@ Wingman is a coding-agent plugin with project memory, contract checks, reuse hel
 For Codex:
 
 ```bash
+codex plugin marketplace add lsshym/wingman.ai --ref main
+codex plugin add wingman@wingman-marketplace
+```
+
+Start a new Codex thread after installation.
+
+You can also use the installer wrapper:
+
+```bash
 curl -fsSLO https://raw.githubusercontent.com/lsshym/wingman.ai/main/scripts/install-codex-wingman.sh
 bash install-codex-wingman.sh --self-delete
 ```
-
-Restart Codex after installation.
 
 For Cursor or Claude Code, use the plugin metadata in this repository. Skill names may appear with a platform namespace, such as `/wingman:memory-setup`.
 

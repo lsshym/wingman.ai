@@ -9,11 +9,18 @@ Wingman 是一个面向编码代理的插件，提供项目记忆、契约检查
 Codex 用户：
 
 ```bash
+codex plugin marketplace add lsshym/wingman.ai --ref main
+codex plugin add wingman@wingman-marketplace
+```
+
+安装后请打开一个新的 Codex 线程。
+
+也可以使用安装脚本包装这两步：
+
+```bash
 curl -fsSLO https://raw.githubusercontent.com/lsshym/wingman.ai/main/scripts/install-codex-wingman.sh
 bash install-codex-wingman.sh --self-delete
 ```
-
-安装后请重启 Codex。
 
 Cursor 或 Claude Code 用户可以使用本仓库中的插件元数据。技能名称可能会带有平台命名空间，例如 `/wingman:memory-setup`。
 
