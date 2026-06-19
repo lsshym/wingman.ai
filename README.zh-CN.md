@@ -9,7 +9,7 @@ Wingman 是一个面向编码代理的插件，提供项目记忆、契约检查
 Codex 用户：
 
 ```bash
-codex plugin marketplace add lsshym/wingman.ai --ref main
+codex plugin marketplace add lsshym/wingman.ai
 codex plugin add wingman@wingman-marketplace
 ```
 

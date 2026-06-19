@@ -9,7 +9,7 @@ Wingman is a coding-agent plugin with project memory, contract checks, reuse hel
 For Codex:
 
 ```bash
-codex plugin marketplace add lsshym/wingman.ai --ref main
+codex plugin marketplace add lsshym/wingman.ai
 codex plugin add wingman@wingman-marketplace
 ```
 
