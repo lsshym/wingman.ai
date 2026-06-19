@@ -15,13 +15,6 @@ codex plugin add wingman@wingman-marketplace
 
 安装后请打开一个新的 Codex 线程。
 
-也可以使用安装脚本包装这两步：
-
-```bash
-curl -fsSLO https://raw.githubusercontent.com/lsshym/wingman.ai/main/scripts/install-codex-wingman.sh
-bash install-codex-wingman.sh --self-delete
-```
-
 Cursor 或 Claude Code 用户可以使用本仓库中的插件元数据。技能名称可能会带有平台命名空间，例如 `/wingman:memory-setup`。
 
 ## 记忆技能
