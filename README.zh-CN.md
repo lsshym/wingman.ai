@@ -2,7 +2,7 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-Wingman 是一个面向编码代理的插件，提供项目记忆、契约检查、复用辅助以及聚焦的重构工作流。
+Wingman 是一个面向编码代理的插件，提供项目记忆、契约检查、项目地图发现以及聚焦的工作流指导。
 
 ## 安装
 
@@ -73,20 +73,20 @@ Use `memory-clean` to compact the current memory context.
 Use `data-contracts` to bind this API response into the existing React component.
 ```
 
-### `reuse-select`
+### `project-map-find`
 
-在构建新内容前使用，尤其是可能已经存在可复用组件、工具函数、模块、契约或模式时。
+在构建新内容前使用，或当你需要查找项目里是否已有某个功能、流程、页面、组件、模块、契约、模式或业务概念时使用。
 
 ```text
-Use `reuse-select` before creating a new upload progress component.
+Use `project-map-find` before creating a new upload progress component.
 ```
 
-### `reuse-catalog`
+### `project-map-catalog`
 
-当你创建或发现了一个未来代理应当考虑复用的实现后使用。
+当你创建或发现了一个未来代理应当能定位、理解或作为先例复用的稳定项目能力后使用。
 
 ```text
-Use `reuse-catalog` for src/components/UploadProgress.tsx.
+Use `project-map-catalog` for src/components/UploadProgress.tsx.
 ```
 
 ### `using-wingman`
@@ -101,14 +101,15 @@ Use `using-wingman` to load the Wingman skill guide.
 
 ```text
 /memory-setup
-/reuse-select
-/reuse-catalog
+/project-map-find
+/project-map-catalog
 ```
 
 ## 说明
 
 - 用户指令和项目本地指令仍然优先。
 - Wingman 记忆文件位于当前仓库的 `.wingman/` 目录下。
+- Wingman 项目地图文件位于当前仓库的 `.wingman/project-map/` 目录下。
 - `memory-setup` 和 `memory-clean` 只会在你直接要求时运行。
 
 ## 许可证

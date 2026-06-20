@@ -1,6 +1,6 @@
 {
   "name": "wingman",
   "version": "1.0.0",
-  "description": "Cross-platform AI coding plugin for project memory, contract checks, and reuse workflows.",
+  "description": "Cross-platform AI coding plugin for project memory, contract checks, and project-map discovery.",
   "contextFileName": "GEMINI.md"
 }
