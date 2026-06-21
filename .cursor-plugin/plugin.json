@@ -1,6 +1,6 @@
 {
   "name": "wingman",
-  "description": "Cross-platform AI coding plugin for project memory, contract checks, and reuse workflows.",
+  "description": "Cross-platform AI coding plugin for project memory, contract checks, and project-map discovery.",
   "version": "1.0.0",
   "author": {
     "name": "keni"
@@ -15,7 +15,7 @@
     "skills",
     "workflow",
     "memory",
-    "reuse"
+    "project-map"
   ],
   "skills": "./skills/",
   "hooks": "./hooks/hooks-cursor.json"

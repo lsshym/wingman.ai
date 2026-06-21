@@ -2,18 +2,18 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-Wingman is a coding-agent plugin with project memory, contract checks, reuse helpers, and focused refactor workflows.
+Wingman is a coding-agent plugin with project memory, contract checks, project-map discovery, and focused workflow guidance.
 
 ## Install
 
 For Codex:
 
 ```bash
-curl -fsSLO https://raw.githubusercontent.com/lsshym/wingman.ai/main/scripts/install-codex-wingman.sh
-bash install-codex-wingman.sh --self-delete
+codex plugin marketplace add lsshym/wingman.ai
+codex plugin add wingman@wingman-marketplace
 ```
 
-Restart Codex after installation.
+Start a new Codex thread after installation.
 
 For Cursor or Claude Code, use the plugin metadata in this repository. Skill names may appear with a platform namespace, such as `/wingman:memory-setup`.
 
@@ -73,20 +73,20 @@ Use when connecting APIs, schemas, types, events, configs, data models, CLI inpu
 Use `data-contracts` to bind this API response into the existing React component.
 ```
 
-### `reuse-select`
+### `project-map-find`
 
-Use before building something new when an existing component, utility, module, contract, or pattern may already exist.
+Use before building something new, or when you need to find whether an existing feature, flow, page, component, module, contract, pattern, or business concept already exists.
 
 ```text
-Use `reuse-select` before creating a new upload progress component.
+Use `project-map-find` before creating a new upload progress component.
 ```
 
-### `reuse-catalog`
+### `project-map-catalog`
 
-Use after creating or finding one reusable implementation that future agents should consider.
+Use after creating or finding one durable project capability that future agents should be able to locate, understand, or reuse as a precedent.
 
 ```text
-Use `reuse-catalog` for src/components/UploadProgress.tsx.
+Use `project-map-catalog` for src/components/UploadProgress.tsx.
 ```
 
 ### `using-wingman`
@@ -101,14 +101,15 @@ Use `using-wingman` to load the Wingman skill guide.
 
 ```text
 /memory-setup
-/reuse-select
-/reuse-catalog
+/project-map-find
+/project-map-catalog
 ```
 
 ## Notes
 
 - User instructions and project-local instructions still come first.
 - Wingman memory files live inside the current repository under `.wingman/`.
+- Wingman project-map files live inside the current repository under `.wingman/project-map/`.
 - `memory-setup` and `memory-clean` run only when you directly ask for them.
 
 ## License
