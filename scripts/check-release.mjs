@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
 import { readdir, readFile, stat } from "node:fs/promises";
-import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const pluginName = "wingman";
-const payloadRoot = path.join(repoRoot, "plugins", pluginName);
+const codexMarketplaceName = "wingman-marketplace";
+const codexGitUrl = "https://github.com/lsshym/wingman.ai.git";
+const codexGitRef = "main";
 
 const requiredJsonFiles = [
   "package.json",
@@ -29,15 +30,15 @@ const requiredReleaseFiles = [
 const issues = [];
 const warnings = [];
 const checkedScopes = [
-  "package.json 的最小工具入口：name、version、type、check:release、prepare:codex-local",
+  "package.json 的最小工具入口：name、version、type、check:release",
   "Codex / Cursor / Claude / Gemini 的插件 manifest 基础信息与版本一致性",
-  "Codex 本地安装入口：.agents/plugins/marketplace.json 指向 ./plugins/wingman",
+  "Codex Git marketplace：marketplace entry 指向本仓 Git plugin root",
   "Claude marketplace 是否包含 wingman 插件条目",
   "Gemini extension 是否声明 contextFileName 并指向 GEMINI.md",
   "manifest 中声明的 skills、hooks、icon/logo 路径是否真实存在",
   "skills/*/SKILL.md 的名称、frontmatter、Use when 描述和 H1 结构",
   "发布必备材料：README、GEMINI.md、LICENSE、assets/icon.svg",
-  "Codex 本地安装 payload：plugins/wingman 是否与根目录关键文件同步",
+  "Codex 分发不再提交 plugins/wingman 生成副本",
 ];
 
 main().catch((error) => {
@@ -55,12 +56,12 @@ async function main() {
   await checkRequiredFiles();
   checkPackage(json["package.json"]);
   checkPlatformManifests(json);
-  checkCodexLocalMarketplace(json[".agents/plugins/marketplace.json"]);
+  checkCodexGitMarketplace(json[".agents/plugins/marketplace.json"]);
   checkClaudeMarketplace(json[".claude-plugin/marketplace.json"], json["package.json"]);
   checkGeminiExtension(json["gemini-extension.json"], json["package.json"]);
   await checkSkillFiles("skills");
   await checkManifestPaths(json);
-  await checkCodexPayloadSync();
+  await checkNoGeneratedCodexPayload();
 
   printResults();
 }
@@ -110,8 +111,8 @@ function checkPackage(pkg) {
   if (scripts["check:release"] !== "node scripts/check-release.mjs") {
     fail("package.json", 'scripts.check:release must be "node scripts/check-release.mjs"');
   }
-  if (scripts["prepare:codex-local"] !== "bash scripts/sync-to-codex-plugin.sh --dest .") {
-    fail("package.json", "scripts.prepare:codex-local must sync the local Codex payload");
+  if (Object.hasOwn(scripts, "prepare:codex-local")) {
+    fail("package.json", "scripts.prepare:codex-local must be removed; Codex installs from the Git marketplace entry");
   }
 }
 
@@ -170,9 +171,9 @@ function checkPlatformManifests(json) {
   }
 }
 
-function checkCodexLocalMarketplace(marketplace) {
+function checkCodexGitMarketplace(marketplace) {
   if (!marketplace) return;
-  requireString(".agents/plugins/marketplace.json", marketplace, "name");
+  requireString(".agents/plugins/marketplace.json", marketplace, "name", codexMarketplaceName);
   requireObject(".agents/plugins/marketplace.json", marketplace, "interface");
   if (!Array.isArray(marketplace.plugins) || marketplace.plugins.length === 0) {
     fail(".agents/plugins/marketplace.json", "plugins must be a non-empty array");
@@ -184,11 +185,14 @@ function checkCodexLocalMarketplace(marketplace) {
     fail(".agents/plugins/marketplace.json", `plugins must include ${pluginName}`);
     return;
   }
-  if (entry.source?.source !== "local") {
-    fail(".agents/plugins/marketplace.json", "wingman source.source must be local for local install support");
+  if (entry.source?.source !== "url") {
+    fail(".agents/plugins/marketplace.json", "wingman source.source must be url for Git-backed install support");
   }
-  if (entry.source?.path !== "./plugins/wingman") {
-    fail(".agents/plugins/marketplace.json", "wingman source.path must be ./plugins/wingman");
+  if (entry.source?.url !== codexGitUrl) {
+    fail(".agents/plugins/marketplace.json", `wingman source.url must be ${codexGitUrl}`);
+  }
+  if (entry.source?.ref !== codexGitRef) {
+    fail(".agents/plugins/marketplace.json", `wingman source.ref must be ${codexGitRef}`);
   }
   if (entry.policy?.installation !== "AVAILABLE") {
     fail(".agents/plugins/marketplace.json", "wingman policy.installation must be AVAILABLE");
@@ -282,58 +286,20 @@ async function checkManifestPaths(json) {
       fail(label, `path must be relative and start with ./: ${relPath}`);
       continue;
     }
-    if (!(await exists(path.join(repoRoot, relPath)))) {
+    const resolved = path.resolve(repoRoot, relPath);
+    if (!isInsideRepo(resolved)) {
+      fail(label, `referenced path must not escape the repository root: ${relPath}`);
+      continue;
+    }
+    if (!(await exists(resolved))) {
       fail(label, `referenced path does not exist: ${relPath}`);
     }
   }
 }
 
-async function checkCodexPayloadSync() {
-  if (!(await exists(payloadRoot))) {
-    fail("plugins/wingman", "Codex local install payload is missing");
-    return;
-  }
-
-  const requiredPayloadFiles = [
-    ".codex-plugin/plugin.json",
-    "README.md",
-    "LICENSE",
-    "assets/icon.svg",
-  ];
-
-  for (const rel of requiredPayloadFiles) {
-    await requireSameFile(rel, path.join(payloadRoot, rel));
-  }
-
-  const skillDirs = (await readdir(path.join(repoRoot, "skills"), { withFileTypes: true }))
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort();
-
-  for (const dir of skillDirs) {
-    await requireSameFile(
-      path.join("skills", dir, "SKILL.md"),
-      path.join(payloadRoot, "skills", dir, "SKILL.md"),
-    );
-  }
-}
-
-async function requireSameFile(sourceRel, targetAbs) {
-  const sourceAbs = path.join(repoRoot, sourceRel);
-  if (!(await exists(sourceAbs))) {
-    fail(sourceRel, "source file is missing");
-    return;
-  }
-  if (!(await exists(targetAbs))) {
-    fail(relative(targetAbs), `payload copy is missing for ${sourceRel}`);
-    return;
-  }
-  const [sourceHash, targetHash] = await Promise.all([
-    hashFile(sourceAbs),
-    hashFile(targetAbs),
-  ]);
-  if (sourceHash !== targetHash) {
-    fail(relative(targetAbs), `payload copy is out of sync with ${sourceRel}; run npm run prepare:codex-local`);
+async function checkNoGeneratedCodexPayload() {
+  if (await exists(path.join(repoRoot, "plugins", pluginName))) {
+    fail("plugins/wingman", "generated Codex payload must not be committed; Codex installs from the Git marketplace entry");
   }
 }
 
@@ -394,13 +360,13 @@ async function exists(absPath) {
   }
 }
 
-async function hashFile(absPath) {
-  const content = await readFile(absPath);
-  return createHash("sha256").update(content).digest("hex");
-}
-
 function relative(absPath) {
   return path.relative(repoRoot, absPath) || ".";
+}
+
+function isInsideRepo(absPath) {
+  const relativePath = path.relative(repoRoot, absPath);
+  return relativePath === "" || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath));
 }
 
 function printResults() {

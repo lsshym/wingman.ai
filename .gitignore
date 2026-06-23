@@ -1,5 +1,5 @@
 .worktrees/
 .DS_Store
 .eval-runs/
-docs/*
-!docs/Skill 写作规范.md
+docs/superpowers
+docs/update-plans/*

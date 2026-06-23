@@ -1,7 +1,7 @@
 {
   "name": "wingman",
   "version": "1.0.0",
-  "description": "Cross-platform AI coding plugin for project memory, contract checks, and reuse workflows.",
+  "description": "Cross-platform AI coding plugin for project memory, contract checks, and project-map discovery.",
   "author": {
     "name": "keni"
   },
@@ -16,13 +16,13 @@
     "skills",
     "workflow",
     "memory",
-    "reuse"
+    "project-map"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Wingman",
-    "shortDescription": "Project memory, contract checks, and reuse workflows for AI coding agents",
-    "longDescription": "Wingman gives agents reusable skills for loading project memory, aligning API/type contracts, selecting existing implementations, and running explicit diagnostic workflows.",
+    "shortDescription": "Project memory, contract checks, and project-map discovery for AI coding agents",
+    "longDescription": "Wingman gives agents reusable skills for loading project memory, aligning API/type contracts, finding existing project capabilities, and cataloging durable capability knowledge.",
     "developerName": "keni",
     "category": "Coding",
     "capabilities": [
@@ -33,7 +33,7 @@
     "defaultPrompt": [
       "Use Wingman to load project context before this change.",
       "Use data-contracts to align this API response with the existing UI types before editing.",
-      "Use Wingman to decide whether an existing implementation should be reused."
+      "Use Wingman to find existing project capabilities before rebuilding them."
     ],
     "websiteURL": "https://github.com/lsshym/wingman.ai",
     "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",

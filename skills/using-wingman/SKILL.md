@@ -13,7 +13,7 @@ Wingman covers three recurring agent risks:
 
 - project memory: load relevant context before meaningful work and sync durable outcomes afterward
 - contract alignment: protect API, schema, type, event, config, domain, and UI boundaries when meanings may drift
-- reuse decisions: select, extend, wrap, or catalog existing implementations instead of rebuilding them
+- project maps: find existing capabilities before rebuilding, and catalog durable capability knowledge afterward
 
 Small, isolated tasks can stay small. If no Wingman trigger clearly matches, continue normally.
 
@@ -66,8 +66,8 @@ When multiple Wingman skills apply:
 
 1. Explicit user-requested skills.
 2. `memory-load` before work that needs project context.
-3. `data-contracts` or `reuse-select` before implementation when their boundary or reuse triggers apply.
-4. `memory-sync` or `reuse-catalog` after meaningful work when durable context or reusable implementation knowledge should be recorded.
+3. `data-contracts` or `project-map-find` before implementation when contract or existing-capability triggers apply.
+4. `memory-sync` or `project-map-catalog` after meaningful work when durable context or project capability knowledge should be recorded.
 
 Explicit workflow skills still require direct user request unless listed by the user.
 
@@ -103,8 +103,8 @@ Situational skills:
 - `memory-load`: use before non-trivial work where durable project context may matter and repository memory is enabled.
 - `memory-sync`: use after meaningful work that should be recorded as durable context and repository memory is enabled.
 - `data-contracts`: use when data, schema, type, API, event, config, or UI boundary meanings may drift.
-- `reuse-select`: use before rebuilding something that may already exist, or when deciding whether to reuse, extend, wrap, or create an implementation.
-- `reuse-catalog`: use after creating or identifying a reusable project implementation that should become part of the selection map.
+- `project-map-find`: use before rebuilding something that may already exist, when locating existing features/pages/modules/components/contracts, or when deciding whether to reuse, extend, wrap, reference, avoid, or create a capability.
+- `project-map-catalog`: use after creating or identifying a durable project capability, flow, surface, component, module, utility, pattern, contract, domain, or business concept that future agents should be able to find.
 
 Explicit workflow skills:
 
@@ -113,7 +113,7 @@ Explicit workflow skills:
 
 Run explicit workflow skills only when the user directly asks for them.
 
-Slash-prefixed forms such as `/reuse-catalog`, `/reuse-select`, or `/memory-setup` are conceptual invocation aliases for skills. Specific platforms may namespace or display them differently, such as `/wingman:memory-setup` in Claude Code.
+Slash-prefixed forms such as `/project-map-catalog`, `/project-map-find`, or `/memory-setup` are conceptual invocation aliases for skills. Specific platforms may namespace or display them differently, such as `/wingman:memory-setup` in Claude Code.
 
 ## Wingman Red Flags
 
@@ -122,9 +122,9 @@ These are signs that a Wingman skill may be needed:
 | Thought | Check |
 |---------|-------|
 | "This is just a field rename." | If it crosses API, schema, type, UI, event, or config boundaries, use `data-contracts`. |
-| "I'll create a new component/helper." | If a reusable implementation may already exist, use `reuse-select` first. |
+| "I'll create a new component/helper." | If an existing capability or implementation may already exist, use `project-map-find` first. |
 | "No need to read memory for this change." | If repository memory is enabled and the work touches business rules, state transitions, permissions, quotas, billing, field mappings, debugging, or refactoring, use `memory-load`. |
-| "The work is done; I can just report back." | If repository memory is enabled and the result creates durable context, decisions, contract knowledge, or reusable implementation knowledge, use `memory-sync` or `reuse-catalog`. |
+| "The work is done; I can just report back." | If repository memory is enabled and the result creates durable context, decisions, or contract knowledge, use `memory-sync`; if it creates findable project capability knowledge, use `project-map-catalog`. |
 | "The memory folder is missing, so I'll initialize it." | Do not run `memory-setup` unless the user directly asks for it. |
 | "Memory looks too long; I'll clean it now." | Do not run `memory-clean` unless the user asks; during `memory-load`, only warn or stop by pressure severity. |
 
