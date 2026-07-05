@@ -63,11 +63,17 @@ export function mapApiOrder(api: ApiOrder): Order {
 }
 
 assert.deepEqual(
-  mapApiOrder({ order_id: "ord_123", status: "paid", total_cents: 2599, currency: "USD" }),
+  mapApiOrder({
+    order_id: "ord_123",
+    status: "paid",
+    total_cents: 2599,
+    currency: "USD",
+  }),
   { id: "ord_123", status: "Paid", totalCents: 2599, currency: "USD" },
 );
 assert.throws(
-  () => mapApiOrder({ order_id: "ord_124", status: "pending", total_cents: 1300 }),
+  () =>
+    mapApiOrder({ order_id: "ord_124", status: "pending", total_cents: 1300 }),
   /ApiOrder\.currency is required/,
 );
 ```
