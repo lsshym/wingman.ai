@@ -67,10 +67,10 @@ Use `memory-clean` to compact the current memory context.
 
 ### `data-contracts`
 
-当需要连接 API、schema、类型、事件、配置、数据模型、CLI 输入或 UI props 时使用。
+当真实来源数据需要接入接收方代码，且字段名、结构、可选性、枚举值或业务含义可能不一致时使用。
 
 ```text
-Use `data-contracts` to bind this API response into the existing React component.
+Use `data-contracts` to replace this mock payload with the real source contract without inventing fields.
 ```
 
 ### `project-map-find`

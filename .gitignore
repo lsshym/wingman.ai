@@ -3,3 +3,4 @@
 .eval-runs/
 docs/superpowers
 docs/update-plans/*
+.local
