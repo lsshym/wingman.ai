@@ -69,6 +69,8 @@ Use `memory-clean` to compact the current memory context.
 
 当真实来源数据需要接入接收方代码，且字段名、结构、可选性、枚举值或业务含义可能不一致时使用。
 
+该技能内置一个仅供代理调用的 CLI，用于扫描契约反模式、抽取来源/接收方结构、比较结构差异、校验 checkpoint，并给出聚焦验证建议。它用于确定性取证，不是面向人类的交互界面。
+
 ```text
 Use `data-contracts` to replace this mock payload with the real source contract without inventing fields.
 ```

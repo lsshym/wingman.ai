@@ -1,0 +1,16 @@
+{
+  "openapi": "3.1.0",
+  "components": {
+    "schemas": {
+      "ApiUser": {
+        "type": "object",
+        "required": ["id", "display_name"],
+        "properties": {
+          "id": { "type": "string" },
+          "display_name": { "type": "string" },
+          "status": { "type": "string", "enum": ["active", "disabled"] }
+        }
+      }
+    }
+  }
+}

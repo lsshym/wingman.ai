@@ -69,6 +69,8 @@ These skills are separate from the memory workflow. Use them when they fit the t
 
 Use when connecting real source data to receiving code across APIs, database rows, webhooks, SDK/vendor payloads, config/env/CLI input, generated clients, forms, UI props, or AI structured output.
 
+This skill bundles an agent-only CLI that scans diffs for contract anti-patterns, extracts source/receiver shapes, compares structural gaps, validates checkpoints, and suggests focused verification. It is meant for agents to call as deterministic evidence gathering, not as a human-facing interface.
+
 ```text
 Use `data-contracts` to replace this mock payload with the real source contract without inventing fields.
 ```

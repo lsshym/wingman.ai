@@ -61,6 +61,27 @@ Perform this analysis internally. Do not ask the user at each step. Ask only whe
 8. **Keep the change scoped to the data boundary**: no UI redesign, handler rewrite, config behavior change, domain behavior change, or unrelated refactor unless the contract decision requires it.
 9. **Verify**: Use the project's smallest useful proof: focused test, typecheck, schema parse, sample payload, fixture, integration check, compile step, or render path.
 
+## Scripts
+
+This skill includes an agent-only CLI for deterministic evidence gathering:
+
+```bash
+node skills/data-contracts/scripts/data-contracts.mjs analyze --source <file> --receiver <file> --diff <file|-> --format json
+```
+
+Use it when replacing mock payloads, connecting real API/DB/webhook/SDK/config/form/AI structured output data, changing a parser/mapper/adapter/repository boundary, fixing field/type errors, or before finalizing a non-trivial checkpoint.
+
+Command surface:
+
+- `analyze`: run the full local pass: scan, extract, compare, checkpoint, and verification guidance.
+- `scan`: inspect a diff or files for contract anti-patterns such as unsafe casts, fake defaults, guessed fallbacks, enum/status collapse, source fields without evidence, scattered mapping, and receiver overreach.
+- `extract`: normalize JSON samples, JSON Schema, OpenAPI schemas, TypeScript interfaces/types, or Python class annotations into a shape summary.
+- `compare`: compare source and receiver shapes for missing fields, extra fields, optionality drift, structural mismatch, and enum/status mismatch.
+- `checkpoint`: generate or validate the required Source / Receiver / Owner / Gap / Binding / Verification checkpoint fields.
+- `verify`: turn findings and gaps into focused verification suggestions.
+
+The CLI is read-only, non-interactive, no-network, and JSON-first. Treat `requiresSemanticDecision: true` as a stop sign for guessing. The CLI can show structural evidence and known risk patterns, but it does not decide business meaning, source-of-truth ownership, or whether a receiver contract should change.
+
 ## Example Use Rule
 
 If concrete code shape is needed after the checkpoint, read `references/examples.md`, then at most one matching language example.

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { readdir, readFile, stat } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -37,6 +38,7 @@ const checkedScopes = [
   "Gemini extension 是否声明 contextFileName 并指向 GEMINI.md",
   "manifest 中声明的 skills、hooks、icon/logo 路径是否真实存在",
   "skills/*/SKILL.md 的名称、frontmatter、Use when 描述和 H1 结构",
+  "data-contracts agent CLI 的脚本入口和 node:test 覆盖",
   "发布必备材料：README、GEMINI.md、LICENSE、assets/icon.svg",
   "Codex 分发不再提交 plugins/wingman 生成副本",
 ];
@@ -60,6 +62,7 @@ async function main() {
   checkClaudeMarketplace(json[".claude-plugin/marketplace.json"], json["package.json"]);
   checkGeminiExtension(json["gemini-extension.json"], json["package.json"]);
   await checkSkillFiles("skills");
+  await checkDataContractsCli();
   await checkManifestPaths(json);
   await checkNoGeneratedCodexPayload();
 
@@ -268,6 +271,32 @@ async function checkSkillFiles(rootRel) {
     if (!parsed.body.trimStart().startsWith("# ")) {
       fail(rel, "body must start with an H1 heading");
     }
+  }
+}
+
+async function checkDataContractsCli() {
+  const cliRel = "skills/data-contracts/scripts/data-contracts.mjs";
+  if (!(await exists(path.join(repoRoot, cliRel)))) {
+    fail(cliRel, "data-contracts agent CLI script is required");
+    return;
+  }
+
+  const testRel = "tests/data-contracts-cli.test.mjs";
+  if (!(await exists(path.join(repoRoot, testRel)))) {
+    fail(testRel, "data-contracts CLI node:test coverage is required");
+    return;
+  }
+
+  const result = spawnSync(process.execPath, ["--test", testRel], {
+    cwd: repoRoot,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  if (result.status !== 0) {
+    fail(
+      testRel,
+      `data-contracts CLI tests failed:\n${result.stdout || ""}${result.stderr || ""}`.trim(),
+    );
   }
 }
 

@@ -1,0 +1,21 @@
+diff --git a/src/user/mapper.ts b/src/user/mapper.ts
+index 1111111..2222222 100644
+--- a/src/user/mapper.ts
++++ b/src/user/mapper.ts
+@@ -1,5 +1,17 @@
++type ApiUser = {
++  id: string;
++  name: string;
++  avatarUrl: string;
++};
++
+ export function toUserView(payload: unknown): UserView {
++  const user = payload as unknown as UserView;
+   return {
++    id: user.id,
++    displayName: user.displayName || user.user_name || user.name,
++    avatarUrl: "",
++    status: user.status as InternalStatus,
++    workflowKind: user.status,
+   };
+ }

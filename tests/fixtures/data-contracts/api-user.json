@@ -1,0 +1,7 @@
+{
+  "id": "user_123",
+  "display_name": "Ada Lovelace",
+  "email": null,
+  "status": "active",
+  "roles": ["admin"]
+}

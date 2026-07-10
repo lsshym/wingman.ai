@@ -1,0 +1,7 @@
+{
+  "id": "user_123",
+  "displayName": "Ada Lovelace",
+  "email": "ada@example.com",
+  "avatarUrl": "https://example.com/avatar.png",
+  "status": "enabled"
+}
