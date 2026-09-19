@@ -1,6 +1,7 @@
 .worktrees/
 .DS_Store
 .eval-runs/
-docs/superpowers
 docs/update-plans/*
 .local
+.agents/skills/
+skills-lock.json
