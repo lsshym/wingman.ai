@@ -2,7 +2,7 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-Wingman 是一个面向编码代理的插件，提供项目记忆、契约检查、项目地图发现以及聚焦的工作流指导。
+Wingman 是一个面向编码代理的插件，提供项目记忆、数据约定对齐、项目地图发现以及聚焦的工作流指导。
 
 ## 安装
 
@@ -69,7 +69,9 @@ Use `memory-clean` to compact the current memory context.
 
 当真实来源数据需要接入接收方代码，且字段名、结构、可选性、枚举值或业务含义可能不一致时使用。
 
-该技能内置一个仅供代理调用的 CLI，用于扫描契约反模式、抽取来源/接收方结构、比较结构差异、校验 checkpoint，并给出聚焦验证建议。它用于确定性取证，不是面向人类的交互界面。
+该技能把模型容易混在一起的三件事分开：结构证据、业务决定和实现就绪程度。只供代理调用的只读 CLI 对每个 Source → Receiver 交接点只提供一个正常入口 `check`。第一次运行会返回确定性的结构发现、稳定的待决事项 ID 和具体下一步；后续运行只验证最小的、有依据的语义与 binding 记录。输出分别使用 `structuralStatus`、`decisionStatus` 和 `workflowStatus`，因此“结构兼容”绝不会被误解为“语义已经批准”或“验证已经通过”。
+
+Skill 的人工工作流不需要额外运行时。可选 CLI 需要 Node.js 18 或更高版本，只使用内置模块，无需 `npm install`。CLI 不会运行项目验证；`ready_to_verify` 只要求代理随后执行真实的测试、解析、类型检查、渲染或集成路径。如果没有可用的 Node.js，代理必须手工完成同样的检查，明确说明 CLI 没有运行，并且不得编造任何 CLI 状态。
 
 ```text
 Use `data-contracts` to replace this mock payload with the real source contract without inventing fields.

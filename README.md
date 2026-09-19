@@ -69,7 +69,9 @@ These skills are separate from the memory workflow. Use them when they fit the t
 
 Use when connecting real source data to receiving code across APIs, database rows, webhooks, SDK/vendor payloads, config/env/CLI input, generated clients, forms, UI props, or AI structured output.
 
-This skill bundles an agent-only CLI that scans diffs for contract anti-patterns, extracts source/receiver shapes, compares structural gaps, validates checkpoints, and suggests focused verification. It is meant for agents to call as deterministic evidence gathering, not as a human-facing interface.
+The skill separates three concerns that models often blur: structural evidence, business decisions, and implementation readiness. Its read-only Agent CLI exposes one normal `check` command for a single Source → Receiver boundary. The first run returns deterministic findings, stable required-decision IDs, and concrete next actions; later runs validate a minimal authority-backed semantic/binding record. Results use explicit `structuralStatus`, `decisionStatus`, and `workflowStatus`, so “structurally compatible” never means “semantically approved” or “verified.”
+
+The Skill workflow works without an extra runtime. Its optional CLI requires Node.js 18 or newer, uses built-in modules only, and needs no `npm install`. It never runs project verification; `ready_to_verify` tells the Agent to run the real test, parse, typecheck, render, or integration path. When Node.js is unavailable, the Agent performs the same checks manually, discloses that the CLI did not run, and does not invent a CLI state.
 
 ```text
 Use `data-contracts` to replace this mock payload with the real source contract without inventing fields.

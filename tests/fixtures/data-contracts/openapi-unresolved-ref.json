@@ -1,0 +1,14 @@
+{
+  "openapi": "3.1.0",
+  "components": {
+    "schemas": {
+      "ApiEnvelope": {
+        "type": "object",
+        "required": ["user"],
+        "properties": {
+          "user": { "$ref": "#/components/schemas/MissingUser" }
+        }
+      }
+    }
+  }
+}

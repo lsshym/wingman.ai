@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Cross-platform AI coding plugin for project memory, contract checks, and project-map discovery.",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "check:release": "node scripts/check-release.mjs",
-    "test:data-contracts": "node --test tests/data-contracts-cli.test.mjs"
+    "test:data-contracts": "node --test tests/data-contracts/*.test.mjs"
   }
 }

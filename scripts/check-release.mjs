@@ -31,14 +31,14 @@ const requiredReleaseFiles = [
 const issues = [];
 const warnings = [];
 const checkedScopes = [
-  "package.json 的最小工具入口：name、version、type、check:release",
+  "package.json 的最小工具入口：name、version、type、Node 18+、check:release",
   "Codex / Cursor / Claude / Gemini 的插件 manifest 基础信息与版本一致性",
   "Codex Git marketplace：marketplace entry 指向本仓 Git plugin root",
   "Claude marketplace 是否包含 wingman 插件条目",
   "Gemini extension 是否声明 contextFileName 并指向 GEMINI.md",
   "manifest 中声明的 skills、hooks、icon/logo 路径是否真实存在",
   "skills/*/SKILL.md 的名称、frontmatter、Use when 描述和 H1 结构",
-  "data-contracts agent CLI 的脚本入口和 node:test 覆盖",
+  "data-contracts CLI 以 check 为唯一正常入口，兼容别名有期限，文档状态协议一致，并通过 node:test 行为覆盖",
   "发布必备材料：README、GEMINI.md、LICENSE、assets/icon.svg",
   "Codex 分发不再提交 plugins/wingman 生成副本",
 ];
@@ -109,6 +109,8 @@ function checkPackage(pkg) {
   requireString("package.json", pkg, "name", pluginName);
   requireString("package.json", pkg, "version");
   requireString("package.json", pkg, "type", "module");
+  requireObject("package.json", pkg, "engines");
+  requireString("package.json engines", pkg.engines, "node", ">=18");
 
   const scripts = pkg.scripts ?? {};
   if (scripts["check:release"] !== "node scripts/check-release.mjs") {
@@ -276,18 +278,126 @@ async function checkSkillFiles(rootRel) {
 
 async function checkDataContractsCli() {
   const cliRel = "skills/data-contracts/scripts/data-contracts.mjs";
-  if (!(await exists(path.join(repoRoot, cliRel)))) {
+  const cliPath = path.join(repoRoot, cliRel);
+  if (!(await exists(cliPath))) {
     fail(cliRel, "data-contracts agent CLI script is required");
     return;
   }
 
-  const testRel = "tests/data-contracts-cli.test.mjs";
+  const testRel = "tests/data-contracts";
   if (!(await exists(path.join(repoRoot, testRel)))) {
-    fail(testRel, "data-contracts CLI node:test coverage is required");
+    fail(testRel, "data-contracts CLI behavior tests are required");
     return;
   }
+  if (!(await exists(path.join(repoRoot, testRel, "check-workflow.test.mjs")))) {
+    fail(testRel, "check workflow state and decision-gate tests are required");
+  }
 
-  const result = spawnSync(process.execPath, ["--test", testRel], {
+  const help = spawnSync(process.execPath, [cliPath, "--help"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  if (help.status !== 0) {
+    fail(cliRel, `data-contracts help failed:\n${help.stdout || ""}${help.stderr || ""}`.trim());
+  } else {
+    if (!/Normal workflow:\s*[\s\S]*?\bcheck --request\b/.test(help.stdout)) {
+      fail(cliRel, "root help must document check --request as the normal workflow");
+    }
+    if (!/Commands: check, extract, compare, scan/.test(help.stdout)) {
+      fail(cliRel, "public command list must expose check plus diagnostic commands");
+    }
+    if (/Commands:[^\n]*\banalyze\b/.test(help.stdout)) {
+      fail(cliRel, "deprecated analyze must not appear in the public command list");
+    }
+  }
+
+  const deprecatedHelp = spawnSync(process.execPath, [cliPath, "analyze", "--help"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  if (
+    deprecatedHelp.status !== 0 ||
+    !/deprecated compatibility alias/.test(deprecatedHelp.stdout) ||
+    !/1\.x compatibility cycle/.test(deprecatedHelp.stdout)
+  ) {
+    fail(cliRel, "temporary analyze alias must document deprecation and its 1.x removal window");
+  }
+
+  const compatibilityRequest = {
+    sources: [{
+      id: "source",
+      path: "tests/fixtures/data-contracts/user-schema.json",
+      kind: "json-schema",
+    }],
+    receivers: [{
+      id: "receiver",
+      path: "tests/fixtures/data-contracts/user-schema.json",
+      kind: "json-schema",
+    }],
+  };
+  const deprecatedRun = spawnSync(
+    process.execPath,
+    [cliPath, "analyze", "--request", "-"],
+    {
+      cwd: repoRoot,
+      input: JSON.stringify(compatibilityRequest),
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "pipe"],
+    },
+  );
+  let deprecatedPayload;
+  try {
+    deprecatedPayload = JSON.parse(deprecatedRun.stdout || "");
+  } catch {
+    deprecatedPayload = null;
+  }
+  if (
+    deprecatedRun.status !== 0 ||
+    !deprecatedPayload?.diagnostics?.some((item) =>
+      item.kind === "deprecated_command" && /1\.x compatibility cycle/.test(item.message)
+    )
+  ) {
+    fail(cliRel, "temporary analyze alias must emit a machine-readable deprecation diagnostic");
+  }
+
+  const protocolDocs = [
+    "skills/data-contracts/SKILL.md",
+    "skills/data-contracts/references/cli.md",
+    "docs/specs/data-contracts.md",
+  ];
+  for (const rel of protocolDocs) {
+    const content = await readRequiredText(rel);
+    for (const requiredTerm of [
+      "check",
+      "structuralStatus",
+      "decisionStatus",
+      "workflowStatus",
+      "ready_to_implement",
+      "ready_to_verify",
+      "needs_evidence",
+      "needs_decision",
+    ]) {
+      if (!content.includes(requiredTerm)) {
+        fail(rel, `data-contracts protocol documentation must include ${requiredTerm}`);
+      }
+    }
+  }
+  for (const rel of ["README.md", "README.zh-CN.md"]) {
+    const content = await readRequiredText(rel);
+    if (
+      !content.includes("`check`") ||
+      !content.includes("`structuralStatus`") ||
+      !content.includes("`decisionStatus`") ||
+      !content.includes("`workflowStatus`")
+    ) {
+      fail(rel, "data-contracts overview must describe check and the three state dimensions");
+    }
+  }
+
+  const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
+  const result = spawnSync(npmCommand, ["run", "test:data-contracts"], {
     cwd: repoRoot,
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
@@ -295,7 +405,7 @@ async function checkDataContractsCli() {
   if (result.status !== 0) {
     fail(
       testRel,
-      `data-contracts CLI tests failed:\n${result.stdout || ""}${result.stderr || ""}`.trim(),
+      `data-contracts behavior tests failed:\n${result.stdout || ""}${result.stderr || ""}`.trim(),
     );
   }
 }

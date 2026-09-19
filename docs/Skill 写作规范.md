@@ -219,7 +219,7 @@ description: Use when [触发条件、用户意图、症状词、边界]. Do not
 ```yaml
 ---
 name: data-contracts
-description: Use when aligning provider and consumer contracts across API payloads...
+description: Use when real data crosses into receiving code and fields, nesting, optionality, nullability, enums, or business meaning may differ...
 ---
 ```
 
@@ -278,7 +278,7 @@ description: Use when [用户意图/任务类型] involving [对象/边界/文�
 好的例子：
 
 ```yaml
-description: Use when aligning provider and consumer contracts across API payloads, webhooks, database rows, SDK responses, schemas, DTOs, UI props, or AI structured outputs. Trigger for API integration, field alignment, schema/type mismatch, missing fields, optional fields, 接口对接, 字段对齐, or 类型对不上. Do not use for pure styling or local renames with no data boundary.
+description: Use when real data crosses into receiving code and fields, nesting, optionality, nullability, enums, or business meaning may differ. Trigger for API/DB/webhook/SDK/config/form/AI-output wiring, mock replacement, parser or mapper changes, snake_case/camelCase, 接口对接, 字段对齐, 类型对不上. Do not use for styling, copy, imports, or renames with no data boundary.
 ```
 
 差的例子：
@@ -1134,7 +1134,7 @@ OpenAI Codex、Anthropic Claude、Agent Skills 开放规范在核心结构上高
 
 本项目已有一些值得复用的写法：
 
-- `skills/data-contracts/SKILL.md`：description 包含英文、中文、字段边界、排除项；正文有 Provider/Consumer/Source of truth/Gaps/Binding/Verification 的契约检查点。
+- `skills/data-contracts/SKILL.md`：description 包含英文、中文、数据交接场景和排除项；正文要求分别确认实际输入结构、字段业务含义和接收要求的改动影响，并约束数据只能在一个入口使用或适配，最后执行真正穿过交接点的验证。正常机器接口只有 `check`，用 `structuralStatus`、`decisionStatus` 和 `workflowStatus` 分开表达结构事实、决定完整性与下一阶段；不维护大型 manifest，也不宣称 CLI 已完成项目验证。人工工作流不依赖 Node.js；可选 CLI 要求 Node.js 18+ 且无需安装 package。运行时缺失时必须明确走人工检查，不能自动安装、临时改用 shell parser 或编造 CLI 状态。
 - `skills/memory-sync/SKILL.md`：Gate 写得很明确，先判断是否允许读写记忆，再路由事实到不同目的地。
 - `skills/using-wingman/SKILL.md`：适合参考插件级入口 skill 的组织方式。
 

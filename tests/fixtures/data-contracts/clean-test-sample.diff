@@ -1,0 +1,12 @@
+diff --git a/tests/user-mapper.test.ts b/tests/user-mapper.test.ts
+index 1111111..2222222 100644
+--- a/tests/user-mapper.test.ts
++++ b/tests/user-mapper.test.ts
+@@ -1,2 +1,7 @@
+ test("nullable source sample", () => {
++  const sample = {
++    id: "user_1",
++    email: null,
++    status: "active",
++  };
+ });

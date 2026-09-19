@@ -1,0 +1,11 @@
+diff --git a/src/options.ts b/src/options.ts
+index 1111111..2222222 100644
+--- a/src/options.ts
++++ b/src/options.ts
+@@ -1,3 +1,6 @@
+ export function readOptions(options: Options) {
++  const files = options.file || options.files;
++  const result = { gaps: [], line: null };
++  const example = 'avatarUrl: ""';
+ return options;
+ }

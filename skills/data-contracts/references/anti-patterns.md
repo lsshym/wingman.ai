@@ -46,7 +46,7 @@ Why it fails:
 The source type now claims data exists even though no schema, fixture, generated type, migration, sample, or runtime payload proves it.
 
 Do instead:
-Keep source types faithful to evidence. Make the receiver optional-aware, fetch the field from a real alternate source, fail validation, or ask for the source-of-truth decision.
+Keep input types faithful to reliable structure evidence. Make the receiving code handle absence, fetch the field from a real alternate input, fail validation, or confirm both its business meaning and the impact of changing the receiving requirement.
 
 ## Fake Defaults To Satisfy Types
 
@@ -90,6 +90,8 @@ Alias chains guess at multiple possible contracts and can hide API, SDK, fixture
 Do instead:
 Use the documented source field. Support multiple aliases only for proven version compatibility, and keep that compatibility handling in one boundary location.
 
+An explicit user decision may authorize what to do when data is absent, but it does not prove that an alias exists or is semantically equivalent. Confirm those facts from the Source/version contract.
+
 ## Vendor Shape Leaks Into Domain Model
 
 Bad smell:
@@ -103,6 +105,8 @@ A stable internal model becomes coupled to one external source's nesting, naming
 
 Do instead:
 Keep the domain model stable. Translate vendor payloads at the project-owned parser, repository, adapter, or SDK boundary.
+
+Matching fields and a single current caller do not make a project-owned domain model vendor-owned. Use direct coupling only when the Receiver is intentionally local/temporary/display-only and is not an independent project contract.
 
 ## Mapper Scattered Across Call Sites
 

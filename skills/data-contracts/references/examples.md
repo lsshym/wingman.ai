@@ -1,6 +1,6 @@
 # Boundary Alignment Examples
 
-Read only one example file, matching the project language or files being edited. Skip examples when the core checkpoint is enough.
+Read only one example file, matching the project language or files being edited. Skip examples when the alignment check is enough.
 
 - TypeScript / JavaScript / Node / React: `examples-typescript.md`
 - Python: `examples-python.md`

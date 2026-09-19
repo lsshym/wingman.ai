@@ -1,0 +1,39 @@
+{
+  "openapi": "3.1.0",
+  "components": {
+    "schemas": {
+      "ApiUser": {
+        "type": "object",
+        "required": ["id", "profile"],
+        "properties": {
+          "id": { "type": "string" },
+          "profile": { "$ref": "#/components/schemas/Profile" }
+        }
+      },
+      "Profile": {
+        "allOf": [
+          {
+            "type": "object",
+            "required": ["display_name"],
+            "properties": {
+              "display_name": { "type": "string" }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "email": { "type": ["string", "null"] }
+            }
+          }
+        ]
+      },
+      "ApiEnvelope": {
+        "type": "object",
+        "required": ["user"],
+        "properties": {
+          "user": { "$ref": "#/components/schemas/ApiUser" }
+        }
+      }
+    }
+  }
+}
